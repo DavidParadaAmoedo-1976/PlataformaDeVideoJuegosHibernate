@@ -13,7 +13,7 @@ public class HibernateUtil {
     public static SessionFactory getSessionFactory() {
         if (SESSION_FACTORY == null) {
             SESSION_FACTORY = new Configuration()
-                    .configure("hibernate.cfg.xml")
+                    .configure("casa/hibernate.cfg.xml")
                     .buildSessionFactory();
         }
         return SESSION_FACTORY;

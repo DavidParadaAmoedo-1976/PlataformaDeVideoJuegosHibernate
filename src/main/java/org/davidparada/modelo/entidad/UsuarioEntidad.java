@@ -13,31 +13,39 @@ public class UsuarioEntidad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
     private Long idUsuario;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "nombre_usuario", nullable = false, unique = true, length = 50)
     private String nombreUsuario;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
+    @Column(name = "nombre_real", length = 100)
     private String nombreReal;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "pais", length = 50)
     private PaisEnum pais;
 
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
+    @Column(name = "fecha_registro")
     private Instant fechaRegistro;
 
+    @Column(name = "avatar", length = 255)
     private String avatar;
 
+    @Column(name = "saldo", precision = 10, scale = 2)
     private Double saldo;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "estado_cuenta", length = 20)
     private EstadoCuentaEnum estadoCuenta;
 
     public UsuarioEntidad(Long idUsuario,
