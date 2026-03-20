@@ -1,21 +1,58 @@
 package org.davidparada.modelo.entidad;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import org.davidparada.modelo.enums.ClasificacionJuegoEnum;
 import org.davidparada.modelo.enums.EstadoJuegoEnum;
 
 import java.time.LocalDate;
+import java.util.List;
 
+@Entity
+@Table(name = "juegos")
 public class JuegoEntidad {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_juego")
     private Long idJuego;
+
+    @Column(name = "titulo", nullable = false, unique = true,length = 100)
     private String titulo;
+
+    @Column(name = "descripcion", length = 2000)
     private String descripcion;
+
+    @Size(min = 2, max = 100)
+    @Column(name = "desarrolador", nullable = false, length = 100)
     private String desarrollador;
+
+    @Column(name = "fecha_lanzamiento", nullable = false)
     private LocalDate fechaLanzamiento;
+
+    @Column(name = "precio_base", nullable = false, precision = 10, scale = 2)
+    @DecimalMin(value = "0.0")
+    @Digits(integer = 8, fraction = 2)
     private Double precioBase;
-    private Integer descuento;
+
+    @Min(0)
+    @Max(100)
+    @Column(name = "descuento")
+    private Integer descuento = 0;
+
+    @Column(name = "categoria")
     private String categoria;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "clasificacion_por_edad", nullable = false)
     private ClasificacionJuegoEnum clasificacionPorEdad;
-    private String[] idiomas;
+
+    @ElementCollection
+    @CollectionTable(name = "idiomas")
+    @Column(name = "idiomas", length = 200)
+    private List<String> idiomas;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado")
     private EstadoJuegoEnum estado;
 
     public JuegoEntidad(Long idJuego,
@@ -27,7 +64,7 @@ public class JuegoEntidad {
                         Integer descuento,
                         String categoria,
                         ClasificacionJuegoEnum clasificacionPorEdad,
-                        String[] idiomas,
+                        List<String> idiomas,
                         EstadoJuegoEnum estado) {
 
         this.idJuego = idJuego;
@@ -84,7 +121,7 @@ public class JuegoEntidad {
         return clasificacionPorEdad;
     }
 
-    public String[] getIdiomas() {
+    public List<String> getIdiomas() {
         return idiomas;
     }
 
@@ -129,7 +166,7 @@ public class JuegoEntidad {
         this.clasificacionPorEdad = clasificacionPorEdad;
     }
 
-    public void setIdiomas(String[] idiomas) {
+    public void setIdiomas(List<String> idiomas) {
         this.idiomas = idiomas;
     }
 

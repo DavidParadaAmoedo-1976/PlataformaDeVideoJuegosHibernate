@@ -93,7 +93,7 @@ class CompraControladorTest {
                         -10, // estado inválido forzado
                         "Accion",
                         ClasificacionJuegoEnum.PEGI_18,
-                        new String[]{"ES"},
+                        new ArrayList<>(List.of("ES")),
                         EstadoJuegoEnum.DISPONIBLE
                 )
         );
@@ -123,7 +123,7 @@ class CompraControladorTest {
                         120,
                         "Accion",
                         ClasificacionJuegoEnum.PEGI_18,
-                        new String[]{"ES"},
+                        new ArrayList<>(List.of("ES")),
                         EstadoJuegoEnum.DISPONIBLE
                 )
         );
@@ -307,7 +307,7 @@ class CompraControladorTest {
                         0,
                         "Accion",
                         ClasificacionJuegoEnum.PEGI_18,
-                        new String[]{"ES"},
+                        new ArrayList<>(List.of("ES")),
                         EstadoJuegoEnum.DISPONIBLE
                 )
         );
@@ -663,7 +663,7 @@ class CompraControladorTest {
                         0,
                         "Accion",
                         ClasificacionJuegoEnum.PEGI_18,
-                        new String[]{"ES"},
+                        new ArrayList<>(List.of("ES")),
                         EstadoJuegoEnum.DISPONIBLE
                 )
         );

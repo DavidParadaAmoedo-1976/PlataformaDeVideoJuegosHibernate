@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,7 +76,7 @@ class ResenaControladorTest {
                         0,
                         "RPG",
                         ClasificacionJuegoEnum.PEGI_18,
-                        new String[]{"Español", "Inglés"},
+                        new ArrayList<>(List.of("Español", "Inglés")),
                         EstadoJuegoEnum.DISPONIBLE
                 )
         );

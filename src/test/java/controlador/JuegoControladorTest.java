@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.davidparada.repositorio.implementacionMemoria.JuegoRepoMemoria;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,7 +45,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -68,7 +69,7 @@ class JuegoControladorTest {
                 0,
                 "accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"ES"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -174,7 +175,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -333,7 +334,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -353,7 +354,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -385,7 +386,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -405,7 +406,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -425,7 +426,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -445,7 +446,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -465,7 +466,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -485,7 +486,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -505,7 +506,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -525,7 +526,7 @@ class JuegoControladorTest {
                 -5,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -545,7 +546,7 @@ class JuegoControladorTest {
                 150,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -565,7 +566,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 null,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -585,7 +586,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{},
+                new ArrayList<>(List.of()),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -613,7 +614,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("español")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -631,7 +632,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 
@@ -648,7 +649,7 @@ class JuegoControladorTest {
                 0,
                 "Accion",
                 ClasificacionJuegoEnum.PEGI_18,
-                new String[]{"Espanol"},
+                new ArrayList<>(List.of("Espanol")),
                 EstadoJuegoEnum.DISPONIBLE
         );
     }

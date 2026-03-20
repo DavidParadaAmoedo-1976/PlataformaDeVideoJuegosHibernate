@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,7 +46,7 @@ class JuegoRepoMemoriaTest {
                         0,
                         "Aventura",
                         ClasificacionJuegoEnum.PEGI_12,
-                        new String[]{"ES"},
+                        new ArrayList<>(List.of("ES")),
                         EstadoJuegoEnum.DISPONIBLE
                 )
         );

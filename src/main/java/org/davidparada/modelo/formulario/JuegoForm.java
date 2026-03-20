@@ -4,6 +4,7 @@ import org.davidparada.modelo.enums.ClasificacionJuegoEnum;
 import org.davidparada.modelo.enums.EstadoJuegoEnum;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class JuegoForm {
     private String titulo;
@@ -14,7 +15,7 @@ public class JuegoForm {
     private Integer descuento;
     private String categoria;
     private ClasificacionJuegoEnum clasificacionPorEdad;
-    private String[] idiomas;
+    private List<String> idiomas;
     private EstadoJuegoEnum estado;
 
     public JuegoForm(String titulo,
@@ -25,7 +26,7 @@ public class JuegoForm {
                      Integer descuento,
                      String categoria,
                      ClasificacionJuegoEnum clasificacionPorEdad,
-                     String[] idiomas, EstadoJuegoEnum estado) {
+                     List<String> idiomas, EstadoJuegoEnum estado) {
 
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -75,7 +76,7 @@ public class JuegoForm {
         return clasificacionPorEdad;
     }
 
-    public String[] getIdiomas() {
+    public List<String> getIdiomas() {
         return idiomas;
     }
 

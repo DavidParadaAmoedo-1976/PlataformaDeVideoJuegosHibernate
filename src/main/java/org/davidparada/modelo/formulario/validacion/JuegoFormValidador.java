@@ -20,7 +20,6 @@ public class JuegoFormValidador {
     public static final double VALOR_MAX_PRECIO = 999.99;
     public static final double DESCUENTO_MIN = 0d;
     public static final double DESCUENTO_MAX = 100d;
-    public static final int LONGITUD_MIN_IDIOMA = 0;
     public static final int LONGITUD_MAX_IDIOMA = 200;
     private static IJuegoRepo juegoRepo;
 
@@ -74,9 +73,9 @@ public class JuegoFormValidador {
     }
 
 
-    private static void validarIdioma(String[] idiomas, List<ErrorModel> errores) {
+    private static void validarIdioma(List<String> idiomas, List<ErrorModel> errores) {
         if (idiomas != null) {
-            if (idiomas.length == LONGITUD_MIN_IDIOMA) {
+            if (idiomas.isEmpty()) {
                 errores.add(new ErrorModel("idiomas", TipoErrorEnum.RANGO_INVALIDO));
             }
             for (String idioma : idiomas) {

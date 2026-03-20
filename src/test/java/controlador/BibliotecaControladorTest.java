@@ -16,6 +16,7 @@ import org.junit.jupiter.api.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,7 +66,7 @@ class BibliotecaControladorTest {
                 0,
                 "Aventura",
                 ClasificacionJuegoEnum.PEGI_12,
-                new String[]{"ES", "EN"},
+                new ArrayList<>(List.of("ES", "EN")),
                 EstadoJuegoEnum.DISPONIBLE
         );
 

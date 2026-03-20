@@ -4,6 +4,7 @@ import org.davidparada.modelo.enums.ClasificacionJuegoEnum;
 import org.davidparada.modelo.enums.EstadoJuegoEnum;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record JuegoDto(Long idJuego,
                        String titulo,
@@ -14,6 +15,6 @@ public record JuegoDto(Long idJuego,
                        Integer descuento,
                        String categoria,
                        ClasificacionJuegoEnum clasificacionPorEdad,
-                       String[] idiomas,
+                       List<String> idiomas,
                        EstadoJuegoEnum estado) {
 }
