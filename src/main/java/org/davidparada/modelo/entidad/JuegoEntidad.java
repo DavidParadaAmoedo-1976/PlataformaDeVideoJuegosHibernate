@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "juegos")
+@Table(name = "juego")
 public class JuegoEntidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
