@@ -23,7 +23,7 @@ public class JuegoEntidad {
     private String descripcion;
 
     @Size(min = 2, max = 100)
-    @Column(name = "desarrolador", nullable = false, length = 100)
+    @Column(name = "desarrollador", nullable = false, length = 100)
     private String desarrollador;
 
     @Column(name = "fecha_lanzamiento", nullable = false)
@@ -47,12 +47,11 @@ public class JuegoEntidad {
     private ClasificacionJuegoEnum clasificacionPorEdad;
 
     @ElementCollection
-    @CollectionTable(name = "idiomas")
     @Column(name = "idiomas", length = 200)
     private List<String> idiomas;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado")
+    @Column(name = "estado", nullable = false)
     private EstadoJuegoEnum estado;
 
     // Constructor completo

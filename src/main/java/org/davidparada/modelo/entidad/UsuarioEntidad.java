@@ -25,28 +25,28 @@ public class UsuarioEntidad {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @Column(name = "nombre_real", length = 100)
+    @Column(name = "nombre_real", nullable = false, length = 100)
     private String nombreReal;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "pais", length = 50)
+    @Column(name = "pais", nullable = false, length = 50)
     private PaisEnum pais;
 
-    @Column(name = "fecha_nacimiento")
+    @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
 
     @Column(name = "fecha_registro")
-    private Instant fechaRegistro;
+    private Instant fechaRegistro = Instant.now();
 
     @Column(name = "avatar", length = 255)
     private String avatar;
 
     @Column(name = "saldo", precision = 10, scale = 2)
-    private Double saldo;
+    private Double saldo = 0.0;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_cuenta", length = 20)
-    private EstadoCuentaEnum estadoCuenta;
+    private EstadoCuentaEnum estadoCuenta = EstadoCuentaEnum.ACTIVA;
 
     // Constructor completo
     public UsuarioEntidad(Long idUsuario,

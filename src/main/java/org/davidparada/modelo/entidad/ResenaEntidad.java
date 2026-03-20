@@ -1,10 +1,7 @@
 package org.davidparada.modelo.entidad;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.*;
 import jdk.jfr.Timestamp;
 import org.davidparada.modelo.enums.EstadoPublicacionEnum;
 
@@ -27,8 +24,7 @@ public class ResenaEntidad {
     @Column(name = "recomendado",nullable = false)
     private boolean recomendado;
 
-    @Min(50)
-    @Max(8000)
+    @Size(min = 50, max = 8000)
     @Column(name = "texto_resena",nullable = false)
     private String textoResena;
 
@@ -43,6 +39,7 @@ public class ResenaEntidad {
     @Column(name = "fecha_ultima_edicion")
     private Instant fechaUltimaEdicion;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado_publicacion")
     private EstadoPublicacionEnum estadoPublicacion = EstadoPublicacionEnum.PUBLICADA;
 
