@@ -23,7 +23,7 @@ public class BibliotecaEntidad {
     @Column(name = "fecha_adquisicion",nullable = false)
     private Instant fechaAdquisicion;
 
-    @Column(name = "horas_de_juego")
+    @Column(name = "horas_de_juego",precision = 9, scale = 1)
     @DecimalMin(value = "0.0")
     @Digits(integer = 8, fraction = 1)
     private Double horasDeJuego = 0.0;
@@ -34,6 +34,7 @@ public class BibliotecaEntidad {
     @Column(name = "estado_instalacion")
     private boolean estadoInstalacion = false;
 
+    // Constructor completo
     public BibliotecaEntidad(Long idBiblioteca,
                              Long idUsuario,
                              Long idJuego,

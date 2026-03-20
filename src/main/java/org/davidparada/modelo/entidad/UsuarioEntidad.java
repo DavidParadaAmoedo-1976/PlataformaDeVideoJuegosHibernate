@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuario")
 public class UsuarioEntidad {
 
     @Id
@@ -48,6 +48,7 @@ public class UsuarioEntidad {
     @Column(name = "estado_cuenta", length = 20)
     private EstadoCuentaEnum estadoCuenta;
 
+    // Constructor completo
     public UsuarioEntidad(Long idUsuario,
                           String nombreUsuario,
                           String email,

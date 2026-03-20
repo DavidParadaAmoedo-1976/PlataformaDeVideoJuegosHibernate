@@ -55,6 +55,7 @@ public class JuegoEntidad {
     @Column(name = "estado")
     private EstadoJuegoEnum estado;
 
+    // Constructor completo
     public JuegoEntidad(Long idJuego,
                         String titulo,
                         String descripcion,
