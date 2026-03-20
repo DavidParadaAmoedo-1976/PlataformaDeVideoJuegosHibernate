@@ -1,21 +1,52 @@
 package org.davidparada.modelo.entidad;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jdk.jfr.Timestamp;
 import org.davidparada.modelo.enums.EstadoPublicacionEnum;
 
 import java.time.Instant;
 
+@Entity
+@Table(name = "resena")
 public class ResenaEntidad {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_resena")
+    private Long idResena;
 
-    private final Long idResena;
-    private final Long idUsuario;
-    private final Long idJuego;
-    private final boolean recomendado;
-    private final String textoResena;
-    private final Double cantidadHorasJugadas;
-    private final Instant fechaPublicacion;
-    private final Instant fechaUltimaEdicion;
-    private final EstadoPublicacionEnum estadoPublicacion;
+    @Column(name = "id_usuario",nullable = false)
+    private Long idUsuario;
 
+    @Column(name = "id_juego",nullable = false)
+    private Long idJuego;
+
+    @Column(name = "recomendado",nullable = false)
+    private boolean recomendado;
+
+    @Min(50)
+    @Max(8000)
+    @Column(name = "texto_resena",nullable = false)
+    private String textoResena;
+
+    @Column(name = "cantidad_horas_jugadas",precision = 9,scale = 1)
+    @DecimalMin(value = "0.0")
+    @Digits(integer = 8, fraction = 1)
+    private Double cantidadHorasJugadas;
+
+    @Column(name = "fecha_publicacion")
+    private Instant fechaPublicacion;
+
+    @Column(name = "fecha_ultima_edicion")
+    private Instant fechaUltimaEdicion;
+
+    @Column(name = "estado_publicacion")
+    private EstadoPublicacionEnum estadoPublicacion = EstadoPublicacionEnum.PUBLICADA;
+
+    // Constructor completo
     public ResenaEntidad(Long idResena,
                          Long idUsuario,
                          Long idJuego,
@@ -36,6 +67,11 @@ public class ResenaEntidad {
         this.estadoPublicacion = estadoPublicacion;
     }
 
+    // Constructor vacio
+    public ResenaEntidad() {
+    }
+
+    // Getters
     public Long getIdResena() {
         return idResena;
     }
@@ -70,5 +106,43 @@ public class ResenaEntidad {
 
     public EstadoPublicacionEnum getEstadoPublicacion() {
         return estadoPublicacion;
+    }
+
+    // Setters
+
+    public void setIdResena(Long idResena) {
+        this.idResena = idResena;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public void setIdJuego(Long idJuego) {
+        this.idJuego = idJuego;
+    }
+
+    public void setRecomendado(boolean recomendado) {
+        this.recomendado = recomendado;
+    }
+
+    public void setTextoResena(String textoResena) {
+        this.textoResena = textoResena;
+    }
+
+    public void setCantidadHorasJugadas(Double cantidadHorasJugadas) {
+        this.cantidadHorasJugadas = cantidadHorasJugadas;
+    }
+
+    public void setFechaPublicacion(Instant fechaPublicacion) {
+        this.fechaPublicacion = fechaPublicacion;
+    }
+
+    public void setFechaUltimaEdicion(Instant fechaUltimaEdicion) {
+        this.fechaUltimaEdicion = fechaUltimaEdicion;
+    }
+
+    public void setEstadoPublicacion(EstadoPublicacionEnum estadoPublicacion) {
+        this.estadoPublicacion = estadoPublicacion;
     }
 }
