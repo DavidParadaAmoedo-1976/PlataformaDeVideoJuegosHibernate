@@ -16,7 +16,7 @@ public class JuegoEntidad {
     @Column(name = "id_juego")
     private Long idJuego;
 
-    @Column(name = "titulo", nullable = false, unique = true,length = 100)
+    @Column(name = "titulo", nullable = false, unique = true, length = 100)
     private String titulo;
 
     @Column(name = "descripcion", length = 2000)

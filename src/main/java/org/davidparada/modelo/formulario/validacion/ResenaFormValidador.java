@@ -53,7 +53,7 @@ public class ResenaFormValidador {
     }
 
     public static void validarMaxUnDecimal(String campo, Double valor, List<ErrorModel> errores) {
-        if (valor == null){
+        if (valor == null) {
             return;
         }
 

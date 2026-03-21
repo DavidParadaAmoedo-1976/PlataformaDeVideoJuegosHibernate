@@ -14,119 +14,191 @@ import java.util.Optional;
 public class UsuarioRepoHibernate implements IUsuarioRepo {
 
     @Override
-    public UsuarioEntidad crear(UsuarioForm form) {
+    public UsuarioEntidad crear(UsuarioForm formulario){
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            UsuarioEntidad usuario = UsuarioFormularioAEntidadMapper.crearUsuarioEntidad(null, formulario);
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+            session.persist(usuario);
 
-        UsuarioEntidad usuario =
-                UsuarioFormularioAEntidadMapper.crearUsuarioEntidad(null, form);
+            tx.commit();
+            return usuario;
 
-        session.persist(usuario);
-
-        tx.commit();
-        session.close();
-
-        return usuario;
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al crear usuario en base de datos", e);
+        }
     }
 
     @Override
-    public Optional<UsuarioEntidad> buscarPorId(Long id) {
+    public Optional<UsuarioEntidad> buscarPorId(Long idUsuario) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
+            UsuarioEntidad usuario = session.get(UsuarioEntidad.class, idUsuario);
 
-        UsuarioEntidad usuario = session.get(UsuarioEntidad.class, id);
+            tx.commit();
+            return Optional.ofNullable(usuario);
 
-        session.close();
-
-        return Optional.ofNullable(usuario);
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al buscar usuario por Id", e);
+        }
     }
 
     @Override
     public List<UsuarioEntidad> listarTodos() {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
+            String query = "FROM UsuarioEntidad";
+            List<UsuarioEntidad> listaUsuarios = session.
+                    createQuery(query, UsuarioEntidad.class)
+                    .getResultList();
 
-        List<UsuarioEntidad> lista =
-                session.createQuery("FROM UsuarioEntidad", UsuarioEntidad.class).list();
+            tx.commit();
+            return listaUsuarios;
 
-        session.close();
-
-        return lista;
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al listar los usuarios en base de datos", e);
+        }
     }
 
     @Override
     public Optional<UsuarioEntidad> actualizar(Long id, UsuarioForm form) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+            UsuarioEntidad usuarioEntidad = session.get(UsuarioEntidad.class, id);
 
-        UsuarioEntidad existente = session.get(UsuarioEntidad.class, id);
+            if (usuarioEntidad == null) {
+                tx.commit();
+                return Optional.empty();
+            }
+            usuarioEntidad.setNombreUsuario(form.getNombreUsuario());
+            usuarioEntidad.setEmail(form.getEmail());
+            usuarioEntidad.setPassword(form.getPassword());
+            usuarioEntidad.setNombreReal(form.getNombreReal());
+            usuarioEntidad.setPais(form.getPais());
+            usuarioEntidad.setFechaNacimiento(form.getFechaNacimiento());
+            usuarioEntidad.setFechaRegistro(form.getFechaRegistro());
+            usuarioEntidad.setAvatar(form.getAvatar());
+            usuarioEntidad.setSaldo(form.getSaldo());
+            usuarioEntidad.setEstadoCuenta(form.getEstadoCuenta());
 
-        if (existente == null) {
-            session.close();
-            return Optional.empty();
+            tx.commit();
+
+            return Optional.of(usuarioEntidad);
+
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al actualizar usuario en base de datos", e);
         }
-
-        UsuarioEntidad actualizado =
-                UsuarioFormularioAEntidadMapper.actualizarUsuarioEntidad(id, form);
-
-        session.merge(actualizado);
-
-        tx.commit();
-        session.close();
-
-        return Optional.of(actualizado);
     }
 
     @Override
     public boolean eliminar(Long id) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+            UsuarioEntidad usuarioEntidad = session.get(UsuarioEntidad.class, id);
 
-        UsuarioEntidad usuario = session.get(UsuarioEntidad.class, id);
+            if (usuarioEntidad == null) {
+                session.close();
+                return false;
+            }
 
-        if (usuario == null) {
-            session.close();
-            return false;
+            session.remove(usuarioEntidad);
+
+            tx.commit();
+
+            return true;
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al eliminar usuario en base de datos", e);
         }
-
-        session.remove(usuario);
-
-        tx.commit();
-        session.close();
-
-        return true;
     }
 
     @Override
     public Optional<UsuarioEntidad> buscarPorEmail(String email) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
+            String query = "FROM UsuarioEntidad WHERE email = :email";
+            UsuarioEntidad usuario = session.createQuery(query, UsuarioEntidad.class)
+                    .setParameter("email", email)
+                    .uniqueResult();
 
-        UsuarioEntidad usuario = session.createQuery(
-                        "FROM UsuarioEntidad WHERE email = :email", UsuarioEntidad.class)
-                .setParameter("email", email)
-                .uniqueResult();
+            session.close();
 
-        session.close();
-
-        return Optional.ofNullable(usuario);
+            return Optional.ofNullable(usuario);
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al buscar usuario en base de datos", e);
+        }
     }
 
     @Override
     public Optional<UsuarioEntidad> buscarPorNombreUsuario(String nombreUsuario) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
+            String query = "FROM UsuarioEntidad WHERE nombreUsuario = :nombreUsuario";
+            UsuarioEntidad usuario = session.createQuery(query, UsuarioEntidad.class)
+                    .setParameter("nombre", nombreUsuario)
+                    .uniqueResult();
 
-        UsuarioEntidad usuario = session.createQuery(
-                        "FROM UsuarioEntidad WHERE nombreUsuario = :nombre", UsuarioEntidad.class)
-                .setParameter("nombre", nombreUsuario)
-                .uniqueResult();
+            session.close();
 
-        session.close();
+            return Optional.ofNullable(usuario);
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al buscar usuario en base de datos", e);
+        }
+    }
 
-        return Optional.ofNullable(usuario);
+    @Override
+    public void actualizarSaldo(Long idUsuario, Double nuevoSaldo) {
+        Transaction tx = null;
+
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+
+            String query = "FROM UsuarioEntidad WHERE idUsuario = :idUsuario";
+            session.createQuery(query, UsuarioEntidad.class)
+                    .setParameter("saldo", nuevoSaldo)
+                    .setParameter("id", idUsuario)
+                    .executeUpdate();
+
+            tx.commit();
+
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al actualizar el saldo en base de datos", e);
+        }
     }
 }

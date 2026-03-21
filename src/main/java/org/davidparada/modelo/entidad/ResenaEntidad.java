@@ -15,20 +15,20 @@ public class ResenaEntidad {
     @Column(name = "id_resena")
     private Long idResena;
 
-    @Column(name = "id_usuario",nullable = false)
+    @Column(name = "id_usuario", nullable = false)
     private Long idUsuario;
 
-    @Column(name = "id_juego",nullable = false)
+    @Column(name = "id_juego", nullable = false)
     private Long idJuego;
 
-    @Column(name = "recomendado",nullable = false)
+    @Column(name = "recomendado", nullable = false)
     private boolean recomendado;
 
     @Size(min = 50, max = 8000)
-    @Column(name = "texto_resena",nullable = false)
+    @Column(name = "texto_resena", nullable = false)
     private String textoResena;
 
-    @Column(name = "cantidad_horas_jugadas",precision = 9,scale = 1)
+    @Column(name = "cantidad_horas_jugadas", precision = 9, scale = 1)
     @DecimalMin(value = "0.0")
     @Digits(integer = 8, fraction = 1)
     private Double cantidadHorasJugadas;

@@ -79,36 +79,34 @@ public class UsuarioControlador implements IUsuarioControlador {
         if (idUsuario == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
+
         if (cantidad == null) {
             errores.add(new ErrorModel("saldo", TipoErrorEnum.OBLIGATORIO));
         } else {
-            if (cantidad <= CERO)
+            if (cantidad <= CERO) {
                 errores.add(new ErrorModel("saldo", TipoErrorEnum.VALOR_NEGATIVO));
+            }
 
-            if (cantidad < SALDO_MIN_A_ANADIR || cantidad > SALDO_MAX_A_ANADIR)
+            if (cantidad < SALDO_MIN_A_ANADIR || cantidad > SALDO_MAX_A_ANADIR) {
                 errores.add(new ErrorModel("saldo", TipoErrorEnum.RANGO_INVALIDO));
+            }
         }
+
         comprobarListaErrores(errores);
-        java.util.Objects.requireNonNull(cantidad);
 
         UsuarioEntidad usuario = obtenerUsuario(idUsuario, errores);
 
         if (usuario.getEstadoCuenta() != EstadoCuentaEnum.ACTIVA) {
             errores.add(new ErrorModel("estadoCuenta", TipoErrorEnum.ESTADO_INCORRECTO));
         }
+
         comprobarListaErrores(errores);
 
-        usuarioRepo.actualizar(usuario.getIdUsuario(), new UsuarioForm(
-                usuario.getNombreUsuario(),
-                usuario.getEmail(),
-                usuario.getPassword(),
-                usuario.getNombreReal(),
-                usuario.getPais(),
-                usuario.getFechaNacimiento(),
-                usuario.getFechaRegistro(),
-                usuario.getAvatar(),
-                usuario.getSaldo() + cantidad,
-                usuario.getEstadoCuenta()));
+        // ✅ SOLO calcular el nuevo saldo
+        Double nuevoSaldo = usuario.getSaldo() + cantidad;
+
+        // ✅ delegar al repo
+        usuarioRepo.actualizarSaldo(idUsuario, nuevoSaldo);
     }
 
     @Override

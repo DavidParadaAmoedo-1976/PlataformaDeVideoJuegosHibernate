@@ -23,5 +23,6 @@ public interface IUsuarioRepo extends ICrud<UsuarioEntidad, UsuarioForm, Long> {
      */
     Optional<UsuarioEntidad> buscarPorNombreUsuario(String nombreUsuario);
 
+    void actualizarSaldo(Long idUsuario, Double nuevoSaldo);
 }
 

@@ -18,10 +18,10 @@ public class CompraEntidad {
     @Column(name = "id_compra")
     private Long idCompra;
 
-    @Column(name = "id_usuario",nullable = false)
+    @Column(name = "id_usuario", nullable = false)
     private Long idUsuario;
 
-    @Column(name = "id_juego",nullable = false)
+    @Column(name = "id_juego", nullable = false)
     private Long idJuego;
 
     @Column(name = "fecha_compra")
