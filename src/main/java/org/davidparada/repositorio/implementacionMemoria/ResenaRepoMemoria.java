@@ -26,9 +26,9 @@ public class ResenaRepoMemoria implements IResenaRepo {
     }
 
     @Override
-    public Optional<ResenaEntidad> buscarPorId(Long idEntidad) {
+    public Optional<ResenaEntidad> buscarPorId(Long idResena) {
         return reseniasEntidad.stream()
-                .filter(r -> r.getIdResena().equals(idEntidad))
+                .filter(r -> r.getIdResena().equals(idResena))
                 .findFirst();
     }
 
@@ -38,20 +38,20 @@ public class ResenaRepoMemoria implements IResenaRepo {
     }
 
     @Override
-    public Optional<ResenaEntidad> actualizar(Long idEntidad, ResenaForm form) {
-        ResenaEntidad resenaEntidad = buscarPorId(idEntidad).orElse(null);
+    public Optional<ResenaEntidad> actualizar(Long idResena, ResenaForm form) {
+        ResenaEntidad resenaEntidad = buscarPorId(idResena).orElse(null);
         if (resenaEntidad == null) {
             return Optional.empty();
         }
-        ResenaEntidad nuevaResenia = ResenaFormularioAEntidadMapper.actualizarReseniaEntidad(idEntidad, form);
+        ResenaEntidad nuevaResenia = ResenaFormularioAEntidadMapper.actualizarReseniaEntidad(idResena, form);
         reseniasEntidad.remove(resenaEntidad);
         reseniasEntidad.add(nuevaResenia);
         return Optional.of(nuevaResenia);
     }
 
     @Override
-    public boolean eliminar(Long idEntidad) {
-        Optional<ResenaEntidad> resenaEntidad = buscarPorId(idEntidad);
+    public boolean eliminar(Long idResena) {
+        Optional<ResenaEntidad> resenaEntidad = buscarPorId(idResena);
         return resenaEntidad.map(reseniasEntidad::remove).orElse(false);
     }
 

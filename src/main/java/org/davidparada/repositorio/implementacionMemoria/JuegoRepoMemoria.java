@@ -66,9 +66,9 @@ public class JuegoRepoMemoria implements IJuegoRepo {
     }
 
     @Override
-    public Optional<JuegoEntidad> buscarPorId(Long id) {
+    public Optional<JuegoEntidad> buscarPorId(Long idJuego) {
         return juegosEntidad.stream()
-                .filter(j -> j.getIdJuego().equals(id))
+                .filter(j -> j.getIdJuego().equals(idJuego))
                 .findFirst();
     }
 
@@ -78,13 +78,13 @@ public class JuegoRepoMemoria implements IJuegoRepo {
     }
 
     @Override
-    public Optional<JuegoEntidad> actualizar(Long id, JuegoForm form) {
-        JuegoEntidad juegoEntidad = buscarPorId(id).orElse(null);
+    public Optional<JuegoEntidad> actualizar(Long idJuego, JuegoForm form) {
+        JuegoEntidad juegoEntidad = buscarPorId(idJuego).orElse(null);
         if (juegoEntidad == null) {
             return Optional.empty();
         }
 
-        JuegoEntidad nuevoJuego = JuegoFormularioAEntidadMapper.actualizarJuegoEntidad(id, form);
+        JuegoEntidad nuevoJuego = JuegoFormularioAEntidadMapper.actualizarJuegoEntidad(idJuego, form);
         juegosEntidad.remove(juegoEntidad);
         juegosEntidad.add(nuevoJuego);
 
@@ -92,8 +92,8 @@ public class JuegoRepoMemoria implements IJuegoRepo {
     }
 
     @Override
-    public boolean eliminar(Long id) {
-        Optional<JuegoEntidad> juegoEntidad = buscarPorId(id);
+    public boolean eliminar(Long idJuego) {
+        Optional<JuegoEntidad> juegoEntidad = buscarPorId(idJuego);
         if (juegoEntidad.isEmpty()) {
             return false;
         }

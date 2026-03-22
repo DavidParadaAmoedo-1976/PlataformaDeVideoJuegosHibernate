@@ -26,9 +26,9 @@ public class BibliotecaRepoMemoria implements IBibliotecaRepo {
     }
 
     @Override
-    public Optional<BibliotecaEntidad> buscarPorId(Long idEntidad) {
+    public Optional<BibliotecaEntidad> buscarPorId(Long idBiblioteca) {
         return bibliotecasEntidad.stream()
-                .filter(b -> b.getIdBiblioteca().equals(idEntidad))
+                .filter(b -> b.getIdBiblioteca().equals(idBiblioteca))
                 .findFirst();
     }
 
@@ -38,16 +38,16 @@ public class BibliotecaRepoMemoria implements IBibliotecaRepo {
     }
 
     @Override
-    public Optional<BibliotecaEntidad> actualizar(Long idEntidad, BibliotecaForm form) {
+    public Optional<BibliotecaEntidad> actualizar(Long idBiblioteca, BibliotecaForm form) {
 
-        BibliotecaEntidad bibliotecaEntidad = buscarPorId(idEntidad).orElse(null);
+        BibliotecaEntidad bibliotecaEntidad = buscarPorId(idBiblioteca).orElse(null);
 
         if (bibliotecaEntidad == null) {
             return Optional.empty();
         }
 
         BibliotecaEntidad nuevaBiblioteca =
-                BibliotecaFormularioAEntidadMapper.actualizarBibliotecaEntidad(idEntidad, form);
+                BibliotecaFormularioAEntidadMapper.actualizarBibliotecaEntidad(idBiblioteca, form);
 
         bibliotecasEntidad.remove(bibliotecaEntidad);
         bibliotecasEntidad.add(nuevaBiblioteca);
@@ -56,8 +56,8 @@ public class BibliotecaRepoMemoria implements IBibliotecaRepo {
     }
 
     @Override
-    public boolean eliminar(Long idEntidad) {
-        Optional<BibliotecaEntidad> bibliotecaEntidad = buscarPorId(idEntidad);
+    public boolean eliminar(Long idBiblioteca) {
+        Optional<BibliotecaEntidad> bibliotecaEntidad = buscarPorId(idBiblioteca);
         if (bibliotecaEntidad.isEmpty()) {
             return false;
         }

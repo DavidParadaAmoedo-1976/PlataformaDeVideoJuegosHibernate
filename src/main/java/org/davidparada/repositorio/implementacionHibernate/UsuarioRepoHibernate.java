@@ -75,12 +75,12 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
     }
 
     @Override
-    public Optional<UsuarioEntidad> actualizar(Long id, UsuarioForm form) {
+    public Optional<UsuarioEntidad> actualizar(Long idUsuario, UsuarioForm form) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            UsuarioEntidad usuarioEntidad = session.get(UsuarioEntidad.class, id);
+            UsuarioEntidad usuarioEntidad = session.get(UsuarioEntidad.class, idUsuario);
 
             if (usuarioEntidad == null) {
                 tx.commit();
@@ -110,12 +110,12 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
     }
 
     @Override
-    public boolean eliminar(Long id) {
+    public boolean eliminar(Long idUsuario) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            UsuarioEntidad usuarioEntidad = session.get(UsuarioEntidad.class, id);
+            UsuarioEntidad usuarioEntidad = session.get(UsuarioEntidad.class, idUsuario);
 
             if (usuarioEntidad == null) {
                 session.close();

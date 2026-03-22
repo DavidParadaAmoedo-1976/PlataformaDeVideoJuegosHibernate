@@ -27,9 +27,9 @@ public class UsuarioRepoMemoria implements IUsuarioRepo {
     }
 
     @Override
-    public Optional<UsuarioEntidad> buscarPorId(Long idEntidad) {
+    public Optional<UsuarioEntidad> buscarPorId(Long idUsuario) {
         return usuariosEntidad.stream()
-                .filter(u -> u.getIdUsuario().equals(idEntidad))
+                .filter(u -> u.getIdUsuario().equals(idUsuario))
                 .findFirst();
     }
 
@@ -39,13 +39,13 @@ public class UsuarioRepoMemoria implements IUsuarioRepo {
     }
 
     @Override
-    public Optional<UsuarioEntidad> actualizar(Long idEntidad, UsuarioForm form) {
-        UsuarioEntidad usuario = buscarPorId(idEntidad).orElse(null);
+    public Optional<UsuarioEntidad> actualizar(Long idUsuario, UsuarioForm form) {
+        UsuarioEntidad usuario = buscarPorId(idUsuario).orElse(null);
         if (usuario == null) {
             return Optional.empty();
         }
 
-        UsuarioEntidad nuevoUsuario = UsuarioFormularioAEntidadMapper.actualizarUsuarioEntidad(idEntidad, form);
+        UsuarioEntidad nuevoUsuario = UsuarioFormularioAEntidadMapper.actualizarUsuarioEntidad(idUsuario, form);
         usuariosEntidad.remove(usuario);
         usuariosEntidad.add(nuevoUsuario);
 
@@ -53,8 +53,8 @@ public class UsuarioRepoMemoria implements IUsuarioRepo {
     }
 
     @Override
-    public boolean eliminar(Long idEntidad) {
-        Optional<UsuarioEntidad> usuarioEntidad = buscarPorId(idEntidad);
+    public boolean eliminar(Long idUsuario) {
+        Optional<UsuarioEntidad> usuarioEntidad = buscarPorId(idUsuario);
         if (usuarioEntidad.isEmpty()) {
             return false;
         }

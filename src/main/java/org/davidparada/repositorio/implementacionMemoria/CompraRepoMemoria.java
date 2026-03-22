@@ -26,9 +26,9 @@ public class CompraRepoMemoria implements ICompraRepo {
     }
 
     @Override
-    public Optional<CompraEntidad> buscarPorId(Long idEntidad) {
+    public Optional<CompraEntidad> buscarPorId(Long idCompra) {
         return comprasEntidad.stream()
-                .filter(c -> c.getIdCompra().equals(idEntidad))
+                .filter(c -> c.getIdCompra().equals(idCompra))
                 .findFirst();
     }
 
@@ -51,8 +51,8 @@ public class CompraRepoMemoria implements ICompraRepo {
     }
 
     @Override
-    public boolean eliminar(Long idEntidad) {
-        Optional<CompraEntidad> compraEntidad = buscarPorId(idEntidad);
+    public boolean eliminar(Long idCompra) {
+        Optional<CompraEntidad> compraEntidad = buscarPorId(idCompra);
         if (compraEntidad.isEmpty()) {
             return false;
         }
