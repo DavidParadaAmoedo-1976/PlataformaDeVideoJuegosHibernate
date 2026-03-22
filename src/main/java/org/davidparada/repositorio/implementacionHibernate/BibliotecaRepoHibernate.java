@@ -82,12 +82,12 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
     }
 
     @Override
-    public Optional<BibliotecaEntidad> buscarPorId(Long id) {
+    public Optional<BibliotecaEntidad> buscarPorId(Long idBiblioteca) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            Optional<BibliotecaEntidad> bibliotecaEntidad = Optional.ofNullable(session.get(BibliotecaEntidad.class, id));
+            Optional<BibliotecaEntidad> bibliotecaEntidad = Optional.ofNullable(session.get(BibliotecaEntidad.class, idBiblioteca));
 
             tx.commit();
             return bibliotecaEntidad;
@@ -123,12 +123,12 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
     }
 
     @Override
-    public Optional<BibliotecaEntidad> actualizar(Long id, BibliotecaForm formulario) {
+    public Optional<BibliotecaEntidad> actualizar(Long idBiblioteca, BibliotecaForm formulario) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-        BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, id);
+        BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, idBiblioteca);
         if(bibliotecaEntidad == null){
             tx.commit();
             return Optional.empty();
@@ -147,12 +147,12 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
     }
 
     @Override
-    public boolean eliminar(Long id) {
+    public boolean eliminar(Long idBiblioteca) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, id);
+            BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, idBiblioteca);
             if(bibliotecaEntidad == null){
                 tx.commit();
                 return false;

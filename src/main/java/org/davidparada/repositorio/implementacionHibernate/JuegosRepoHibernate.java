@@ -77,12 +77,12 @@ public class JuegosRepoHibernate implements IJuegoRepo {
     }
 
     @Override
-    public Optional<JuegoEntidad> buscarPorId(Long id) {
+    public Optional<JuegoEntidad> buscarPorId(Long idJuego) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            Optional<JuegoEntidad> juegoEntidad = Optional.ofNullable(session.get(JuegoEntidad.class, id));
+            Optional<JuegoEntidad> juegoEntidad = Optional.ofNullable(session.get(JuegoEntidad.class, idJuego));
 
             tx.commit();
             return juegoEntidad;
@@ -142,12 +142,12 @@ public class JuegosRepoHibernate implements IJuegoRepo {
     }
 
     @Override
-    public boolean eliminar(Long id) {
+    public boolean eliminar(Long idJuego) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            JuegoEntidad juegoEntidad = session.get(JuegoEntidad.class, id);
+            JuegoEntidad juegoEntidad = session.get(JuegoEntidad.class, idJuego);
             if (juegoEntidad == null) {
                 tx.commit();
                 return false;

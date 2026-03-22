@@ -12,12 +12,12 @@ public class BibliotecaFormularioAEntidadMapper {
     private BibliotecaFormularioAEntidadMapper() {
     }
 
-    public static BibliotecaEntidad crearBibliotecaEntidad(Long id, BibliotecaForm form) {
+    public static BibliotecaEntidad crearBibliotecaEntidad(Long id, BibliotecaForm formulario) {
 
         return new BibliotecaEntidad(
                 id,
-                form.getIdUsuario(),
-                form.getIdJuego(),
+                formulario.getIdUsuario(),
+                formulario.getIdJuego(),
                 Instant.now(),     // FechaAdquisicion automática
                 HORAS_DE_JUEGO_POR_DEFECTO,                 // HorasDeJuego inicial
                 null,                // "ultimaFechaDeJuego" -> aún no ha jugado
@@ -25,15 +25,20 @@ public class BibliotecaFormularioAEntidadMapper {
         );
     }
 
-    public static BibliotecaEntidad actualizarBibliotecaEntidad(Long id, BibliotecaForm form) {
+    public static BibliotecaEntidad crearBibliotecaEntidad(BibliotecaForm formulario) {
+        return crearBibliotecaEntidad(null, formulario);
+    }
+
+
+        public static BibliotecaEntidad actualizarBibliotecaEntidad(Long id, BibliotecaForm formulario) {
         return new BibliotecaEntidad(
                 id,
-                form.getIdUsuario(),
-                form.getIdJuego(),
-                form.getFechaAdquisicion(),
-                form.getHorasDeJuego(),
-                form.getUltimaFechaDeJuego(),
-                form.isEstadoInstalacion()
+                formulario.getIdUsuario(),
+                formulario.getIdJuego(),
+                formulario.getFechaAdquisicion(),
+                formulario.getHorasDeJuego(),
+                formulario.getUltimaFechaDeJuego(),
+                formulario.isEstadoInstalacion()
         );
     }
 
