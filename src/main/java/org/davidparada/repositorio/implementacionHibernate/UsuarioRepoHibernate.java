@@ -14,7 +14,7 @@ import java.util.Optional;
 public class UsuarioRepoHibernate implements IUsuarioRepo {
 
     @Override
-    public UsuarioEntidad crear(UsuarioForm formulario){
+    public UsuarioEntidad crear(UsuarioForm formulario) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();

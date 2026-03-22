@@ -11,37 +11,54 @@ public class JuegoFormularioAEntidadMapper {
     private JuegoFormularioAEntidadMapper() {
     }
 
-    public static JuegoEntidad crearJuegoEntidad(Long id, JuegoForm form) {
+    public static JuegoEntidad crearJuegoEntidad(Long id, JuegoForm formulario) {
         return new JuegoEntidad(
                 id,
-                form.getTitulo(),
-                form.getDescripcion(),
-                form.getDesarrollador(),
-                form.getFechaLanzamiento(),
-                form.getPrecioBase(),
+                formulario.getTitulo(),
+                formulario.getDescripcion(),
+                formulario.getDesarrollador(),
+                formulario.getFechaLanzamiento(),
+                formulario.getPrecioBase(),
                 DESCUENTO_POR_DEFECTO,
-                form.getCategoria(),
-                form.getClasificacionPorEdad(),
-                form.getIdiomas(),
+                formulario.getCategoria(),
+                formulario.getClasificacionPorEdad(),
+                formulario.getIdiomas(),
                 EstadoJuegoEnum.DISPONIBLE
         );
     }
 
-    public static JuegoEntidad actualizarJuegoEntidad(Long id, JuegoForm form) {
+    public static JuegoEntidad crearJuegoEntidad(JuegoForm formulario) {
+        return crearJuegoEntidad( null, formulario);
+    }
+
+    public static JuegoEntidad actualizarJuegoEntidad(Long id, JuegoForm formulario) {
 
         return new JuegoEntidad(
                 id,
-                form.getTitulo(),
-                form.getDescripcion(),
-                form.getDesarrollador(),
-                form.getFechaLanzamiento(),
-                form.getPrecioBase(),
-                form.getDescuento(),
-                form.getCategoria(),
-                form.getClasificacionPorEdad(),
-                form.getIdiomas(),
-                form.getEstado()
+                formulario.getTitulo(),
+                formulario.getDescripcion(),
+                formulario.getDesarrollador(),
+                formulario.getFechaLanzamiento(),
+                formulario.getPrecioBase(),
+                formulario.getDescuento(),
+                formulario.getCategoria(),
+                formulario.getClasificacionPorEdad(),
+                formulario.getIdiomas(),
+                formulario.getEstado()
         );
+    }
+
+    public static void actualizar(JuegoEntidad juego, JuegoForm formulario) {
+        juego.setTitulo(formulario.getTitulo());
+        juego.setDescripcion(formulario.getDescripcion());
+        juego.setDesarrollador(formulario.getDesarrollador());
+        juego.setFechaLanzamiento(formulario.getFechaLanzamiento());
+        juego.setPrecioBase(formulario.getPrecioBase());
+        juego.setDescuento(formulario.getDescuento());
+        juego.setCategoria(formulario.getCategoria());
+        juego.setClasificacionPorEdad(formulario.getClasificacionPorEdad());
+        juego.setIdiomas(formulario.getIdiomas());
+        juego.setEstado(formulario.getEstado());
     }
 }
 

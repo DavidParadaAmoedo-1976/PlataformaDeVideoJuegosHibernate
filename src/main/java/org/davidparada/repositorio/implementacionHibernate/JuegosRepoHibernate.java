@@ -16,95 +16,153 @@ import java.util.Optional;
 public class JuegosRepoHibernate implements IJuegoRepo {
     @Override
     public boolean existeTitulo(String titulo) {
+        Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Long contador = session.createQuery
-                            ("SELECT COUNT(j) FROM JuegoEntidad j WHERE LOWER(j.titulo) = LOWER(:titulo)",
-                                    Long.class
-                            )
+            tx = session.beginTransaction();
+
+            String query = "SELECT COUNT(j) FROM JuegoEntidad j WHERE LOWER(j.titulo) = LOWER(:titulo)";
+            Long contador = session.createQuery(query, Long.class)
                     .setParameter("titulo", titulo)
                     .uniqueResult();
 
+            tx.commit();
             return contador != null && contador > 0;
+
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al buscar el titulo en base de datos", e);
         }
     }
 
     @Override
     public List<JuegoEntidad> buscarConFiltros(String titulo, String categoria, Double precioMin, Double precioMax, ClasificacionJuegoEnum clasificacion, EstadoJuegoEnum estado) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        return List.of();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+
+            //-------------------------------------------
+            //-------------------------------------------
+
+            tx.commit();
+            return List.of();
+
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al buscar juegos en base de datos", e);
+        }
     }
 
     @Override
     public JuegoEntidad crear(JuegoForm formulario) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        JuegoEntidad juego = JuegoFormularioAEntidadMapper.crearJuegoEntidad(null, formulario);
+            JuegoEntidad juego = JuegoFormularioAEntidadMapper.crearJuegoEntidad(formulario);
+            session.persist(juego);
 
-        session.persist(juego);
-        tx.commit();
-        session.close();
+            tx.commit();
+            return juego;
 
-        return juego;
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al crear juego en base de datos", e);
+        }
     }
 
     @Override
     public Optional<JuegoEntidad> buscarPorId(Long id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        JuegoEntidad juego = session.get(JuegoEntidad.class, id);
+            JuegoEntidad juego = session.get(JuegoEntidad.class, id);
 
-        session.close();
+            tx.commit();
+            return Optional.ofNullable(juego);
 
-        return Optional.ofNullable(juego);
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al buscar juego en base de datos", e);
+        }
     }
 
     @Override
     public List<JuegoEntidad> listarTodos() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        List<JuegoEntidad> listaJuegos = session.createQuery("FROM JuegoEntidad", JuegoEntidad.class).list();
+            String query = "FROM JuegoEntidad";
+            List<JuegoEntidad> listaJuegos = session
+                    .createQuery(query, JuegoEntidad.class)
+                    .list();
 
-        session.close();
+            tx.commit();
+            return listaJuegos;
 
-        return listaJuegos;
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al listar los juegos de base de datos", e);
+        }
     }
 
     @Override
-    public Optional<JuegoEntidad> actualizar(Long id, JuegoForm formulario) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+    public Optional<JuegoEntidad> actualizar(Long idJuego, JuegoForm formulario) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        JuegoEntidad juegoEntidad = session.get(JuegoEntidad.class, id);
-        if (juegoEntidad != null) {
-            session.close();
-            return Optional.empty();
+            JuegoEntidad juegoEntidad = session.get(JuegoEntidad.class, idJuego);
+            if (juegoEntidad == null) {
+                tx.commit();
+                return Optional.empty();
+            }
+            JuegoFormularioAEntidadMapper.actualizar(juegoEntidad, formulario);
+
+            tx.commit();
+            return Optional.of(juegoEntidad);
+
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al actualizar el juego en base de datos", e);
         }
-        JuegoEntidad juegoAcualizado = JuegoFormularioAEntidadMapper.actualizarJuegoEntidad(id, formulario);
-        session.merge(juegoAcualizado);
-
-        tx.commit();
-        session.close();
-
-        return Optional.of(juegoAcualizado);
     }
 
     @Override
     public boolean eliminar(Long id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
 
-        JuegoEntidad juegoEntidad = session.get(JuegoEntidad.class, id);
+            JuegoEntidad juegoEntidad = session.get(JuegoEntidad.class, id);
 
-        if (juegoEntidad == null) {
-            session.close();
-            return false;
+            if (juegoEntidad == null) {
+                tx.commit();
+                return false;
+            }
+            session.remove(juegoEntidad);
+
+            tx.commit();
+            return true;
+
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw new RuntimeException("Error al eliminar juego en la base de datos", e);
         }
-        session.remove(juegoEntidad);
-
-        tx.commit();
-        session.close();
-
-        return true;
     }
 }
