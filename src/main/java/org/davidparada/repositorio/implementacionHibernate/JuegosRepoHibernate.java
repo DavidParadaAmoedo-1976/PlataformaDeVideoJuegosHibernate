@@ -62,11 +62,11 @@ public class JuegosRepoHibernate implements IJuegoRepo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            JuegoEntidad juego = JuegoFormularioAEntidadMapper.crearJuegoEntidad(formulario);
-            session.persist(juego);
+            JuegoEntidad juegoEntidad = JuegoFormularioAEntidadMapper.crearJuegoEntidad(formulario);
+            session.persist(juegoEntidad);
 
             tx.commit();
-            return juego;
+            return juegoEntidad;
 
         } catch (Exception e) {
             if (tx != null) {
@@ -82,10 +82,10 @@ public class JuegosRepoHibernate implements IJuegoRepo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            JuegoEntidad juego = session.get(JuegoEntidad.class, id);
+            Optional<JuegoEntidad> juegoEntidad = Optional.ofNullable(session.get(JuegoEntidad.class, id));
 
             tx.commit();
-            return Optional.ofNullable(juego);
+            return juegoEntidad;
 
         } catch (Exception e) {
             if (tx != null) {
@@ -104,7 +104,7 @@ public class JuegosRepoHibernate implements IJuegoRepo {
             String query = "FROM JuegoEntidad";
             List<JuegoEntidad> listaJuegos = session
                     .createQuery(query, JuegoEntidad.class)
-                    .list();
+                    .getResultList();
 
             tx.commit();
             return listaJuegos;
@@ -148,7 +148,6 @@ public class JuegosRepoHibernate implements IJuegoRepo {
             tx = session.beginTransaction();
 
             JuegoEntidad juegoEntidad = session.get(JuegoEntidad.class, id);
-
             if (juegoEntidad == null) {
                 tx.commit();
                 return false;
