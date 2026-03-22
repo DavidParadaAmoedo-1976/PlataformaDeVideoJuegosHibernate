@@ -151,10 +151,10 @@ class BibliotecaControladorTest {
         controlador.anadirJuego(idUsuario, idJuego);
 
         // añadir tiempo primera vez
-        controlador.anadirTiempoDeJuego(idUsuario, idJuego, 5.0);
+        controlador.actualizarTiempoDeJuego(idUsuario, idJuego, 5.0);
 
         // añadir tiempo segunda vez
-        controlador.anadirTiempoDeJuego(idUsuario, idJuego, 3.0);
+        controlador.actualizarTiempoDeJuego(idUsuario, idJuego, 3.0);
 
         var entidad = bibliotecaRepoMemoria.buscarPorUsuarioYJuego(idUsuario, idJuego);
 
@@ -169,7 +169,7 @@ class BibliotecaControladorTest {
 
         assertThrows(
                 ValidationException.class,
-                () -> controlador.anadirTiempoDeJuego(idUsuario, idJuego, -5.0)
+                () -> controlador.actualizarTiempoDeJuego(idUsuario, idJuego, -5.0)
         );
     }
 
@@ -190,7 +190,7 @@ class BibliotecaControladorTest {
                 entidad.get().isEstadoInstalacion()
         );
 
-        controlador.anadirTiempoDeJuego(idUsuario, idJuego, 5.0);
+        controlador.actualizarTiempoDeJuego(idUsuario, idJuego, 5.0);
 
         var actualizada =
                 bibliotecaRepoMemoria.buscarPorUsuarioYJuego(idUsuario, idJuego);
@@ -201,7 +201,7 @@ class BibliotecaControladorTest {
     @Test
     void anadirTiempo_horasNull() {
         assertThrows(ValidationException.class,
-                () -> controlador.anadirTiempoDeJuego(idUsuario, idJuego, 0));
+                () -> controlador.actualizarTiempoDeJuego(idUsuario, idJuego, 0));
     }
 
     // ======================================================
@@ -211,9 +211,11 @@ class BibliotecaControladorTest {
     @Test
     void consultarUltimaSesion_nuncaJugado() throws Exception {
         controlador.anadirJuego(idUsuario, idJuego);
-        String mensaje =
+
+        BibliotecaDto dto =
                 controlador.consultarUltimaSesion(idUsuario, idJuego);
-        assertEquals("Nunca Jugado", mensaje);
+
+        assertNull(dto.ultimaFechaDeJuego());
     }
 
     @Test
@@ -224,21 +226,24 @@ class BibliotecaControladorTest {
         var entidad =
                 bibliotecaRepoMemoria.buscarPorUsuarioYJuego(idUsuario, idJuego);
 
+        Instant fechaUltimaSesion = Instant.now().minusSeconds(3600);
+
         BibliotecaForm form = new BibliotecaForm(
                 idUsuario,
                 idJuego,
                 entidad.get().getFechaAdquisicion(),
                 entidad.get().getHorasDeJuego(),
-                Instant.now().minusSeconds(3600),
+                fechaUltimaSesion,
                 entidad.get().isEstadoInstalacion()
         );
 
         bibliotecaRepoMemoria.actualizar(entidad.get().getIdBiblioteca(), form);
 
-        String mensaje =
+        BibliotecaDto dto =
                 controlador.consultarUltimaSesion(idUsuario, idJuego);
 
-        assertTrue(mensaje.contains("Hace"));
+        assertNotNull(dto);
+        assertEquals(fechaUltimaSesion, dto.ultimaFechaDeJuego());
     }
 
     // ======================================================

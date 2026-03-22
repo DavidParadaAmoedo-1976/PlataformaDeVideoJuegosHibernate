@@ -193,13 +193,14 @@ class ResenaControladorTest {
 
         ResenaEntidad resena = crearResenaBase();
 
-        boolean eliminado =
+        ResenaDto dto =
                 controlador.eliminarResena(
                         resena.getIdResena(),
                         resena.getIdUsuario()
                 );
 
-        assertTrue(eliminado);
+        assertNotNull(dto);
+        assertEquals(resena.getIdResena(), dto.idResena());
     }
 
     @Test

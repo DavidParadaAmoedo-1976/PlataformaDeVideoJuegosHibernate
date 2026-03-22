@@ -291,10 +291,10 @@ class UsuarioControladorTest {
         usuarioControlador.anadirSaldo(usuario.idUsuario(), 20.0);
         usuarioControlador.anadirSaldo(usuario.idUsuario(), 30.0);
 
-        Double saldo =
+        UsuarioDto usuarioActualizado =
                 usuarioControlador.consultarSaldo(usuario.idUsuario());
 
-        assertEquals(50.0, saldo);
+        assertEquals(50.0, usuarioActualizado.saldo());
     }
 
     @Test
@@ -326,10 +326,10 @@ class UsuarioControladorTest {
 
         usuarioControlador.anadirSaldo(usuario.idUsuario(), 50.0);
 
-        Double saldo =
+        UsuarioDto usuarioActualizado =
                 usuarioControlador.consultarSaldo(usuario.idUsuario());
 
-        assertEquals(50.0, saldo);
+        assertEquals(50.0, usuarioActualizado.saldo());
     }
 
     @Test
@@ -373,10 +373,10 @@ class UsuarioControladorTest {
 
         usuarioControlador.anadirSaldo(usuario.idUsuario(), 25.0);
 
-        Double saldo =
+        UsuarioDto usuarioActualizado =
                 usuarioControlador.consultarSaldo(usuario.idUsuario());
 
-        assertEquals(25.0, saldo);
+        assertEquals(25.0, usuarioActualizado.saldo());
     }
 
     @Test
@@ -401,9 +401,10 @@ class UsuarioControladorTest {
 
         UsuarioDto usuario = crearUsuarioBase();
 
-        Double saldo = usuarioControlador.consultarSaldo(usuario.idUsuario());
+        UsuarioDto usuarioActualizado =
+                usuarioControlador.consultarSaldo(usuario.idUsuario());
 
-        assertEquals(0.0, saldo);
+        assertEquals(0.0, usuarioActualizado.saldo());
     }
 
 

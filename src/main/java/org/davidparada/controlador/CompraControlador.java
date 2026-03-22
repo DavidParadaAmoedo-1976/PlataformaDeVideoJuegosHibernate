@@ -59,11 +59,7 @@ public class CompraControlador implements ICompraControlador {
 
     // Realizar compra
     @Override
-    public CompraDto realizarCompra(
-            Long idUsuario,
-            Long idJuego,
-            MetodoPagoEnum metodoPago
-    ) throws ValidationException {
+    public CompraDto realizarCompra(Long idUsuario, Long idJuego, MetodoPagoEnum metodoPago) throws ValidationException {
 
         List<ErrorModel> errores = new ArrayList<>();
 
@@ -145,7 +141,7 @@ public class CompraControlador implements ICompraControlador {
 
     // Procesar pago
     @Override
-    public void procesarPago(Long idCompra, MetodoPagoEnum metodoPago) throws ValidationException {
+    public CompraDto procesarPago(Long idCompra, MetodoPagoEnum metodoPago) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
         if (idCompra == null) {
@@ -165,6 +161,12 @@ public class CompraControlador implements ICompraControlador {
         }
         comprobarListaErrores(errores);
 
+        UsuarioEntidad usuarioEntidad = obtenerUsuario(compraEntidad.getIdUsuario(), errores);
+        if (usuarioEntidad.getEstadoCuenta().equals(EstadoCuentaEnum.SUSPENDIDA)) {
+            errores.add(new ErrorModel("usuario", TipoErrorEnum.ESTADO_INCORRECTO));
+        }
+        comprobarListaErrores(errores);
+
         // Selecciono metodo de pago
         if (metodoPago != null) {
             switch (metodoPago) {
@@ -176,6 +178,7 @@ public class CompraControlador implements ICompraControlador {
                 default -> throw new IllegalArgumentException("Método de pago no válido");
             }
         }
+        return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad, usuarioEntidad, juegoEntidad);
     }
 
     private void salir(Long idCompra) throws ValidationException {
@@ -378,7 +381,7 @@ public class CompraControlador implements ICompraControlador {
 
     // Solicitar reembolso
     @Override
-    public void solicitarReembolso(Long idCompra) throws ValidationException {
+    public CompraDto solicitarReembolso(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
         if (idCompra == null) {
@@ -434,8 +437,12 @@ public class CompraControlador implements ICompraControlador {
         );
         compraRepo.actualizar(idCompra, nuevaCompra);
 
+        JuegoEntidad juegoEntidad = obtenerJuego(compraEntidad.getIdJuego(), errores);
+
         // Quitar juego de la biblioteca
         bibliotecaControlador.eliminarJuego(compraEntidad.getIdUsuario(), compraEntidad.getIdJuego());
+
+        return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad,usuarioEntidad,juegoEntidad);
     }
 
     // Generar factura
