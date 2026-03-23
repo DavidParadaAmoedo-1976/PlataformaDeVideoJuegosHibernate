@@ -32,7 +32,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             if (tx != null) {
                 tx.rollback();
             }
-            throw new RuntimeException("Error al buscar biblioteca en base de datos", e);
+            throw new RuntimeException("Error al buscar bibliotecas en base de datos", e);
         }
     }
 
