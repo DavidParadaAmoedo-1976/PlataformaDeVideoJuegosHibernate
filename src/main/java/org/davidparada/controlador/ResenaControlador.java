@@ -109,7 +109,7 @@ public class ResenaControlador implements IResenaControlador {
 
         resenaRepo.eliminar(resenaEntidad.getIdResena());
 
-        return ResenaEntidadADtoMapper.resenaEntidadADto(resenaEntidad,usuarioEntidad, juegoEntidad);
+        return ResenaEntidadADtoMapper.resenaEntidadADto(resenaEntidad, usuarioEntidad, juegoEntidad);
     }
 
     @Override

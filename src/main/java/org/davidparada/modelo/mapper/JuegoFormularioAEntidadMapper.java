@@ -28,7 +28,7 @@ public class JuegoFormularioAEntidadMapper {
     }
 
     public static JuegoEntidad crearJuegoEntidad(JuegoForm formulario) {
-        return crearJuegoEntidad( null, formulario);
+        return crearJuegoEntidad(null, formulario);
     }
 
     public static JuegoEntidad actualizarJuegoEntidad(Long id, JuegoForm formulario) {

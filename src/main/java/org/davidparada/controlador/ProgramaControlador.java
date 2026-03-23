@@ -2,8 +2,13 @@ package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IProgramaControlador;
 import org.davidparada.excepcion.ValidationException;
-import org.davidparada.modelo.dto.*;
-import org.davidparada.modelo.entidad.*;
+import org.davidparada.modelo.dto.JuegosPopularesDto;
+import org.davidparada.modelo.dto.ReporteUsuariosDto;
+import org.davidparada.modelo.dto.ReporteVentasDto;
+import org.davidparada.modelo.entidad.BibliotecaEntidad;
+import org.davidparada.modelo.entidad.CompraEntidad;
+import org.davidparada.modelo.entidad.JuegoEntidad;
+import org.davidparada.modelo.entidad.ResenaEntidad;
 import org.davidparada.modelo.enums.CriterioPopularidadEnum;
 import org.davidparada.modelo.enums.TipoErrorEnum;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
@@ -14,7 +19,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
-import static org.davidparada.controlador.util.ObtenerEntidadesOptional.*;
+import static org.davidparada.controlador.util.ObtenerEntidadesOptional.obtenerJuego;
 
 public class ProgramaControlador implements IProgramaControlador {
 

@@ -43,7 +43,7 @@ public class ResenaRepoHibernate implements IResenaRepo {
 
             String query = "FROM ResenaEntidad WHERE Juego = :idJuego";
             List<ResenaEntidad> resenasEntidad = session
-                    .createQuery(query,ResenaEntidad.class)
+                    .createQuery(query, ResenaEntidad.class)
                     .setParameter("idJuego", idJuego)
                     .getResultList();
 

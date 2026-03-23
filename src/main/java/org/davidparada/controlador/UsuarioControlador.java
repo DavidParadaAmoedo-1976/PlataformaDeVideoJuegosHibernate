@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
-import static org.davidparada.controlador.util.ObtenerEntidadesOptional.*;
+import static org.davidparada.controlador.util.ObtenerEntidadesOptional.obtenerUsuario;
 
 public class UsuarioControlador implements IUsuarioControlador {
 

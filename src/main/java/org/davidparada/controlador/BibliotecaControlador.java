@@ -187,7 +187,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         );
 
         bibliotecaRepo.actualizar(bibliotecaEntidad.getIdBiblioteca(), actualizarTiempoDeJuego);
-        return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad,  usuarioEntidad, juegoEntidad);
+        return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
     }
 
     // Consultar última sesión

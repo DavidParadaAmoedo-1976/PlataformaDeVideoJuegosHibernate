@@ -1,7 +1,6 @@
 package org.davidparada.repositorio.implementacionHibernate;
 
 import org.davidparada.modelo.entidad.BibliotecaEntidad;
-import org.davidparada.modelo.entidad.UsuarioEntidad;
 import org.davidparada.modelo.formulario.BibliotecaForm;
 import org.davidparada.modelo.mapper.BibliotecaFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
@@ -20,7 +19,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             tx = session.beginTransaction();
 
             String query = "FROM BibliotecaEntidad WHERE idUsuario = :idUsuario";
-            List<BibliotecaEntidad>  bibliotecasEntidad = session
+            List<BibliotecaEntidad> bibliotecasEntidad = session
                     .createQuery(query, BibliotecaEntidad.class)
                     .setParameter("idUsuario", idUsuario)
                     .getResultList();
@@ -128,15 +127,15 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-        BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, idBiblioteca);
-        if(bibliotecaEntidad == null){
-            tx.commit();
-            return Optional.empty();
-        }
-        BibliotecaFormularioAEntidadMapper.actualizar(bibliotecaEntidad, formulario);
+            BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, idBiblioteca);
+            if (bibliotecaEntidad == null) {
+                tx.commit();
+                return Optional.empty();
+            }
+            BibliotecaFormularioAEntidadMapper.actualizar(bibliotecaEntidad, formulario);
 
-        tx.commit();
-        return Optional.of(bibliotecaEntidad);
+            tx.commit();
+            return Optional.of(bibliotecaEntidad);
 
         } catch (Exception e) {
             if (tx != null) {
@@ -153,7 +152,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             tx = session.beginTransaction();
 
             BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, idBiblioteca);
-            if(bibliotecaEntidad == null){
+            if (bibliotecaEntidad == null) {
                 tx.commit();
                 return false;
             }

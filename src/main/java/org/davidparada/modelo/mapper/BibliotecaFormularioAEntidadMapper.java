@@ -30,7 +30,7 @@ public class BibliotecaFormularioAEntidadMapper {
     }
 
 
-        public static BibliotecaEntidad actualizarBibliotecaEntidad(Long id, BibliotecaForm formulario) {
+    public static BibliotecaEntidad actualizarBibliotecaEntidad(Long id, BibliotecaForm formulario) {
         return new BibliotecaEntidad(
                 id,
                 formulario.getIdUsuario(),

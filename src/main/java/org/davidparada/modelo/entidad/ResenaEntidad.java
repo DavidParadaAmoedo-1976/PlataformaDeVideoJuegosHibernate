@@ -1,8 +1,9 @@
 package org.davidparada.modelo.entidad;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import jdk.jfr.Timestamp;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Size;
 import org.davidparada.modelo.enums.EstadoPublicacionEnum;
 
 import java.time.Instant;

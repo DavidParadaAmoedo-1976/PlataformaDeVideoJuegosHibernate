@@ -4,7 +4,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/mydb</property>
+        <property name="hibernate.connection.url">jdbc:mysql://192.168.8.31:3306/mydb</property>
         <property name="hibernate.connection.username">myuser</property>
         <property name="hibernate.connection.password">MYPASSWORD</property>
         <property name="hibernate.hbm2ddl.auto">validate</property>

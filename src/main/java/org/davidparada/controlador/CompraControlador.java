@@ -2,7 +2,10 @@ package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.ICompraControlador;
 import org.davidparada.excepcion.ValidationException;
-import org.davidparada.modelo.dto.*;
+import org.davidparada.modelo.dto.CompraDto;
+import org.davidparada.modelo.dto.DetallesCompraDto;
+import org.davidparada.modelo.dto.FacturaDto;
+import org.davidparada.modelo.dto.JuegoDto;
 import org.davidparada.modelo.entidad.BibliotecaEntidad;
 import org.davidparada.modelo.entidad.CompraEntidad;
 import org.davidparada.modelo.entidad.JuegoEntidad;
@@ -442,7 +445,7 @@ public class CompraControlador implements ICompraControlador {
         // Quitar juego de la biblioteca
         bibliotecaControlador.eliminarJuego(compraEntidad.getIdUsuario(), compraEntidad.getIdJuego());
 
-        return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad,usuarioEntidad,juegoEntidad);
+        return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad, usuarioEntidad, juegoEntidad);
     }
 
     // Generar factura

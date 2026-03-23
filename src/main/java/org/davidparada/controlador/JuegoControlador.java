@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
-import static org.davidparada.controlador.util.ObtenerEntidadesOptional.*;
+import static org.davidparada.controlador.util.ObtenerEntidadesOptional.obtenerJuego;
 
 public class JuegoControlador implements IJuegoControlador {
 
@@ -135,7 +135,7 @@ public class JuegoControlador implements IJuegoControlador {
                         juego.getClasificacionPorEdad(),
                         juego.getIdiomas(),
                         juego.getEstado()
-        ));
+                ));
         return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
     }
 
