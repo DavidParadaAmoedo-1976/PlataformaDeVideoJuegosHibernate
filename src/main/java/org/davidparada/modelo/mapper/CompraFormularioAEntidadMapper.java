@@ -14,37 +14,51 @@ public class CompraFormularioAEntidadMapper {
     private CompraFormularioAEntidadMapper() {
     }
 
-    public static CompraEntidad crearCompraEntidad(Long idCompra, CompraForm form) {
+    public static CompraEntidad crearCompraEntidad(Long idCompra, CompraForm formulario) {
 
         return new CompraEntidad(
                 idCompra,
-                form.getIdUsuario(),
-                form.getIdJuego(),
+                formulario.getIdUsuario(),
+                formulario.getIdJuego(),
                 Instant.now(),
-                form.getMetodoPago(),
-                redondear(form.getPrecioBase()),
+                formulario.getMetodoPago(),
+                formulario.getPrecioBase(),
                 DESCUENTO_POR_DEFECTO,
                 EstadoCompraEnum.PENDIENTE
         );
     }
 
-    public static CompraEntidad actualizarCompraEntidad(Long idCompra, CompraForm form) {
+    public static CompraEntidad crearCompraEntidad(CompraForm formulario) {
+        return crearCompraEntidad(null, formulario);
+    }
 
-        double precioBase = redondear(form.getPrecioBase());
+    public static CompraEntidad actualizarCompraEntidad(Long idCompra, CompraForm formulario) {
+//
+//        double precioBase = redondear(formulario.getPrecioBase());
 
         return new CompraEntidad(
                 idCompra,
-                form.getIdUsuario(),
-                form.getIdJuego(),
-                form.getFechaCompra(),
-                form.getMetodoPago(),
-                precioBase,
-                form.getDescuento(),
-                form.getEstadoCompra()
+                formulario.getIdUsuario(),
+                formulario.getIdJuego(),
+                formulario.getFechaCompra(),
+                formulario.getMetodoPago(),
+                formulario.getPrecioBase(),
+                formulario.getDescuento(),
+                formulario.getEstadoCompra()
         );
     }
 
-    private static double redondear(double valor) {
-        return Math.round(valor * REDONDEO) / REDONDEO;
+    public static void actualizar(CompraEntidad compraEntidad, CompraForm formulario) {
+        compraEntidad.setIdUsuario(formulario.getIdUsuario());
+        compraEntidad.setIdJuego(formulario.getIdJuego());
+        compraEntidad.setFechaCompra(formulario.getFechaCompra());
+        compraEntidad.setMetodoPago(formulario.getMetodoPago());
+        compraEntidad.setPrecioBase(formulario.getPrecioBase());
+        compraEntidad.setDescuento(formulario.getDescuento());
+        compraEntidad.setEstadoCompra(formulario.getEstadoCompra());
     }
+
+//    private static double redondear(double valor) {
+//        return Math.round(valor * REDONDEO) / REDONDEO;
+//    }
 }

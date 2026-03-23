@@ -5,7 +5,7 @@
     <session-factory>
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/plataforma_de_videojuegos</property>
-        <property name="hibernate.connection.username">myuser</property>
+        <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">abc123.</property>
         <property name="hibernate.hbm2ddl.auto">validate</property>
         <property name="hibernate.dialect.storage_engine">innodb</property>

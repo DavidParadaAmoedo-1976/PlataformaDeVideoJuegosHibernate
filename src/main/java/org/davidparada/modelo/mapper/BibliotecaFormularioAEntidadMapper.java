@@ -12,10 +12,10 @@ public class BibliotecaFormularioAEntidadMapper {
     private BibliotecaFormularioAEntidadMapper() {
     }
 
-    public static BibliotecaEntidad crearBibliotecaEntidad(Long id, BibliotecaForm formulario) {
+    public static BibliotecaEntidad crearBibliotecaEntidad(Long idBiblioteca, BibliotecaForm formulario) {
 
         return new BibliotecaEntidad(
-                id,
+                idBiblioteca,
                 formulario.getIdUsuario(),
                 formulario.getIdJuego(),
                 Instant.now(),     // FechaAdquisicion automática
@@ -30,9 +30,9 @@ public class BibliotecaFormularioAEntidadMapper {
     }
 
 
-    public static BibliotecaEntidad actualizarBibliotecaEntidad(Long id, BibliotecaForm formulario) {
+    public static BibliotecaEntidad actualizarBibliotecaEntidad(Long idBibliteca, BibliotecaForm formulario) {
         return new BibliotecaEntidad(
-                id,
+                idBibliteca,
                 formulario.getIdUsuario(),
                 formulario.getIdJuego(),
                 formulario.getFechaAdquisicion(),
