@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "juego")
+@Table(name = "juegos")
 public class JuegoEntidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class JuegoEntidad {
     @Column(name = "fecha_lanzamiento", nullable = false)
     private LocalDate fechaLanzamiento;
 
-    @Column(name = "precio_base", nullable = false, precision = 10, scale = 2)
+    @Column(name = "precio_base", nullable = false)
     @DecimalMin(value = "0.0")
     @Digits(integer = 8, fraction = 2)
     private Double precioBase;
@@ -46,8 +46,12 @@ public class JuegoEntidad {
     @Column(name = "clasificacion_por_edad", nullable = false)
     private ClasificacionJuegoEnum clasificacionPorEdad;
 
+//    @ElementCollection
+//    @Column(name = "idiomas", length = 200)
+//    private List<String> idiomas;
     @ElementCollection
-    @Column(name = "idiomas", length = 200)
+    @CollectionTable(name = "juego_idiomas", joinColumns = @JoinColumn(name = "id_juego"))
+    @Column(name = "idioma")
     private List<String> idiomas;
 
     @Enumerated(EnumType.STRING)

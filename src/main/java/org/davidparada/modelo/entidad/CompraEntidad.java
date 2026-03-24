@@ -11,7 +11,7 @@ import org.davidparada.modelo.enums.MetodoPagoEnum;
 import java.time.Instant;
 
 @Entity
-@Table(name = "compra")
+@Table(name = "compras")
 public class CompraEntidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class CompraEntidad {
     @Column(name = "metodo_pago", nullable = false)
     private MetodoPagoEnum metodoPago;
 
-    @Column(name = "precio_base", nullable = false, precision = 10, scale = 2)
+    @Column(name = "precio_base", nullable = false)
     @DecimalMin(value = "0.0")
     @Digits(integer = 8, fraction = 2)
     private Double precioBase;

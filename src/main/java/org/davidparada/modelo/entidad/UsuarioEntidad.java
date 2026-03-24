@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "usuarios")
 public class UsuarioEntidad {
 
     @Id
@@ -41,7 +41,7 @@ public class UsuarioEntidad {
     @Column(name = "avatar", length = 255)
     private String avatar;
 
-    @Column(name = "saldo", precision = 10, scale = 2)
+    @Column(name = "saldo")
     private Double saldo = 0.0;
 
     @Enumerated(EnumType.STRING)

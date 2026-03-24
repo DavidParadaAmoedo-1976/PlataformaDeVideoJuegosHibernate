@@ -9,7 +9,7 @@ import org.davidparada.modelo.enums.EstadoPublicacionEnum;
 import java.time.Instant;
 
 @Entity
-@Table(name = "resena")
+@Table(name = "resenas")
 public class ResenaEntidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class ResenaEntidad {
     @Column(name = "texto_resena", nullable = false)
     private String textoResena;
 
-    @Column(name = "cantidad_horas_jugadas", precision = 9, scale = 1)
+    @Column(name = "cantidad_horas_jugadas")
     @DecimalMin(value = "0.0")
     @Digits(integer = 8, fraction = 1)
     private Double cantidadHorasJugadas;

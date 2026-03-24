@@ -165,12 +165,12 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
 
             String query = "FROM UsuarioEntidad WHERE nombreUsuario = :nombreUsuario";
             UsuarioEntidad usuario = session.createQuery(query, UsuarioEntidad.class)
-                    .setParameter("nombre", nombreUsuario)
+                    .setParameter("nombreUsuario", nombreUsuario)
                     .uniqueResult();
 
-            session.close();
-
+            tx.commit();
             return Optional.ofNullable(usuario);
+
         } catch (Exception e) {
             if (tx != null) {
                 tx.rollback();
