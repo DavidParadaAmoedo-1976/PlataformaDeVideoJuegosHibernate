@@ -41,13 +41,4 @@ public class BibliotecaFormularioAEntidadMapper {
                 formulario.isEstadoInstalacion()
         );
     }
-
-    public static void actualizar(BibliotecaEntidad bibliotecaEntidad, BibliotecaForm formulario) {
-        bibliotecaEntidad.setIdUsuario(formulario.getIdUsuario());
-        bibliotecaEntidad.setIdJuego(formulario.getIdJuego());
-        bibliotecaEntidad.setFechaAdquisicion(formulario.getFechaAdquisicion());
-        bibliotecaEntidad.setHorasDeJuego(formulario.getHorasDeJuego());
-        bibliotecaEntidad.setUltimaFechaDeJuego(formulario.getUltimaFechaDeJuego());
-        bibliotecaEntidad.setEstadoInstalacion(formulario.isEstadoInstalacion());
-    }
 }

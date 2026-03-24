@@ -47,18 +47,5 @@ public class JuegoFormularioAEntidadMapper {
                 formulario.getEstado()
         );
     }
-
-    public static void actualizar(JuegoEntidad juego, JuegoForm formulario) {
-        juego.setTitulo(formulario.getTitulo());
-        juego.setDescripcion(formulario.getDescripcion());
-        juego.setDesarrollador(formulario.getDesarrollador());
-        juego.setFechaLanzamiento(formulario.getFechaLanzamiento());
-        juego.setPrecioBase(formulario.getPrecioBase());
-        juego.setDescuento(formulario.getDescuento());
-        juego.setCategoria(formulario.getCategoria());
-        juego.setClasificacionPorEdad(formulario.getClasificacionPorEdad());
-        juego.setIdiomas(formulario.getIdiomas());
-        juego.setEstado(formulario.getEstado());
-    }
 }
 

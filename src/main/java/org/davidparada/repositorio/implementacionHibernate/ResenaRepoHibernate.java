@@ -5,6 +5,7 @@ import org.davidparada.modelo.formulario.ResenaForm;
 import org.davidparada.modelo.mapper.ResenaFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IResenaRepo;
 import org.davidparada.util.HibernateUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -27,7 +28,7 @@ public class ResenaRepoHibernate implements IResenaRepo {
             tx.commit();
             return resenasEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -50,7 +51,7 @@ public class ResenaRepoHibernate implements IResenaRepo {
             tx.commit();
             return resenasEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -74,7 +75,7 @@ public class ResenaRepoHibernate implements IResenaRepo {
             tx.commit();
             return Optional.of(resenaEntidad);
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -94,7 +95,7 @@ public class ResenaRepoHibernate implements IResenaRepo {
             tx.commit();
             return resenaEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -113,8 +114,7 @@ public class ResenaRepoHibernate implements IResenaRepo {
             tx.commit();
             return resenaEntidad;
 
-        } catch (
-                Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -136,7 +136,7 @@ public class ResenaRepoHibernate implements IResenaRepo {
             tx.commit();
             return resenasEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -150,18 +150,14 @@ public class ResenaRepoHibernate implements IResenaRepo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            ResenaEntidad resenaEntidad = session.get(ResenaEntidad.class, idResena);
-            if (resenaEntidad == null) {
-                tx.commit();
-                return Optional.empty();
-            }
-            ResenaFormularioAEntidadMapper.actualizar(resenaEntidad, formulario);
+            ResenaEntidad resenaEntidad = ResenaFormularioAEntidadMapper.crearReseniaEntidad(idResena, formulario);
+            ResenaEntidad resenaActualizada = session.merge(resenaEntidad);
 
             tx.commit();
-            return Optional.of(resenaEntidad);
+            return Optional.of(resenaActualizada);
 
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -185,7 +181,7 @@ public class ResenaRepoHibernate implements IResenaRepo {
             tx.commit();
             return true;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }

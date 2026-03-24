@@ -5,6 +5,7 @@ import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.modelo.mapper.UsuarioFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
 import org.davidparada.util.HibernateUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -25,7 +26,7 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
             tx.commit();
             return usuario;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -44,7 +45,7 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
             tx.commit();
             return Optional.ofNullable(usuario);
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -66,7 +67,7 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
             tx.commit();
             return listaUsuarios;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -80,28 +81,14 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            UsuarioEntidad usuarioEntidad = session.get(UsuarioEntidad.class, idUsuario);
-
-            if (usuarioEntidad == null) {
-                tx.commit();
-                return Optional.empty();
-            }
-            usuarioEntidad.setNombreUsuario(form.getNombreUsuario());
-            usuarioEntidad.setEmail(form.getEmail());
-            usuarioEntidad.setPassword(form.getPassword());
-            usuarioEntidad.setNombreReal(form.getNombreReal());
-            usuarioEntidad.setPais(form.getPais());
-            usuarioEntidad.setFechaNacimiento(form.getFechaNacimiento());
-            usuarioEntidad.setFechaRegistro(form.getFechaRegistro());
-            usuarioEntidad.setAvatar(form.getAvatar());
-            usuarioEntidad.setSaldo(form.getSaldo());
-            usuarioEntidad.setEstadoCuenta(form.getEstadoCuenta());
+            UsuarioEntidad usuarioEntidad = UsuarioFormularioAEntidadMapper.crearUsuarioEntidad(idUsuario, form);
+            UsuarioEntidad usuarioActualizado = session.merge(usuarioEntidad);
 
             tx.commit();
 
-            return Optional.of(usuarioEntidad);
+            return Optional.of(usuarioActualizado);
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -127,7 +114,7 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
             tx.commit();
 
             return true;
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -149,7 +136,7 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
             session.close();
 
             return Optional.ofNullable(usuario);
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -171,34 +158,11 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
             tx.commit();
             return Optional.ofNullable(usuario);
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
             throw new RuntimeException("Error al buscar usuario en base de datos", e);
-        }
-    }
-
-    @Override
-    public void actualizarSaldo(Long idUsuario, Double nuevoSaldo) {
-        Transaction tx = null;
-
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-
-            String query = "FROM UsuarioEntidad WHERE idUsuario = :idUsuario";
-            session.createQuery(query, UsuarioEntidad.class)
-                    .setParameter("saldo", nuevoSaldo)
-                    .setParameter("id", idUsuario)
-                    .executeUpdate();
-
-            tx.commit();
-
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al actualizar el saldo en base de datos", e);
         }
     }
 }

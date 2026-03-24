@@ -5,6 +5,7 @@ import org.davidparada.modelo.formulario.CompraForm;
 import org.davidparada.modelo.mapper.CompraFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.ICompraRepo;
 import org.davidparada.util.HibernateUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -27,7 +28,7 @@ public class CompraRepoHibernate implements ICompraRepo {
             tx.commit();
             return comprasEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -51,7 +52,7 @@ public class CompraRepoHibernate implements ICompraRepo {
             tx.commit();
             return compraEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -71,7 +72,7 @@ public class CompraRepoHibernate implements ICompraRepo {
             tx.commit();
             return compraEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -90,7 +91,7 @@ public class CompraRepoHibernate implements ICompraRepo {
             tx.commit();
             return compraEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -113,7 +114,7 @@ public class CompraRepoHibernate implements ICompraRepo {
             return comprasEntidad;
 
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -127,15 +128,11 @@ public class CompraRepoHibernate implements ICompraRepo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            CompraEntidad compraEntidad = session.get(CompraEntidad.class, idCompra);
-            if (compraEntidad != null) {
-                tx.commit();
-                return Optional.empty();
-            }
-            CompraFormularioAEntidadMapper.actualizar(compraEntidad, formulario);
+            CompraEntidad compraEntidad = CompraFormularioAEntidadMapper.crearCompraEntidad(idCompra, formulario);
+            CompraEntidad compraActualizada = session.merge(compraEntidad);
 
             tx.commit();
-            return Optional.of(compraEntidad);
+            return Optional.of(compraActualizada);
 
         } catch (Exception e) {
             if (tx != null) {
@@ -161,7 +158,7 @@ public class CompraRepoHibernate implements ICompraRepo {
             tx.commit();
             return true;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }

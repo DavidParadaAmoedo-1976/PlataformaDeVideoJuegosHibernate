@@ -7,6 +7,7 @@ import org.davidparada.modelo.formulario.JuegoForm;
 import org.davidparada.modelo.mapper.JuegoFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
 import org.davidparada.util.HibernateUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -28,7 +29,7 @@ public class JuegosRepoHibernate implements IJuegoRepo {
             tx.commit();
             return contador != null && contador > 0;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -48,7 +49,7 @@ public class JuegosRepoHibernate implements IJuegoRepo {
             tx.commit();
             return List.of();
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -68,7 +69,7 @@ public class JuegosRepoHibernate implements IJuegoRepo {
             tx.commit();
             return juegoEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -87,7 +88,7 @@ public class JuegosRepoHibernate implements IJuegoRepo {
             tx.commit();
             return juegoEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -109,7 +110,7 @@ public class JuegosRepoHibernate implements IJuegoRepo {
             tx.commit();
             return listaJuegos;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -128,12 +129,13 @@ public class JuegosRepoHibernate implements IJuegoRepo {
                 tx.commit();
                 return Optional.empty();
             }
-            JuegoFormularioAEntidadMapper.actualizar(juegoEntidad, formulario);
+            JuegoFormularioAEntidadMapper.crearJuegoEntidad(idJuego, formulario);
+            JuegoEntidad juegoActualizado = session.merge(juegoEntidad);
 
             tx.commit();
-            return Optional.of(juegoEntidad);
+            return Optional.of(juegoActualizado);
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -157,7 +159,7 @@ public class JuegosRepoHibernate implements IJuegoRepo {
             tx.commit();
             return true;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }

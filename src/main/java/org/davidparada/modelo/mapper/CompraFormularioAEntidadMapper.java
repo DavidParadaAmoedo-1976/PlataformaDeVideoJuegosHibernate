@@ -48,16 +48,6 @@ public class CompraFormularioAEntidadMapper {
         );
     }
 
-    public static void actualizar(CompraEntidad compraEntidad, CompraForm formulario) {
-        compraEntidad.setIdUsuario(formulario.getIdUsuario());
-        compraEntidad.setIdJuego(formulario.getIdJuego());
-        compraEntidad.setFechaCompra(formulario.getFechaCompra());
-        compraEntidad.setMetodoPago(formulario.getMetodoPago());
-        compraEntidad.setPrecioBase(formulario.getPrecioBase());
-        compraEntidad.setDescuento(formulario.getDescuento());
-        compraEntidad.setEstadoCompra(formulario.getEstadoCompra());
-    }
-
 //    private static double redondear(double valor) {
 //        return Math.round(valor * REDONDEO) / REDONDEO;
 //    }

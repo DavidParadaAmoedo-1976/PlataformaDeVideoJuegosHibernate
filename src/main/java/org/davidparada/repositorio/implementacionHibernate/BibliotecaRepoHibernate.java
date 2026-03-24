@@ -5,6 +5,7 @@ import org.davidparada.modelo.formulario.BibliotecaForm;
 import org.davidparada.modelo.mapper.BibliotecaFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
 import org.davidparada.util.HibernateUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -27,7 +28,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             tx.commit();
             return bibliotecasEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -52,7 +53,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             tx.commit();
             return bibliotecaEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -72,7 +73,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             tx.commit();
             return bibliotecaEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -91,7 +92,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             tx.commit();
             return bibliotecaEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -113,7 +114,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             tx.commit();
             return bibliotecasEntidad;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -127,17 +128,13 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
-            BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, idBiblioteca);
-            if (bibliotecaEntidad == null) {
-                tx.commit();
-                return Optional.empty();
-            }
-            BibliotecaFormularioAEntidadMapper.actualizar(bibliotecaEntidad, formulario);
+            BibliotecaEntidad bibliotecaEntidad = BibliotecaFormularioAEntidadMapper.crearBibliotecaEntidad(idBiblioteca, formulario);
+            BibliotecaEntidad bibliotecaActualizada = session.merge(bibliotecaEntidad);
 
             tx.commit();
-            return Optional.of(bibliotecaEntidad);
+            return Optional.of(bibliotecaActualizada);
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
@@ -161,7 +158,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
             tx.commit();
             return true;
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }

@@ -22,7 +22,5 @@ public interface IUsuarioRepo extends ICrud<UsuarioEntidad, UsuarioForm, Long> {
      * @return Muestra un objeto de la Entidad usuario.
      */
     Optional<UsuarioEntidad> buscarPorNombreUsuario(String nombreUsuario);
-
-    void actualizarSaldo(Long idUsuario, Double nuevoSaldo);
 }
 

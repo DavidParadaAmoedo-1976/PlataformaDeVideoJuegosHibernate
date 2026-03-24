@@ -44,15 +44,4 @@ public class ResenaFormularioAEntidadMapper {
                 form.getEstadoPublicacion()
         );
     }
-
-    public static void actualizar(ResenaEntidad resenaEntidad, ResenaForm formulario) {
-        resenaEntidad.setIdUsuario(formulario.getIdUsuario());
-        resenaEntidad.setIdJuego(formulario.getIdJuego());
-        resenaEntidad.setRecomendado(formulario.isRecomendado());
-        resenaEntidad.setTextoResena(formulario.getTextoResena());
-        resenaEntidad.setCantidadHorasJugadas(formulario.getCantidadHorasJugadas());
-        resenaEntidad.setFechaPublicacion(formulario.getFechaPublicacion());
-        resenaEntidad.setFechaUltimaEdicion(formulario.getFechaUltimaEdicion());
-        resenaEntidad.setEstadoPublicacion(formulario.getEstadoPublicacion());
-    }
 }

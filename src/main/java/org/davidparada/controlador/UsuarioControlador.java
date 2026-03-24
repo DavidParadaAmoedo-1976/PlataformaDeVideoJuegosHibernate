@@ -94,20 +94,28 @@ public class UsuarioControlador implements IUsuarioControlador {
 
         comprobarListaErrores(errores);
 
-        UsuarioEntidad usuario = obtenerUsuario(idUsuario, errores);
+        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
 
-        if (usuario.getEstadoCuenta() != EstadoCuentaEnum.ACTIVA) {
+        if (usuarioEntidad.getEstadoCuenta() != EstadoCuentaEnum.ACTIVA) {
             errores.add(new ErrorModel("estadoCuenta", TipoErrorEnum.ESTADO_INCORRECTO));
         }
 
         comprobarListaErrores(errores);
 
-        // ✅ SOLO calcular el nuevo saldo
-        Double nuevoSaldo = usuario.getSaldo() + cantidad;
+        usuarioRepo.actualizar(usuarioEntidad.getIdUsuario(), new UsuarioForm(
+                usuarioEntidad.getNombreUsuario(),
+                usuarioEntidad.getEmail(),
+                usuarioEntidad.getPassword(),
+                usuarioEntidad.getNombreReal(),
+                usuarioEntidad.getPais(),
+                usuarioEntidad.getFechaNacimiento(),
+                usuarioEntidad.getFechaRegistro(),
+                usuarioEntidad.getAvatar(),
+                usuarioEntidad.getSaldo() + cantidad,
+                usuarioEntidad.getEstadoCuenta()));
 
-        // ✅ delegar al repo
-        usuarioRepo.actualizarSaldo(idUsuario, nuevoSaldo);
-        return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+
+        return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad);
     }
 
     @Override
