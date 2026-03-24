@@ -5,6 +5,7 @@ import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.modelo.mapper.UsuarioFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
 import org.davidparada.util.HibernateUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -44,7 +45,7 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
             tx.commit();
             return Optional.ofNullable(usuario);
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) {
                 tx.rollback();
             }
