@@ -74,15 +74,4 @@ public class UsuarioRepoMemoria implements IUsuarioRepo {
                 .filter(u -> u.getNombreUsuario().equalsIgnoreCase(nombreUsuario))
                 .findFirst();
     }
-
-    @Override
-    public void actualizarSaldo(Long idUsuario, Double nuevoSaldo) {
-        List<UsuarioEntidad> usuarios = listarTodos();
-        for (UsuarioEntidad usuario : usuarios) {
-            if (usuario.getIdUsuario().equals(idUsuario)) {
-                usuario.setSaldo(nuevoSaldo);
-                return; // importante salir
-            }
-        }
-    }
 }

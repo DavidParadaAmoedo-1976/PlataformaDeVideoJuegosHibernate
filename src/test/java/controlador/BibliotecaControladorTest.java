@@ -78,8 +78,8 @@ class BibliotecaControladorTest {
 
         controlador = new BibliotecaControlador(
                 bibliotecaRepoMemoria,
-                juegoRepoMemoria
-        );
+                juegoRepoMemoria,
+                obtenerEntidades);
     }
 
     // ======================================================

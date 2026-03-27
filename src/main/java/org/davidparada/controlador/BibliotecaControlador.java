@@ -1,6 +1,7 @@
 package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IBibliotecaControlador;
+import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.BibliotecaDto;
 import org.davidparada.modelo.dto.EstadisticasBibliotecaDto;
@@ -27,7 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
-import static org.davidparada.controlador.util.ObtenerEntidadesOptional.*;
+
 
 public class BibliotecaControlador implements IBibliotecaControlador {
 
@@ -37,12 +38,16 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     public static final int CERO = 0;
     private final IBibliotecaRepo bibliotecaRepo;
     private final IJuegoRepo juegoRepo;
+    private final ObtenerEntidadesOptional obtenerEntidades;
 
     public BibliotecaControlador(IBibliotecaRepo bibliotecaRepo,
-                                 IJuegoRepo juegoRepo) {
+                                 IJuegoRepo juegoRepo,
+                                 ObtenerEntidadesOptional obtenerEntidades
+                                 ) {
 
         this.bibliotecaRepo = bibliotecaRepo;
         this.juegoRepo = juegoRepo;
+        this.obtenerEntidades = obtenerEntidades;
     }
 
     // Ver Biblioteca personal
@@ -56,7 +61,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
         // Mapea la lista de Entidad a un DTO para poder mostrar los datos del juego
 
-        UsuarioEntidad usuario = obtenerUsuario(idUsuario, errores);
+        UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
         List<BibliotecaDto> juegos = juegosEntidad.stream()
                 .map(b -> {
@@ -134,8 +139,8 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         );
 
         BibliotecaEntidad nuevoJuegoEntidad = bibliotecaRepo.crear(nuevoJuego);
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerJuego(idJuego, errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
         return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(nuevoJuegoEntidad, usuarioEntidad, juegoEntidad);
     }
@@ -149,9 +154,9 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarIdUsuario(idUsuario, errores);
         comprobarIdJuego(idJuego, errores);
 
-        BibliotecaEntidad bibliotecaEntidad = obtenerBiblioteca(idUsuario, idJuego, errores);
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerJuego(idJuego, errores);
+        BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
         bibliotecaRepo.eliminar(bibliotecaEntidad.getIdBiblioteca());
         return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
@@ -173,9 +178,9 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
         comprobarListaErrores(errores);
 
-        BibliotecaEntidad bibliotecaEntidad = obtenerBiblioteca(idUsuario, idJuego, errores);
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerJuego(idJuego, errores);
+        BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
         BibliotecaForm actualizarTiempoDeJuego = new BibliotecaForm(
                 idUsuario,
@@ -198,9 +203,9 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
         comprobarIdUsuario(idUsuario, errores);
         comprobarIdJuego(idJuego, errores);
-        BibliotecaEntidad bibliotecaEntidad = obtenerBiblioteca(idUsuario, idJuego, errores);
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerJuego(idJuego, errores);
+        BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
         if (bibliotecaEntidad.getUltimaFechaDeJuego() == null) {
             return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
@@ -231,7 +236,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         List<ErrorModel> errores = new ArrayList<>();
 
         comprobarIdUsuario(idUsuario, errores);
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
         List<BibliotecaEntidad> bibliotecaEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
 
         return bibliotecaEntidad.stream()

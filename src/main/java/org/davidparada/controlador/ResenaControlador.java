@@ -1,6 +1,7 @@
 package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IResenaControlador;
+import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.EstadisticasResenasJuegoDto;
 import org.davidparada.modelo.dto.JuegoDto;
@@ -37,7 +38,7 @@ public class ResenaControlador implements IResenaControlador {
     public static final int INICIO_VARIABLE_A_CERO = 0;
     private final IResenaRepo resenaRepo;
 
-    public ResenaControlador(IResenaRepo reseniaRepo) {
+    public ResenaControlador(IResenaRepo reseniaRepo, ObtenerEntidadesOptional obtenerEntidades) {
         this.resenaRepo = reseniaRepo;
     }
 
