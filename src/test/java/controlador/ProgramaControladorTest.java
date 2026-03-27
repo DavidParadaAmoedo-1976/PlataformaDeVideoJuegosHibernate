@@ -30,8 +30,13 @@ class ProgramaControladorTest {
     private CompraRepoMemoria compraRepoMemoria;
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private ResenaRepoMemoria resenaRepoMemoria;
+    private final ObtenerEntidadesOptional obtenerEntidades;
 
     private Instant ahora;
+
+    ProgramaControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
+        this.obtenerEntidades = obtenerEntidades;
+    }
 
     @BeforeEach
     void setUp() {
@@ -49,7 +54,8 @@ class ProgramaControladorTest {
                 juegoRepoMemoria,
                 usuarioRepoMemoria,
                 bibliotecaRepoMemoria,
-                resenaRepoMemoria
+                resenaRepoMemoria,
+                obtenerEntidades
         );
         new ObtenerEntidadesOptional(compraRepoMemoria, usuarioRepoMemoria, juegoRepoMemoria, bibliotecaRepoMemoria, resenaRepoMemoria);
         cargarDatosBase();

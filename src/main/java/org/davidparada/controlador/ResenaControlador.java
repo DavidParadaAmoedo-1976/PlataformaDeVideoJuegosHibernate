@@ -37,9 +37,11 @@ public class ResenaControlador implements IResenaControlador {
     public static final double CALCULO_PORCENTAJE = 100.0;
     public static final int INICIO_VARIABLE_A_CERO = 0;
     private final IResenaRepo resenaRepo;
+    private final ObtenerEntidadesOptional obtenerEntidades;
 
     public ResenaControlador(IResenaRepo reseniaRepo, ObtenerEntidadesOptional obtenerEntidades) {
         this.resenaRepo = reseniaRepo;
+        this.obtenerEntidades = obtenerEntidades;
     }
 
     @Override
@@ -62,9 +64,9 @@ public class ResenaControlador implements IResenaControlador {
         }
         comprobarListaErrores(errores);
 
-        UsuarioEntidad usuario = obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juego = obtenerJuego(idJuego, errores);
-        obtenerBiblioteca(idUsuario, idJuego, errores);
+        UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+        obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
 
         List<ResenaEntidad> resenasEntidad = resenaRepo.buscarPorJuego(idJuego);
 
@@ -104,9 +106,9 @@ public class ResenaControlador implements IResenaControlador {
         }
         comprobarListaErrores(errores);
 
-        ResenaEntidad resenaEntidad = obtenerResenaPorIdYUsuario(idResena, idUsuario, errores);
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerJuego(resenaEntidad.getIdJuego(), errores);
+        ResenaEntidad resenaEntidad = obtenerEntidades.obtenerResenaPorIdYUsuario(idResena, idUsuario, errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(resenaEntidad.getIdJuego(), errores);
 
         resenaRepo.eliminar(resenaEntidad.getIdResena());
 
@@ -128,7 +130,7 @@ public class ResenaControlador implements IResenaControlador {
         }
         comprobarListaErrores(errores);
 
-        JuegoEntidad juegoEntidad = obtenerJuego(idJuego, errores);
+        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
         JuegoDto juegoDto = JuegoEntidadADtoMapper.juegoEntidadADto(juegoEntidad);
 
         List<ResenaEntidad> resenasEntidad = resenaRepo.buscarPorJuego(idJuego);
@@ -170,7 +172,7 @@ public class ResenaControlador implements IResenaControlador {
 
         for (ResenaEntidad r : resenasFiltradasYOrdenadas) {
 
-            UsuarioEntidad usuarioEntidad = obtenerUsuario(r.getIdUsuario(), errores);
+            UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(r.getIdUsuario(), errores);
 
             resultado.add(new ResenaDto(
                     r.getIdResena(),
@@ -200,7 +202,7 @@ public class ResenaControlador implements IResenaControlador {
         }
         comprobarListaErrores(errores);
 
-        ResenaEntidad resenaEntidad = obtenerResenaPorIdYUsuario(idResena, idUsuario, errores);
+        ResenaEntidad resenaEntidad = obtenerEntidades.obtenerResenaPorIdYUsuario(idResena, idUsuario, errores);
 
         ResenaForm nuevaResena = new ResenaForm(
                 resenaEntidad.getIdUsuario(),
@@ -215,8 +217,8 @@ public class ResenaControlador implements IResenaControlador {
         Optional<ResenaEntidad> resenaActualizada = resenaRepo.actualizar(idResena, nuevaResena);
         ResenaEntidad resenaGuardada = resenaActualizada.orElseThrow();
 
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerJuego(resenaEntidad.getIdJuego(), errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(resenaEntidad.getIdJuego(), errores);
 
         return ResenaEntidadADtoMapper.resenaEntidadADto(
                 resenaGuardada,
@@ -237,7 +239,7 @@ public class ResenaControlador implements IResenaControlador {
         comprobarListaErrores(errores);
 
         // Validar que el juego existe
-        obtenerJuego(idJuego, errores);
+        obtenerEntidades.obtenerJuego(idJuego, errores);
 
         List<ResenaEntidad> resenas = resenaRepo.buscarPorJuego(idJuego);
 
@@ -289,13 +291,13 @@ public class ResenaControlador implements IResenaControlador {
             errores.add(new ErrorModel("idUsuario", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
         List<ResenaEntidad> resenasEntidad = resenaRepo.buscarPorUsuario(idUsuario);
         List<ResenaDto> resenasDto = new ArrayList<>();
 
         for (ResenaEntidad r : resenasEntidad) {
-            JuegoEntidad juegoEntidad = obtenerJuego(r.getIdJuego(), errores);
+            JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(r.getIdJuego(), errores);
             resenasDto.add(new ResenaDto(
                     r.getIdResena(),
                     r.getIdUsuario(),

@@ -39,6 +39,11 @@ class CompraControladorTest {
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private BibliotecaControlador bibliotecaControlador;
     private JuegoControlador juegoControlador;
+    private final ObtenerEntidadesOptional obtenerEntidades;
+
+    CompraControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
+        this.obtenerEntidades = obtenerEntidades;
+    }
 
     @BeforeEach
     void setup() {
@@ -53,7 +58,8 @@ class CompraControladorTest {
                 usuarioRepoMemoria,
                 juegoRepoMemoria,
                 bibliotecaRepoMemoria,
-                bibliotecaControlador
+                bibliotecaControlador,
+                obtenerEntidades
         );
 
         new ObtenerEntidadesOptional(compraRepoMemoria, usuarioRepoMemoria, juegoRepoMemoria, bibliotecaRepoMemoria, null);

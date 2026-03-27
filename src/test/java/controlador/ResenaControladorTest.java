@@ -35,6 +35,11 @@ class ResenaControladorTest {
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private UsuarioEntidad usuario;
     private JuegoEntidad juego;
+    private final ObtenerEntidadesOptional obtenerEntidades;
+
+    ResenaControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
+        this.obtenerEntidades = obtenerEntidades;
+    }
 
     @BeforeEach
     void setUp() throws ValidationException {

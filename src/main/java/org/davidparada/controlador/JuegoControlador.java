@@ -1,6 +1,7 @@
 package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IJuegoControlador;
+import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.JuegoDto;
 import org.davidparada.modelo.entidad.JuegoEntidad;
@@ -19,16 +20,17 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
-import static org.davidparada.controlador.util.ObtenerEntidadesOptional.obtenerJuego;
 
 public class JuegoControlador implements IJuegoControlador {
 
     public static final int DESCUENTO_MINIMO = 0;
     public static final int DESCUENTO_MAXIMO = 100;
     private final IJuegoRepo juegoRepo;
+    private final ObtenerEntidadesOptional obtenerEntidades;
 
-    public JuegoControlador(IJuegoRepo juegoRepo) {
+    public JuegoControlador(IJuegoRepo juegoRepo, ObtenerEntidadesOptional obtenerEntidades) {
         this.juegoRepo = juegoRepo;
+        this.obtenerEntidades = obtenerEntidades;
     }
 
     // Anadir Juego
@@ -98,7 +100,7 @@ public class JuegoControlador implements IJuegoControlador {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
-        JuegoEntidad juego = obtenerJuego(idJuego, errores);
+        JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
         comprobarListaErrores(errores);
 
@@ -122,7 +124,7 @@ public class JuegoControlador implements IJuegoControlador {
         }
         comprobarListaErrores(errores);
 
-        JuegoEntidad juego = obtenerJuego(id, errores);
+        JuegoEntidad juego = obtenerEntidades.obtenerJuego(id, errores);
 
         juegoRepo.actualizar(juego.getIdJuego(),
                 new JuegoForm(juego.getTitulo(),
@@ -152,7 +154,7 @@ public class JuegoControlador implements IJuegoControlador {
         }
         comprobarListaErrores(errores);
 
-        JuegoEntidad juego = obtenerJuego(id, errores);
+        JuegoEntidad juego = obtenerEntidades.obtenerJuego(id, errores);
 
         juegoRepo.actualizar(juego.getIdJuego(),
                 new JuegoForm(

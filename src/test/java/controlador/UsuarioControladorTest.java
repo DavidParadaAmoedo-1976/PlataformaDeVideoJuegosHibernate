@@ -20,12 +20,18 @@ class UsuarioControladorTest {
 
     private UsuarioControlador usuarioControlador;
     private UsuarioRepoMemoria usuarioRepoMemoria;
+    private final ObtenerEntidadesOptional obtenerEntidades;
+
+    UsuarioControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
+        this.obtenerEntidades = obtenerEntidades;
+    }
+
 
     @BeforeEach
     void setUp() {
 
         usuarioRepoMemoria = new UsuarioRepoMemoria();
-        usuarioControlador = new UsuarioControlador(usuarioRepoMemoria);
+        usuarioControlador = new UsuarioControlador(usuarioRepoMemoria, obtenerEntidades);
 
         new ObtenerEntidadesOptional(null, usuarioRepoMemoria, null, null, null);
     }

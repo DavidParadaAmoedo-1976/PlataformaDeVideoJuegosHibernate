@@ -31,9 +31,15 @@ class BibliotecaControladorTest {
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private UsuarioRepoMemoria usuarioRepoMemoria;
     private JuegoRepoMemoria juegoRepoMemoria;
+    private final ObtenerEntidadesOptional obtenerEntidades;
+
 
     private Long idUsuario;
     private Long idJuego;
+
+    BibliotecaControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
+        this.obtenerEntidades = obtenerEntidades;
+    }
 
     @BeforeEach
     void setUp() {
@@ -79,7 +85,8 @@ class BibliotecaControladorTest {
         controlador = new BibliotecaControlador(
                 bibliotecaRepoMemoria,
                 juegoRepoMemoria,
-                obtenerEntidades);
+                obtenerEntidades
+        );
     }
 
     // ======================================================
