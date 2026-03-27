@@ -59,7 +59,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
         List<BibliotecaEntidad> juegosEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario); // Guarda todos los juegos de la biblioteca del usuario en una lista.
 
-        // Mapea la lista de Entidad a un DTO para poder mostrar los datos del juego
+        // Mapea la lista de Entidades a un DTO para poder mostrar los datos del juego
 
         UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 

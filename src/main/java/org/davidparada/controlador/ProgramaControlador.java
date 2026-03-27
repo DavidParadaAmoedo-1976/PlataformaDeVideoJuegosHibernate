@@ -1,6 +1,7 @@
 package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IProgramaControlador;
+import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.JuegosPopularesDto;
 import org.davidparada.modelo.dto.ReporteUsuariosDto;
@@ -19,7 +20,6 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
-import static org.davidparada.controlador.util.ObtenerEntidadesOptional.obtenerJuego;
 
 public class ProgramaControlador implements IProgramaControlador {
 
@@ -29,25 +29,29 @@ public class ProgramaControlador implements IProgramaControlador {
     public static final int CERO = 0;
     public static final int RECOMENDADA = 1;
     public static final int NO_RECOMENDADA = 0;
-    public static final double VALOR_SIN_RESEÑAS = 0.0;
+    public static final double VALOR_SIN_RESENAS = 0.0;
     private final ICompraRepo compraRepo;
     private final IJuegoRepo juegoRepo;
     private final IUsuarioRepo usuarioRepo;
     private final IBibliotecaRepo bibliotecaRepo;
     private final IResenaRepo resenaRepo;
+    private final ObtenerEntidadesOptional obtenerEntidades;
+
 
     public ProgramaControlador(
             ICompraRepo compraRepo,
             IJuegoRepo juegoRepo,
             IUsuarioRepo usuarioRepo,
             IBibliotecaRepo bibliotecaRepo,
-            IResenaRepo resenaRepo
+            IResenaRepo resenaRepo,
+            ObtenerEntidadesOptional obtenerEntidades
     ) {
         this.compraRepo = compraRepo;
         this.juegoRepo = juegoRepo;
         this.usuarioRepo = usuarioRepo;
         this.bibliotecaRepo = bibliotecaRepo;
         this.resenaRepo = resenaRepo;
+        this.obtenerEntidades = obtenerEntidades;
     }
 
     // Generar reportes de ventas
@@ -187,7 +191,7 @@ public class ProgramaControlador implements IProgramaControlador {
             double media = entry.getValue().stream()
                     .mapToInt(r -> r.isRecomendado() ? RECOMENDADA : NO_RECOMENDADA)
                     .average()
-                    .orElse(VALOR_SIN_RESEÑAS);
+                    .orElse(VALOR_SIN_RESENAS);
 
             ranking.put(entry.getKey(), media);
         }
@@ -228,7 +232,7 @@ public class ProgramaControlador implements IProgramaControlador {
 
         for (Map.Entry<Long, Double> entry : listaOrdenada) {
 
-            JuegoEntidad juegoEntidad = obtenerJuego(entry.getKey(), errores);
+            JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(entry.getKey(), errores);
 
             JuegosPopularesDto dto = new JuegosPopularesDto(
                     posicion,

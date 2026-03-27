@@ -25,87 +25,87 @@ public class DatosPrueba {
 
         try {
 
-//            // ==========================
-//            // CREAR 30 JUEGOS
-//            // ==========================
-//
-//            String[] idiomas = new String[]{"Español, Inglés"};
-//
-//            for (int i = 1; i <= 30; i++) {
-//
-//                juegoCtrl.crearJuego(new JuegoForm(
-//                        "Juego " + i,
-//                        "Descripción del juego " + i,
-//                        "DevStudio " + (i % 5),
-//                        LocalDate.now().minusDays(i),
-//                        10.0 + random.nextInt(50),
-//                        0,
-//                        "Acción",
-//                        ClasificacionJuegoEnum.PEGI_18,
-//                        List.of(idiomas),
-//                        EstadoJuegoEnum.DISPONIBLE
-//                ));
-//            }
-//
-//            // ==========================
-//            // CREAR 15 USUARIOS
-//            // ==========================
-//
-//            for (int i = 1; i <= 15; i++) {
-//                try{
-//
-//                usuarioCtrl.registrarUsuario(new UsuarioForm(
-//                        "usuario" + i,
-//                        "usuario" + i + "@mail.com",
-//                        "Pasword" + i,
-//                        "Nombre Real " + i,
-//                        PaisEnum.ESPANA,
-//                        LocalDate.of(random.nextInt(1990,2000), 5, 10),
-//                        Instant.now(),
-//                        null,
-//                        200.0,
-//                        EstadoCuentaEnum.ACTIVA
-//                ));
-//                } catch (ValidationException e) {
-//
-//                    System.out.println("❌ Error en usuario " + i);
-//
-//                    for (ErrorModel error : e.getErrores()) {
-//                        System.out.println(
-//                                "Campo: " + error.campo() +
-//                                        " | Tipo: " + error.error()
-//                        );
-//                    }
-//
-//                    System.out.println("-----------------------------");
-//                }
-//            }
-//
-//            // ==========================
-//            // 3️⃣ CREAR 10 COMPRAS
-//            // ==========================
-//
-//            for (int i = 1; i <= 10; i++) {
-//                try{
-//                compraCtrl.realizarCompra(
-//                        (long) (random.nextInt(15) + 1),
-//                        (long) (random.nextInt(30) + 1),
-//                        MetodoPagoEnum.TARJETA);
-//
-//            } catch (ValidationException e) {
-//
-//                System.out.println("❌ Error en usuario " + i);
-//
-//                for (ErrorModel error : e.getErrores()) {
-//                    System.out.println(
-//                            "Campo: " + error.campo() +
-//                                    " | Tipo: " + error.error()
-//                    );
-//                }
-//
-//                System.out.println("-----------------------------");
-//            }
-//            }
+            // ==========================
+            // CREAR 30 JUEGOS
+            // ==========================
+
+            String[] idiomas = new String[]{"Español, Inglés"};
+
+            for (int i = 1; i <= 30; i++) {
+
+                juegoCtrl.crearJuego(new JuegoForm(
+                        "Juego " + i,
+                        "Descripción del juego " + i,
+                        "DevStudio " + (i % 5),
+                        LocalDate.now().minusDays(i),
+                        10.0 + random.nextInt(50),
+                        0,
+                        "Acción",
+                        ClasificacionJuegoEnum.PEGI_18,
+                        List.of(idiomas),
+                        EstadoJuegoEnum.DISPONIBLE
+                ));
+            }
+
+            // ==========================
+            // CREAR 15 USUARIOS
+            // ==========================
+
+            for (int i = 1; i <= 15; i++) {
+                try{
+
+                    usuarioCtrl.registrarUsuario(new UsuarioForm(
+                            "usuario" + i,
+                            "usuario" + i + "@mail.com",
+                            "Pasword" + i,
+                            "Nombre Real " + i,
+                            PaisEnum.ESPANA,
+                            LocalDate.of(random.nextInt(1990,2000), 5, 10),
+                            Instant.now(),
+                            null,
+                            200.0,
+                            EstadoCuentaEnum.ACTIVA
+                    ));
+                } catch (ValidationException e) {
+
+                    System.out.println("❌ Error en usuario " + i);
+
+                    for (ErrorModel error : e.getErrores()) {
+                        System.out.println(
+                                "Campo: " + error.campo() +
+                                        " | Tipo: " + error.error()
+                        );
+                    }
+
+                    System.out.println("-----------------------------");
+                }
+            }
+
+            // ==========================
+            // 3️⃣ CREAR 10 COMPRAS
+            // ==========================
+
+            for (int i = 1; i <= 10; i++) {
+                try{
+                    compraCtrl.realizarCompra(
+                            (long) (random.nextInt(15) + 1),
+                            (long) (random.nextInt(30) + 1),
+                            MetodoPagoEnum.TARJETA
+                    );
+                } catch (ValidationException e) {
+
+                    System.out.println("❌ Error en usuario " + i);
+
+                    for (ErrorModel error : e.getErrores()) {
+                        System.out.println(
+                                "Campo: " + error.campo() +
+                                        " | Tipo: " + error.error()
+                        );
+                    }
+
+                    System.out.println("-----------------------------");
+                }
+            }
 
             // ==========================
             // CREAR 10 EN BIBLIOTECA
@@ -129,7 +129,7 @@ public class DatosPrueba {
                         (long) (random.nextInt(15) + 1),
                         (long) (random.nextInt(30) + 1),
                         random.nextBoolean(),
-                        "Reseña de prueba ".repeat(5) + i
+                        "Reseña de prueba ".repeat(5)
                 );
             }
 
@@ -140,3 +140,4 @@ public class DatosPrueba {
         }
     }
 }
+

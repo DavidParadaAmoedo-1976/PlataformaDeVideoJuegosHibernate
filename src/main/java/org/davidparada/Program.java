@@ -21,8 +21,8 @@ public class Program {
         // controladores
         ObtenerEntidadesOptional obtenerEntidades = new ObtenerEntidadesOptional(compraRepo, usuarioRepo,juegoRepo,bibliotecaRepo, resenaRepo);
 
-        UsuarioControlador usuarioControlador = new UsuarioControlador(usuarioRepo);
-        JuegoControlador juegoControlador = new JuegoControlador(juegoRepo);
+        UsuarioControlador usuarioControlador = new UsuarioControlador(usuarioRepo, obtenerEntidades);
+        JuegoControlador juegoControlador = new JuegoControlador(juegoRepo, obtenerEntidades);
 
         BibliotecaControlador bibliotecaControlador =
                 new BibliotecaControlador(bibliotecaRepo, juegoRepo, obtenerEntidades);
@@ -36,6 +36,9 @@ public class Program {
         // datos prueba
 
         DatosPrueba.cargarDatos(usuarioControlador, juegoControlador, bibliotecaControlador, compraControlador, resenaControlador);
+
+
     }
+
 }
 

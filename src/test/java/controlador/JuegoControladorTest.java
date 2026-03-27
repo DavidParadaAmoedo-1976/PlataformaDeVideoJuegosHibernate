@@ -22,12 +22,18 @@ import static org.junit.jupiter.api.Assertions.*;
 class JuegoControladorTest {
 
     private JuegoControlador juegoControlador;
+    private final ObtenerEntidadesOptional obtenerEntidades;
+
+    JuegoControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
+        this.obtenerEntidades = obtenerEntidades;
+    }
+
 
     @BeforeEach
     void setUp() {
         JuegoRepoMemoria juegoRepoMemoria = new JuegoRepoMemoria();
         JuegoFormValidador.setJuegoRepo(juegoRepoMemoria);
-        juegoControlador = new JuegoControlador(juegoRepoMemoria);
+        juegoControlador = new JuegoControlador(juegoRepoMemoria, obtenerEntidades);
 
         new ObtenerEntidadesOptional(null, null, juegoRepoMemoria, null, null);
 

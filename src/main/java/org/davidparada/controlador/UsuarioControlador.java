@@ -1,6 +1,7 @@
 package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IUsuarioControlador;
+import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.UsuarioDto;
 import org.davidparada.modelo.entidad.UsuarioEntidad;
@@ -23,9 +24,11 @@ public class UsuarioControlador implements IUsuarioControlador {
     public static final double SALDO_MAX_A_ANADIR = 500.0;
     public static final int CERO = 0;
     private final IUsuarioRepo usuarioRepo;
+    private final ObtenerEntidadesOptional obtenerEntidades;
 
-    public UsuarioControlador(IUsuarioRepo usuarioRepo) {
+    public UsuarioControlador(IUsuarioRepo usuarioRepo, ObtenerEntidadesOptional obtenerEntidades) {
         this.usuarioRepo = usuarioRepo;
+        this.obtenerEntidades = obtenerEntidades;
     }
 
     @Override
@@ -54,7 +57,7 @@ public class UsuarioControlador implements IUsuarioControlador {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
-        UsuarioEntidad usuario = obtenerUsuario(idUsuario, errores);
+        UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
         return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
     }
@@ -93,7 +96,7 @@ public class UsuarioControlador implements IUsuarioControlador {
 
         comprobarListaErrores(errores);
 
-        UsuarioEntidad usuarioEntidad = obtenerUsuario(idUsuario, errores);
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
         if (usuarioEntidad.getEstadoCuenta() != EstadoCuentaEnum.ACTIVA) {
             errores.add(new ErrorModel("estadoCuenta", TipoErrorEnum.ESTADO_INCORRECTO));
@@ -125,13 +128,13 @@ public class UsuarioControlador implements IUsuarioControlador {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
-        UsuarioEntidad usuario = obtenerUsuario(idUsuario, errores);
+        UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
         return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
     }
 
 //    /**
 //     * Cambia el estado de la cuenta del usuario que pertenece al ID recibido,
-//     * le pone el valor recibido como segundo parametro.
+//     * le pone el valor recibido como segundo parámetro.
 //     * @param idUsuario
 //     * @param nuevoEstado
 //     * @throws ValidationException
@@ -170,7 +173,7 @@ public class UsuarioControlador implements IUsuarioControlador {
 //    /**
 //     * Elimina el usuario al que pertenece el ID recibido.
 //     * @param id
-//     * @return Indica si la operación a tenido éxito.
+//     * @return Indica si la operación ha tenido éxito.
 //     * @throws ValidationException
 //     */
 //    public boolean eliminarUsuario(Long id) throws ValidationException {
