@@ -88,8 +88,8 @@ public class DatosPrueba {
             for (int i = 1; i <= 10; i++) {
                 try{
                     compraCtrl.realizarCompra(
-                            (long) (random.nextInt(15) + 1),
-                            (long) (random.nextInt(30) + 1),
+                            (long) i,
+                            (long) i,
                             MetodoPagoEnum.TARJETA
                     );
                 } catch (ValidationException e) {
@@ -114,8 +114,8 @@ public class DatosPrueba {
             for (int i = 1; i <= 10; i++) {
 
                 bibliotecaCtrl.anadirJuego(
-                        (long) (random.nextInt(15) + 1),
-                        (long) (random.nextInt(30) + 1)
+                        (long) (i),
+                        (long) (i)
                 );
             }
 
@@ -126,8 +126,8 @@ public class DatosPrueba {
             for (int i = 1; i <= 10; i++) {
 
                 resenaCtrl.escribirResena(
-                        (long) (random.nextInt(15) + 1),
-                        (long) (random.nextInt(30) + 1),
+                        (long) (i),
+                        (long) (i),
                         random.nextBoolean(),
                         "Reseña de prueba ".repeat(5)
                 );
