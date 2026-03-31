@@ -14,7 +14,7 @@ import org.hibernate.Transaction;
 import java.util.List;
 import java.util.Optional;
 
-public class JuegosRepoHibernate implements IJuegoRepo {
+public class JuegoRepoHibernate implements IJuegoRepo {
     @Override
     public boolean existeTitulo(String titulo) {
         Transaction tx = null;

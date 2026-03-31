@@ -13,7 +13,7 @@ public class Program {
 
         // repositorios
         IUsuarioRepo usuarioRepo = new UsuarioRepoHibernate();
-        IJuegoRepo juegoRepo = new JuegosRepoHibernate();
+        IJuegoRepo juegoRepo = new JuegoRepoHibernate();
         IBibliotecaRepo bibliotecaRepo = new BibliotecaRepoHibernate();
         ICompraRepo compraRepo = new CompraRepoHibernate();
         IResenaRepo resenaRepo = new ResenaRepoHibernate();
