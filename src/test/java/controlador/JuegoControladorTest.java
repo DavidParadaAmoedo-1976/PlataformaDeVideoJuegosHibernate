@@ -10,6 +10,9 @@ import org.davidparada.modelo.enums.OrdenarJuegosEnum;
 import org.davidparada.modelo.formulario.JuegoForm;
 import org.davidparada.modelo.formulario.validacion.JuegoFormValidador;
 import org.davidparada.repositorio.implementacionMemoria.JuegoRepoMemoria;
+import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
+import org.davidparada.transaciones.GestorTransaccionesMemoria;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,23 +23,25 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JuegoControladorTest {
+//
+//    private JuegoControlador juegoControlador;
+//    private final ObtenerEntidadesOptional obtenerEntidades;
+//    private final IGestorTransacciones gestorTransacciones;
+//
+//    JuegoControladorTest(ObtenerEntidadesOptional obtenerEntidades, IGestorTransacciones gestorTransacciones) {
+//        this.obtenerEntidades = obtenerEntidades;
+//        this.gestorTransacciones = gestorTransacciones;
+//    }
 
     private JuegoControlador juegoControlador;
-    private final ObtenerEntidadesOptional obtenerEntidades;
-
-    JuegoControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
-        this.obtenerEntidades = obtenerEntidades;
-    }
-
-
     @BeforeEach
     void setUp() {
-        JuegoRepoMemoria juegoRepoMemoria = new JuegoRepoMemoria();
-        JuegoFormValidador.setJuegoRepo(juegoRepoMemoria);
-        juegoControlador = new JuegoControlador(juegoRepoMemoria, obtenerEntidades);
+        IJuegoRepo juegoRepo = new JuegoRepoMemoria();
+        JuegoFormValidador.setJuegoRepo(juegoRepo);
 
-        new ObtenerEntidadesOptional(null, null, juegoRepoMemoria, null, null);
-
+        ObtenerEntidadesOptional obtener = new ObtenerEntidadesOptional(null, null, juegoRepo, null, null);
+        IGestorTransacciones gestor = new GestorTransaccionesMemoria();
+        juegoControlador = new JuegoControlador(juegoRepo, obtener, gestor);
     }
 
     @Test
@@ -80,7 +85,7 @@ class JuegoControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> juegoControlador.crearJuego(duplicado)
         );
     }
@@ -161,7 +166,7 @@ class JuegoControladorTest {
 
     @Test
     void consultarDetallesFallaSiNoExiste() {
-        assertThrows(ValidationException.class, () -> {
+        assertThrows(RuntimeException.class, () -> {
             juegoControlador.consultarDetalles(999L);
         });
     }
@@ -228,7 +233,7 @@ class JuegoControladorTest {
 
     @Test
     void aplicarDescuentoFallaSiJuegoNoExiste() {
-        assertThrows(ValidationException.class, () -> {
+        assertThrows(RuntimeException.class, () -> {
             juegoControlador.aplicarDescuento(999L, 20);
         });
     }
@@ -296,7 +301,7 @@ class JuegoControladorTest {
     @Test
     void cambiarEstadoFallaSiJuegoNoExiste() {
 
-        assertThrows(ValidationException.class, () -> {
+        assertThrows(RuntimeException.class, () -> {
             juegoControlador.cambiarEstado(
                     999L,
                     EstadoJuegoEnum.NO_DISPONIBLE
@@ -376,7 +381,7 @@ class JuegoControladorTest {
 
         JuegoForm duplicado = crearFormularioValido();
 
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalStateException.class,
                 () -> juegoControlador.crearJuego(duplicado));
     }
 

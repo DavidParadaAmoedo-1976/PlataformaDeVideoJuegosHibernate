@@ -6,6 +6,7 @@ import org.davidparada.modelo.enums.EstadoJuegoEnum;
 import org.davidparada.modelo.formulario.JuegoForm;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IJuegoRepo extends ICrud<JuegoEntidad, JuegoForm, Long> {
 
@@ -15,7 +16,7 @@ public interface IJuegoRepo extends ICrud<JuegoEntidad, JuegoForm, Long> {
      * @param titulo
      * @return Confirmación de si existe o no.
      */
-    boolean existeTitulo(String titulo);
+    Optional<JuegoEntidad> buscarPorTitulo(String titulo);
 
     /**
      * Muestra los objetos filtrando según los parametros indicados.
@@ -37,5 +38,6 @@ public interface IJuegoRepo extends ICrud<JuegoEntidad, JuegoForm, Long> {
             EstadoJuegoEnum estado
     );
 
+    boolean existeTitulo(String titulo);
 }
 

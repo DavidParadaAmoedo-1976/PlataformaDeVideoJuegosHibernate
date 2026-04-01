@@ -53,8 +53,14 @@ public class JuegoRepoMemoria implements IJuegoRepo {
 
     @Override
     public boolean existeTitulo(String titulo) {
+        return false;
+    }
+
+    @Override
+    public Optional<JuegoEntidad> buscarPorTitulo(String titulo) {
         return juegosEntidad.stream()
-                .anyMatch(j -> j.getTitulo().equalsIgnoreCase(titulo));
+                .filter(j -> j.getTitulo().equalsIgnoreCase(titulo))
+                .findFirst();
     }
 
     @Override

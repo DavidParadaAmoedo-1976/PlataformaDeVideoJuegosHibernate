@@ -5,6 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(name = "biblioteca")
@@ -111,5 +112,45 @@ public class BibliotecaEntidad {
 
     public void setEstadoInstalacion(boolean estadoInstalacion) {
         this.estadoInstalacion = estadoInstalacion;
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "BibliotecaEntidad{" +
+                "idBiblioteca=" + idBiblioteca +
+                ", idUsuario=" + idUsuario +
+                ", idJuego=" + idJuego +
+                ", fechaAdquisicion=" + fechaAdquisicion +
+                ", horasDeJuego=" + horasDeJuego +
+                ", ultimaFechaDeJuego=" + ultimaFechaDeJuego +
+                ", estadoInstalacion=" + estadoInstalacion +
+                '}';
+    }
+
+    // Equals and hashCode
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BibliotecaEntidad that = (BibliotecaEntidad) o;
+        return estadoInstalacion == that.estadoInstalacion
+                && Objects.equals(idBiblioteca, that.idBiblioteca)
+                && Objects.equals(idUsuario, that.idUsuario)
+                && Objects.equals(idJuego, that.idJuego)
+                && Objects.equals(fechaAdquisicion, that.fechaAdquisicion)
+                && Objects.equals(horasDeJuego, that.horasDeJuego)
+                && Objects.equals(ultimaFechaDeJuego, that.ultimaFechaDeJuego);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idBiblioteca,
+                idUsuario,
+                idJuego,
+                fechaAdquisicion,
+                horasDeJuego,
+                ultimaFechaDeJuego,
+                estadoInstalacion);
     }
 }

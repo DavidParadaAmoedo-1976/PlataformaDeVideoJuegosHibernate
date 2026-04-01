@@ -7,6 +7,7 @@ import org.davidparada.modelo.enums.EstadoJuegoEnum;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "juegos")
@@ -46,9 +47,6 @@ public class JuegoEntidad {
     @Column(name = "clasificacion_por_edad", nullable = false)
     private ClasificacionJuegoEnum clasificacionPorEdad;
 
-//    @ElementCollection
-//    @Column(name = "idiomas", length = 200)
-//    private List<String> idiomas;
     @ElementCollection
     @CollectionTable(name = "juego_idiomas", joinColumns = @JoinColumn(name = "id_juego"))
     @Column(name = "idioma")
@@ -176,5 +174,56 @@ public class JuegoEntidad {
 
     public void setEstado(EstadoJuegoEnum estado) {
         this.estado = estado;
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "JuegoEntidad{" +
+                "idJuego=" + idJuego +
+                ", titulo='" + titulo + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", desarrollador='" + desarrollador + '\'' +
+                ", fechaLanzamiento=" + fechaLanzamiento +
+                ", precioBase=" + precioBase +
+                ", descuento=" + descuento +
+                ", categoria='" + categoria + '\'' +
+                ", clasificacionPorEdad=" + clasificacionPorEdad +
+                ", idiomas=" + idiomas +
+                ", estado=" + estado +
+                '}';
+    }
+
+    // Equals y hashCode
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        JuegoEntidad that = (JuegoEntidad) o;
+        return Objects.equals(idJuego, that.idJuego)
+                && Objects.equals(titulo, that.titulo)
+                && Objects.equals(descripcion, that.descripcion)
+                && Objects.equals(desarrollador, that.desarrollador)
+                && Objects.equals(fechaLanzamiento, that.fechaLanzamiento)
+                && Objects.equals(precioBase, that.precioBase)
+                && Objects.equals(descuento, that.descuento)
+                && Objects.equals(categoria, that.categoria)
+                && clasificacionPorEdad == that.clasificacionPorEdad
+                && Objects.equals(idiomas, that.idiomas)
+                && estado == that.estado;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idJuego,
+                titulo,
+                descripcion,
+                desarrollador,
+                fechaLanzamiento,
+                precioBase,
+                descuento,
+                categoria,
+                clasificacionPorEdad,
+                idiomas,
+                estado);
     }
 }

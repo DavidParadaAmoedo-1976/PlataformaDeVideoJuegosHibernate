@@ -14,10 +14,12 @@ import org.davidparada.modelo.formulario.validacion.ErrorModel;
 import org.davidparada.modelo.formulario.validacion.JuegoFormValidador;
 import org.davidparada.modelo.mapper.JuegoEntidadADtoMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
 
@@ -27,27 +29,31 @@ public class JuegoControlador implements IJuegoControlador {
     public static final int DESCUENTO_MAXIMO = 100;
     private final IJuegoRepo juegoRepo;
     private final ObtenerEntidadesOptional obtenerEntidades;
+    private final IGestorTransacciones gestorTransacciones;
 
-    public JuegoControlador(IJuegoRepo juegoRepo, ObtenerEntidadesOptional obtenerEntidades) {
+    public JuegoControlador(IJuegoRepo juegoRepo, ObtenerEntidadesOptional obtenerEntidades, IGestorTransacciones gestorTransacciones) {
         this.juegoRepo = juegoRepo;
         this.obtenerEntidades = obtenerEntidades;
+        this.gestorTransacciones = gestorTransacciones;
     }
 
     // Anadir Juego
     @Override
-    public JuegoDto crearJuego(JuegoForm form) throws ValidationException {
+    public JuegoDto crearJuego(JuegoForm formulario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
-        JuegoFormValidador.validarJuego(form);
-
-        if (juegoRepo.existeTitulo(form.getTitulo())) {
-            errores.add(new ErrorModel("titulo", TipoErrorEnum.DUPLICADO));
-        }
+        JuegoFormValidador.validarJuego(formulario);
+        JuegoEntidad juegoCreado = gestorTransacciones.inTransaction(() -> {
+                    Optional<JuegoEntidad> juegoEntidad = juegoRepo.buscarPorTitulo(formulario.getTitulo());
+                    if (juegoRepo.buscarPorTitulo(formulario.getTitulo()).isPresent()) {
+                        errores.add(new ErrorModel("titulo", TipoErrorEnum.DUPLICADO));
+                        throw new IllegalStateException();
+                    }
+                    return juegoRepo.crear(formulario);
+                });
         comprobarListaErrores(errores);
 
-        JuegoEntidad juegoEntidad = juegoRepo.crear(form);
-
-        return JuegoEntidadADtoMapper.juegoEntidadADto(juegoEntidad);
+        return JuegoEntidadADtoMapper.juegoEntidadADto(juegoCreado);
     }
 
     // Buscar juegos
@@ -61,50 +67,66 @@ public class JuegoControlador implements IJuegoControlador {
             EstadoJuegoEnum estado
     ) {
 
-        List<JuegoEntidad> juegos = juegoRepo.buscarConFiltros(
-                titulo, categoria, precioMin, precioMax, clasificacion, estado
-        );
+        return gestorTransacciones.inTransaction(() -> {
 
-        return juegos.stream()
-                .map(j -> JuegoEntidadADtoMapper.juegoEntidadADto(j))
-                .toList();
+            List<JuegoEntidad> juegos = juegoRepo.buscarConFiltros(
+                    titulo, categoria, precioMin, precioMax, clasificacion, estado
+            );
+
+            return juegos.stream()
+                    .map(j -> {
+                        j.getIdiomas().size();
+                        return JuegoEntidadADtoMapper.juegoEntidadADto(j);
+                    })
+                    .toList();
+        });
     }
 
     // Consultar catalogo completo
     @Override
     public List<JuegoDto> consultarCatalogo(OrdenarJuegosEnum orden) {
 
-        List<JuegoEntidad> juegos = juegoRepo.listarTodos();
+        return gestorTransacciones.inTransaction(() -> {
 
-        if (orden != null) {
+            List<JuegoEntidad> juegos = juegoRepo.listarTodos();
 
-            switch (orden) {
-                case ALFABETICO -> juegos.sort(Comparator.comparing(j -> j.getTitulo()));
-                case PRECIO -> juegos.sort(Comparator.comparing(j -> j.getPrecioBase()));
-                case FECHA -> juegos.sort(Comparator.comparing(j -> j.getFechaLanzamiento()));
-                default -> throw new IllegalArgumentException("No se encontro el tipo de búsqueda");
+            if (orden != null) {
+
+                switch (orden) {
+                    case ALFABETICO -> juegos.sort(Comparator.comparing(j -> j.getTitulo()));
+                    case PRECIO -> juegos.sort(Comparator.comparing(j -> j.getPrecioBase()));
+                    case FECHA -> juegos.sort(Comparator.comparing(j -> j.getFechaLanzamiento()));
+                    default -> throw new IllegalArgumentException("No se encontro el tipo de búsqueda");
+                }
             }
-        }
 
-        return juegos.stream()
-                .map(j -> JuegoEntidadADtoMapper.juegoEntidadADto(j))
-                .toList();
+            return juegos.stream()
+                    .map(j -> JuegoEntidadADtoMapper.juegoEntidadADto(j))
+                    .toList();
+        });
     }
 
     // Consultar detalles de un juego
     @Override
     public JuegoDto consultarDetalles(Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idJuego == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
-        comprobarListaErrores(errores);
-        JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
         comprobarListaErrores(errores);
 
-        return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+        return gestorTransacciones.inTransaction(() -> {
+            try {
+                JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+                comprobarListaErrores(errores);
+
+                return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     // Aplicar descuento
@@ -124,21 +146,29 @@ public class JuegoControlador implements IJuegoControlador {
         }
         comprobarListaErrores(errores);
 
-        JuegoEntidad juego = obtenerEntidades.obtenerJuego(id, errores);
+        return gestorTransacciones.inTransaction(() -> {
 
-        juegoRepo.actualizar(juego.getIdJuego(),
-                new JuegoForm(juego.getTitulo(),
-                        juego.getDescripcion(),
-                        juego.getDesarrollador(),
-                        juego.getFechaLanzamiento(),
-                        juego.getPrecioBase(),
-                        descuento,
-                        juego.getCategoria(),
-                        juego.getClasificacionPorEdad(),
-                        juego.getIdiomas(),
-                        juego.getEstado()
-                ));
-        return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+            JuegoEntidad juego;
+            try {
+                juego = obtenerEntidades.obtenerJuego(id, errores);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+
+            juegoRepo.actualizar(juego.getIdJuego(),
+                    new JuegoForm(juego.getTitulo(),
+                            juego.getDescripcion(),
+                            juego.getDesarrollador(),
+                            juego.getFechaLanzamiento(),
+                            juego.getPrecioBase(),
+                            descuento,
+                            juego.getCategoria(),
+                            juego.getClasificacionPorEdad(),
+                            juego.getIdiomas(),
+                            juego.getEstado()
+                    ));
+            return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+        });
     }
 
     // Cambiar estado del juego
@@ -154,22 +184,29 @@ public class JuegoControlador implements IJuegoControlador {
         }
         comprobarListaErrores(errores);
 
-        JuegoEntidad juego = obtenerEntidades.obtenerJuego(id, errores);
+        return gestorTransacciones.inTransaction(() -> {
+            JuegoEntidad juego = null;
+            try {
+                juego = obtenerEntidades.obtenerJuego(id, errores);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
 
-        juegoRepo.actualizar(juego.getIdJuego(),
-                new JuegoForm(
-                        juego.getTitulo(),
-                        juego.getDescripcion(),
-                        juego.getDesarrollador(),
-                        juego.getFechaLanzamiento(),
-                        juego.getPrecioBase(),
-                        juego.getDescuento(),
-                        juego.getCategoria(),
-                        juego.getClasificacionPorEdad(),
-                        juego.getIdiomas(),
-                        nuevoEstado
-                ));
-        return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+            juegoRepo.actualizar(juego.getIdJuego(),
+                    new JuegoForm(
+                            juego.getTitulo(),
+                            juego.getDescripcion(),
+                            juego.getDesarrollador(),
+                            juego.getFechaLanzamiento(),
+                            juego.getPrecioBase(),
+                            juego.getDescuento(),
+                            juego.getCategoria(),
+                            juego.getClasificacionPorEdad(),
+                            juego.getIdiomas(),
+                            nuevoEstado
+                    ));
+            return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+        });
     }
 
     // Eliminar el juego
