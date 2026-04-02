@@ -49,4 +49,6 @@ public interface IUsuarioControlador {
      * @throws ValidationException
      */
     UsuarioDto consultarSaldo(Long idUsuario) throws ValidationException;
+
+    UsuarioDto login(String nombreUsuario, String password) throws ValidationException;
 }

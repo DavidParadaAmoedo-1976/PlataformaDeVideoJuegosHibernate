@@ -13,6 +13,7 @@ import org.davidparada.modelo.formulario.validacion.UsuarioFormValidador;
 import org.davidparada.modelo.mapper.UsuarioEntidadADtoMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
+import org.davidparada.util.EncriptarPassword;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,22 +37,43 @@ public class UsuarioControlador implements IUsuarioControlador {
 
     @Override
     public UsuarioDto registrarUsuario(UsuarioForm formulario) throws ValidationException {
+
         List<ErrorModel> errores = new ArrayList<>();
 
         UsuarioFormValidador.validarUsuario(formulario);
-        UsuarioEntidad usuarioCreado = gestorTransacciones.inTransaction(() -> {
+
+        return gestorTransacciones.inTransaction(() -> {
             if (usuarioRepo.buscarPorEmail(formulario.getEmail()).isPresent()) {
                 errores.add(new ErrorModel("email", TipoErrorEnum.DUPLICADO));
-                throw new IllegalStateException();
             }
             if (usuarioRepo.buscarPorNombreUsuario(formulario.getNombreUsuario()).isPresent()) {
-                errores.add(new ErrorModel("nombre", TipoErrorEnum.DUPLICADO));
-                throw new IllegalStateException();
+                errores.add(new ErrorModel("nombreUsuario", TipoErrorEnum.DUPLICADO));
             }
-            return usuarioRepo.crear(formulario);
-        });
+            try {
+                comprobarListaErrores(errores);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
 
-        return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioCreado);
+            String passwordHash = EncriptarPassword.generarHash(formulario.getPassword());
+
+            UsuarioForm formularioHash = new UsuarioForm(
+                    formulario.getNombreUsuario(),
+                    formulario.getEmail(),
+                    passwordHash,
+                    formulario.getNombreReal(),
+                    formulario.getPais(),
+                    formulario.getFechaNacimiento(),
+                    formulario.getFechaRegistro(),
+                    formulario.getAvatar(),
+                    formulario.getSaldo(),
+                    formulario.getEstadoCuenta()
+            );
+
+            UsuarioEntidad usuario = usuarioRepo.crear(formularioHash);
+
+            return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+        });
     }
 
 
@@ -159,6 +181,37 @@ public class UsuarioControlador implements IUsuarioControlador {
             } catch (ValidationException e) {
                 throw new RuntimeException(e);
             }
+            return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+        });
+    }
+
+    @Override
+    public UsuarioDto login(String nombreUsuario, String password) throws ValidationException {
+        List<ErrorModel> errores = new ArrayList<>();
+
+        if (nombreUsuario == null || nombreUsuario.isBlank()) {
+            errores.add(new ErrorModel("nombreUsuario", TipoErrorEnum.OBLIGATORIO));
+        }
+        if (password == null || password.isBlank()) {
+            errores.add(new ErrorModel("password", TipoErrorEnum.OBLIGATORIO));
+        }
+        comprobarListaErrores(errores);
+
+        return gestorTransacciones.inTransaction(() -> {
+            UsuarioEntidad usuario = usuarioRepo.buscarPorNombreUsuario(nombreUsuario)
+                    .orElseThrow(() -> new RuntimeException());
+            if (usuario == null) {
+                errores.add(new ErrorModel("usuario", TipoErrorEnum.NO_ENCONTRADO));
+            }
+            if (!EncriptarPassword.verificarPassword(password, usuario.getPassword())) {
+                errores.add(new ErrorModel("password", TipoErrorEnum.NO_COINCIDE));
+            }
+            try {
+                comprobarListaErrores(errores);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+
             return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
         });
     }
