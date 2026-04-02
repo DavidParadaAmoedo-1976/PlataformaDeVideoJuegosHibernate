@@ -46,8 +46,8 @@ public class JuegoRepoHibernate implements IJuegoRepo {
     public List<JuegoEntidad> listarTodos() {
         Session session = sessionManager.getSession();
 
-        CriteriaBuilder criteria = session.getCriteriaBuilder();
-        CriteriaQuery<JuegoEntidad> criteriaQuery = criteria.createQuery(JuegoEntidad.class);
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<JuegoEntidad> criteriaQuery = criteriaBuilder.createQuery(JuegoEntidad.class);
         Root<JuegoEntidad> root = criteriaQuery.from(JuegoEntidad.class);
 
         criteriaQuery.select(root);
@@ -97,10 +97,10 @@ public class JuegoRepoHibernate implements IJuegoRepo {
 
         Session session = sessionManager.getSession();
 
-        CriteriaBuilder criteria = session.getCriteriaBuilder();
-        CriteriaQuery<JuegoEntidad> criteriaQuery = criteria.createQuery(JuegoEntidad.class);
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<JuegoEntidad> criteriaQuery = criteriaBuilder.createQuery(JuegoEntidad.class);
         Root<JuegoEntidad> root = criteriaQuery.from(JuegoEntidad.class);
-        criteriaQuery.select(root).where(criteria.equal(root.get("titulo"), titulo));
+        criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("titulo"), titulo));
 
         return session.createQuery(criteriaQuery).getResultStream().findFirst();
     }

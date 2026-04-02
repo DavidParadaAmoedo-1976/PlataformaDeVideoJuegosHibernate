@@ -17,6 +17,7 @@ import org.davidparada.modelo.mapper.JuegoEntidadADtoMapper;
 import org.davidparada.modelo.mapper.UsuarioEntidadADtoMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -26,9 +27,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
-
 
 public class BibliotecaControlador implements IBibliotecaControlador {
 
@@ -39,15 +40,52 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     private final IBibliotecaRepo bibliotecaRepo;
     private final IJuegoRepo juegoRepo;
     private final ObtenerEntidadesOptional obtenerEntidades;
+    private final IGestorTransacciones gestorTransacciones;
 
     public BibliotecaControlador(IBibliotecaRepo bibliotecaRepo,
                                  IJuegoRepo juegoRepo,
-                                 ObtenerEntidadesOptional obtenerEntidades
-                                 ) {
+                                 ObtenerEntidadesOptional obtenerEntidades,
+                                 IGestorTransacciones gestorTransacciones
+    ) {
 
         this.bibliotecaRepo = bibliotecaRepo;
         this.juegoRepo = juegoRepo;
         this.obtenerEntidades = obtenerEntidades;
+        this.gestorTransacciones = gestorTransacciones;
+    }
+
+    // Añadir juego a biblioteca
+
+    @Override
+    public BibliotecaDto anadirJuego(Long idUsuario, Long idJuego) throws ValidationException {
+        List<ErrorModel> errores = new ArrayList<>();
+
+        comprobarIdUsuario(idUsuario, errores);
+        comprobarIdJuego(idJuego, errores);
+
+        BibliotecaEntidad bibliotecaEntidad = gestorTransacciones.inTransaction(() -> {
+            Optional<BibliotecaEntidad> bibliotecaExistente = bibliotecaRepo.buscarPorUsuarioYJuego(idUsuario, idJuego);
+            if (bibliotecaExistente.isPresent()) {
+                errores.add(new ErrorModel("juego", TipoErrorEnum.DUPLICADO));
+                throw new IllegalStateException();
+
+            }
+            BibliotecaForm nuevoJuego = new BibliotecaForm(
+                    idUsuario,
+                    idJuego,
+                    Instant.now(),
+                    HORAS_DE_JUEGO_POR_DEFECTO,
+                    null,
+                    false
+            );
+
+
+            return bibliotecaRepo.crear(nuevoJuego);
+        });
+        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
+
+        return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
     }
 
     // Ver Biblioteca personal
@@ -57,14 +95,21 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         List<ErrorModel> errores = new ArrayList<>();
         comprobarIdUsuario(idUsuario, errores);
 
-        List<BibliotecaEntidad> juegosEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario); // Guarda todos los juegos de la biblioteca del usuario en una lista.
-
-        // Mapea la lista de Entidades a un DTO para poder mostrar los datos del juego
-
         UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+
+        return gestorTransacciones.inTransaction(() -> {
+            List<BibliotecaDto> juegos = construirBiblioteca(idUsuario, usuario);
+            return ordenarBiblioteca(juegos, orden);
+        });
+    }
+
+    private List<BibliotecaDto> construirBiblioteca(Long idUsuario, UsuarioEntidad usuario) {
+
+        List<BibliotecaEntidad> juegosEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
 
         List<BibliotecaDto> juegos = juegosEntidad.stream()
                 .map(b -> {
+
                     JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElseThrow();
 
                     return new BibliotecaDto(
@@ -81,69 +126,42 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                 })
                 .toList();
 
-        // Ahora que tengo la lista de juegos en Dto para mostrar toca ver como la ordeno.
-
-        if (orden != null) {        // Si la variable orden no es nula pasa al switch para ver como tiene que ordenar.
-
-            switch (orden) {
-                // Orden alfabetico
-                case ALFABETICO -> juegos = juegos.stream()
-                        .sorted(Comparator.comparing(b -> b.juegoDto().titulo()))
-                        .toList();
-
-                // Ordena por tiempo de Juego
-                case TIEMPO_DE_JUEGO -> juegos = juegos.stream()
-                        .sorted(Comparator.comparing((BibliotecaDto b) -> b.horasDeJuego()).reversed())
-                        .toList();
-
-                // Ordena por la última sesión
-                case ULTIMA_SESION -> juegos = juegos.stream()
-                        .sorted(Comparator.comparing((BibliotecaDto j) -> j.ultimaFechaDeJuego()).reversed())
-                        .toList();
-
-                // Ordena por fecha de adquisición
-                case FECHA_DE_ADQUISICION -> juegos = juegos.stream()
-                        .sorted(Comparator.comparing((BibliotecaDto b) -> b.fechaAdquisicion()).reversed())
-                        .toList();
-
-                default -> throw new IllegalArgumentException("No se encontro el orden");
-            }
-        }
         return juegos;
     }
 
-    // Añadir juego a biblioteca
+    private List<BibliotecaDto> ordenarBiblioteca(List<BibliotecaDto> juegos, OrdenarJuegosBibliotecaEnum orden) {
 
-    @Override
-    public BibliotecaDto anadirJuego(Long idUsuario, Long idJuego) throws ValidationException {
-        List<ErrorModel> errores = new ArrayList<>();
-
-        comprobarIdUsuario(idUsuario, errores);
-        comprobarIdJuego(idJuego, errores);
-
-        List<BibliotecaEntidad> bibliotecasEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
-
-        boolean yaTieneJuego = bibliotecasEntidad.stream().anyMatch(b -> b.getIdJuego().equals(idJuego));
-
-        if (yaTieneJuego) {
-            errores.add(new ErrorModel("juego", TipoErrorEnum.DUPLICADO));
-            throw new ValidationException(errores);
+        if (orden == null) {
+            return juegos;
         }
-        BibliotecaForm nuevoJuego = new BibliotecaForm(
-                idUsuario,
-                idJuego,
-                Instant.now(),
-                HORAS_DE_JUEGO_POR_DEFECTO,
-                null,
-                false
-        );
 
-        BibliotecaEntidad nuevoJuegoEntidad = bibliotecaRepo.crear(nuevoJuego);
-        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
+        switch (orden) {
 
-        return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(nuevoJuegoEntidad, usuarioEntidad, juegoEntidad);
+            case ALFABETICO:
+                return juegos.stream()
+                        .sorted(Comparator.comparing(b -> b.juegoDto().titulo()))
+                        .toList();
+
+            case TIEMPO_DE_JUEGO:
+                return juegos.stream()
+                        .sorted(Comparator.comparing((BibliotecaDto b) -> b.horasDeJuego()).reversed())
+                        .toList();
+
+            case ULTIMA_SESION:
+                return juegos.stream()
+                        .sorted(Comparator.comparing((BibliotecaDto b) -> b.ultimaFechaDeJuego()).reversed())
+                        .toList();
+
+            case FECHA_DE_ADQUISICION:
+                return juegos.stream()
+                        .sorted(Comparator.comparing((BibliotecaDto b) -> b.fechaAdquisicion()).reversed())
+                        .toList();
+
+            default:
+                throw new IllegalArgumentException("No se encontró el orden");
+        }
     }
+
 
     // Eliminar juego de biblioteca
 
@@ -154,45 +172,67 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarIdUsuario(idUsuario, errores);
         comprobarIdJuego(idJuego, errores);
 
-        BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
-
-        bibliotecaRepo.eliminar(bibliotecaEntidad.getIdBiblioteca());
-        return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
+            return gestorTransacciones.inTransaction(() -> {
+                try {
+                    BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+                    UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+                    JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
+                    bibliotecaRepo.eliminar(bibliotecaEntidad.getIdBiblioteca());
+                    return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                            bibliotecaEntidad,
+                            usuarioEntidad,
+                            juegoEntidad
+                    );
+                } catch (ValidationException e) {
+                    throw new IllegalStateException();
+                }
+            });
     }
 
     // Actualizar tiempo de juego
 
     @Override
     public BibliotecaDto actualizarTiempoDeJuego(Long idUsuario, Long idJuego, double horas) throws ValidationException {
-
         List<ErrorModel> errores = new ArrayList<>();
 
         comprobarIdUsuario(idUsuario, errores);
         comprobarIdJuego(idJuego, errores);
-
         if (horas < CERO) {
             errores.add(new ErrorModel("horas", TipoErrorEnum.RANGO_INVALIDO));
         }
-
         comprobarListaErrores(errores);
 
-        BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
+        return gestorTransacciones.inTransaction(() -> {
+            try {
+                BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+                UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+                JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-        BibliotecaForm actualizarTiempoDeJuego = new BibliotecaForm(
-                idUsuario,
-                idJuego,
-                bibliotecaEntidad.getFechaAdquisicion(),
-                bibliotecaEntidad.getHorasDeJuego() + horas,
-                Instant.now(), // actualizar última sesión
-                bibliotecaEntidad.isEstadoInstalacion()
-        );
+                double horasTotales = bibliotecaEntidad.getHorasDeJuego() + horas;
+                BibliotecaForm bibliotecaFormActualizada = new BibliotecaForm(
+                        idUsuario,
+                        idJuego,
+                        bibliotecaEntidad.getFechaAdquisicion(),
+                        horasTotales,
+                        Instant.now(),
+                        bibliotecaEntidad.isEstadoInstalacion()
+                );
 
-        bibliotecaRepo.actualizar(bibliotecaEntidad.getIdBiblioteca(), actualizarTiempoDeJuego);
-        return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
+                BibliotecaEntidad actualizado = bibliotecaRepo.actualizar(
+                        bibliotecaEntidad.getIdBiblioteca(),
+                        bibliotecaFormActualizada
+                ).orElseThrow(() -> new IllegalStateException());
+
+                return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                        actualizado,
+                        usuarioEntidad,
+                        juegoEntidad
+                );
+
+            } catch (ValidationException e) {
+                throw new IllegalStateException();
+            }
+        });
     }
 
     // Consultar última sesión
@@ -203,31 +243,38 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
         comprobarIdUsuario(idUsuario, errores);
         comprobarIdJuego(idJuego, errores);
-        BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-        if (bibliotecaEntidad.getUltimaFechaDeJuego() == null) {
-            return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
-                    bibliotecaEntidad, usuarioEntidad, juegoEntidad
-            );
-        }
-        Instant ultimaFechaHoraDeJuego = bibliotecaEntidad.getUltimaFechaDeJuego();
-        Instant horaActual = Instant.now();
+        return gestorTransacciones.inTransaction(() -> {
+            try {
+                BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+                UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+                JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-        // Diferencia real
-        Duration duracion = Duration.between(ultimaFechaHoraDeJuego, horaActual);
+                if (bibliotecaEntidad.getUltimaFechaDeJuego() == null) {
+                    return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                            bibliotecaEntidad, usuarioEntidad, juegoEntidad
+                    );
+                }
+                Instant ultimaFechaHoraDeJuego = bibliotecaEntidad.getUltimaFechaDeJuego();
+                Instant horaActual = Instant.now();
 
-        long horasEnTotal = duracion.toHours();
+                // Diferencia real
+                Duration duracion = Duration.between(ultimaFechaHoraDeJuego, horaActual);
 
-        // Convertimos para mostrar
-        ZonedDateTime fechaLocal = ultimaFechaHoraDeJuego
-                .atZone(ZoneId.systemDefault());
+                long horasEnTotal = duracion.toHours();
 
-        DateTimeFormatter formato =
-                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+                // Convertimos para mostrar
+                ZonedDateTime fechaLocal = ultimaFechaHoraDeJuego
+                        .atZone(ZoneId.systemDefault());
 
-        return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
+                DateTimeFormatter formato =
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+                return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
+            } catch (ValidationException e) {
+                throw new IllegalStateException();
+            }
+        });
     }
 
     // Filtrar biblioteca
@@ -236,87 +283,83 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         List<ErrorModel> errores = new ArrayList<>();
 
         comprobarIdUsuario(idUsuario, errores);
-        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-        List<BibliotecaEntidad> bibliotecaEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
 
-        return bibliotecaEntidad.stream()
-                .filter(b ->
-                        estadoInstalacion == null ||
-                                b.isEstadoInstalacion() == estadoInstalacion
-                )
-                .map(b -> {
-                    JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElseThrow();
-                    return new BibliotecaDto(b.getIdBiblioteca(),
-                            b.getIdUsuario(),
-                            UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad),
-                            b.getIdJuego(),
-                            JuegoEntidadADtoMapper.juegoEntidadADto(juego),
-                            b.getFechaAdquisicion(),
-                            b.getHorasDeJuego(),
-                            b.getUltimaFechaDeJuego(),
-                            b.isEstadoInstalacion()
-                    );
-
-                })
-
-                .filter(dto -> texto == null || dto.juegoDto().titulo().toLowerCase().contains(texto.toLowerCase()))
-                .toList();
+        return gestorTransacciones.inTransaction(() -> {
+            try {
+                UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+                List<BibliotecaEntidad> bibliotecaEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
+                return bibliotecaEntidad.stream()
+                        .filter(b ->
+                                estadoInstalacion == null ||
+                                        b.isEstadoInstalacion() == estadoInstalacion
+                        )
+                        .map(b -> {
+                            JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElseThrow();
+                            return new BibliotecaDto(b.getIdBiblioteca(),
+                                    b.getIdUsuario(),
+                                    UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad),
+                                    b.getIdJuego(),
+                                    JuegoEntidadADtoMapper.juegoEntidadADto(juego),
+                                    b.getFechaAdquisicion(),
+                                    b.getHorasDeJuego(),
+                                    b.getUltimaFechaDeJuego(),
+                                    b.isEstadoInstalacion()
+                            );
+                        })
+                        .filter(dto -> texto == null || dto.juegoDto().titulo().toLowerCase().contains(texto.toLowerCase()))
+                        .toList();
+            } catch (ValidationException e) {
+                throw new IllegalStateException();
+            }
+        });
     }
 
     // Ver estadísticas de biblioteca
 
     @Override
     public EstadisticasBibliotecaDto estadisticasBiblioteca(Long idUsuario) throws ValidationException {
-
         List<ErrorModel> errores = new ArrayList<>();
         comprobarIdUsuario(idUsuario, errores);
 
-        List<BibliotecaEntidad> biblioteca = bibliotecaRepo.buscarPorUsuario(idUsuario);
-
-        int totalJuegos = biblioteca.size();
-        double horasTotales = INICIO_VARIABLE_DOUBLE;
-        double valorTotal = INICIO_VARIABLE_DOUBLE;
-
-        String juegoMasJugado = null;
-        double maxHoras = INICIO_VARIABLE_NEG;
-
-        List<String> juegosInstalados = new ArrayList<>();
-        List<String> juegosNuncaJugados = new ArrayList<>();
-
-        for (BibliotecaEntidad b : biblioteca) {
-
-            JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElse(null);
-
-            if (juego == null) {
-                continue;
+        return gestorTransacciones.inTransaction(() -> {
+            List<BibliotecaEntidad> biblioteca = bibliotecaRepo.buscarPorUsuario(idUsuario);
+            int totalJuegos = biblioteca.size();
+            double horasTotales = INICIO_VARIABLE_DOUBLE;
+            double valorTotal = INICIO_VARIABLE_DOUBLE;
+            String juegoMasJugado = null;
+            double maxHoras = INICIO_VARIABLE_NEG;
+            List<String> juegosInstalados = new ArrayList<>();
+            List<String> juegosNuncaJugados = new ArrayList<>();
+            for (BibliotecaEntidad b : biblioteca) {
+                JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElse(null);
+                if (juego == null) {
+                    continue;
+                }
+                horasTotales += b.getHorasDeJuego();
+                valorTotal += juego.getPrecioBase();
+                if (b.isEstadoInstalacion()) {
+                    juegosInstalados.add(juego.getTitulo());
+                }
+                if (b.getHorasDeJuego() == HORAS_DE_JUEGO_POR_DEFECTO) {
+                    juegosNuncaJugados.add(juego.getTitulo());
+                }
+                if (b.getHorasDeJuego() > maxHoras) {
+                    maxHoras = b.getHorasDeJuego();
+                    juegoMasJugado = juego.getTitulo();
+                }
             }
-
-            horasTotales += b.getHorasDeJuego();
-            valorTotal += juego.getPrecioBase();
-
-            if (b.isEstadoInstalacion()) {
-                juegosInstalados.add(juego.getTitulo());
-            }
-
-            if (b.getHorasDeJuego() == HORAS_DE_JUEGO_POR_DEFECTO) {
-                juegosNuncaJugados.add(juego.getTitulo());
-            }
-
-            if (b.getHorasDeJuego() > maxHoras) {
-                maxHoras = b.getHorasDeJuego();
-                juegoMasJugado = juego.getTitulo();
-            }
-        }
-
-        return new EstadisticasBibliotecaDto(
-                totalJuegos,
-                horasTotales,
-                juegosInstalados,
-                juegoMasJugado,
-                valorTotal,
-                juegosNuncaJugados
-        );
+            return new EstadisticasBibliotecaDto(
+                    totalJuegos,
+                    horasTotales,
+                    juegosInstalados,
+                    juegoMasJugado,
+                    valorTotal,
+                    juegosNuncaJugados
+            );
+        });
     }
+
+
 
     // Comprobaciones
 

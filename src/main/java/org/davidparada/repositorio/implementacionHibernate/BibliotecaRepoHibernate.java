@@ -1,9 +1,14 @@
 package org.davidparada.repositorio.implementacionHibernate;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.davidparada.modelo.entidad.BibliotecaEntidad;
 import org.davidparada.modelo.formulario.BibliotecaForm;
 import org.davidparada.modelo.mapper.BibliotecaFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
+import org.davidparada.transaciones.interfaceTransaciones.ISessionManager;
 import org.davidparada.util.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -13,156 +18,100 @@ import java.util.List;
 import java.util.Optional;
 
 public class BibliotecaRepoHibernate implements IBibliotecaRepo {
-    @Override
-    public List<BibliotecaEntidad> buscarPorUsuario(Long idUsuario) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
 
-            String query = "FROM BibliotecaEntidad WHERE idUsuario = :idUsuario";
-            List<BibliotecaEntidad> bibliotecasEntidad = session
-                    .createQuery(query, BibliotecaEntidad.class)
-                    .setParameter("idUsuario", idUsuario)
-                    .getResultList();
+    private final ISessionManager sessionManager;
 
-            tx.commit();
-            return bibliotecasEntidad;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar bibliotecas en base de datos", e);
-        }
-    }
-
-
-    @Override
-    public Optional<BibliotecaEntidad> buscarPorUsuarioYJuego(Long idUsuario, Long idJuego) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-
-            String query = "FROM BibliotecaEntidad WHERE idUsuario = :idUsuario AND idJuego = :idJuego";
-            Optional<BibliotecaEntidad> bibliotecaEntidad = session
-                    .createQuery(query, BibliotecaEntidad.class)
-                    .setParameter("idUsuario", idUsuario)
-                    .setParameter("idJuego", idJuego)
-                    .uniqueResultOptional();
-
-            tx.commit();
-            return bibliotecaEntidad;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar biblioteca en base de datos", e);
-        }
+    public BibliotecaRepoHibernate(ISessionManager sessionManager) {
+        this.sessionManager = sessionManager;
     }
 
     @Override
     public BibliotecaEntidad crear(BibliotecaForm formulario) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
             BibliotecaEntidad bibliotecaEntidad = BibliotecaFormularioAEntidadMapper.crearBibliotecaEntidad(formulario);
             session.persist(bibliotecaEntidad);
 
-            tx.commit();
             return bibliotecaEntidad;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al crear biblioteca en base de datos", e);
-        }
     }
 
     @Override
     public Optional<BibliotecaEntidad> buscarPorId(Long idBiblioteca) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            Optional<BibliotecaEntidad> bibliotecaEntidad = Optional.ofNullable(session.get(BibliotecaEntidad.class, idBiblioteca));
-
-            tx.commit();
-            return bibliotecaEntidad;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar biblioteca en base de datos", e);
-        }
+            return Optional.ofNullable(session.find(BibliotecaEntidad.class, idBiblioteca));
     }
 
     @Override
     public List<BibliotecaEntidad> listarTodos() {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            String query = "FROM BibliotecaEntidad";
-            List<BibliotecaEntidad> bibliotecasEntidad = session
-                    .createQuery(query, BibliotecaEntidad.class)
-                    .getResultList();
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<BibliotecaEntidad> criteriaQuery = criteriaBuilder.createQuery(BibliotecaEntidad.class);
+        Root<BibliotecaEntidad> root = criteriaQuery.from(BibliotecaEntidad.class);
 
-            tx.commit();
-            return bibliotecasEntidad;
+        criteriaQuery.select(root);
 
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar bibliotecas en base de datos", e);
-        }
+        return session.createQuery(criteriaQuery).getResultList();
     }
 
     @Override
     public Optional<BibliotecaEntidad> actualizar(Long idBiblioteca, BibliotecaForm formulario) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            BibliotecaEntidad bibliotecaEntidad = BibliotecaFormularioAEntidadMapper.crearBibliotecaEntidad(idBiblioteca, formulario);
-            BibliotecaEntidad bibliotecaActualizada = session.merge(bibliotecaEntidad);
-
-            tx.commit();
-            return Optional.of(bibliotecaActualizada);
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al actualizar la biblioteca en base de datos", e);
+        Optional<BibliotecaEntidad> bibliotecaEntidad = this.buscarPorId(idBiblioteca);
+        if (bibliotecaEntidad.isEmpty()) {
+            return Optional.empty();
         }
+
+        session.merge(new BibliotecaEntidad(idBiblioteca,
+                formulario.getIdUsuario(),
+                formulario.getIdJuego(),
+                formulario.getFechaAdquisicion(),
+                formulario.getHorasDeJuego(),
+                formulario.getUltimaFechaDeJuego(),
+                formulario.isEstadoInstalacion()
+                ));
+
+        return buscarPorId(idBiblioteca);
     }
 
     @Override
     public boolean eliminar(Long idBiblioteca) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            BibliotecaEntidad bibliotecaEntidad = session.get(BibliotecaEntidad.class, idBiblioteca);
-            if (bibliotecaEntidad == null) {
-                tx.commit();
-                return false;
-            }
-            session.remove(bibliotecaEntidad);
-
-            tx.commit();
-            return true;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al eliminar biblioteca en base de datos", e);
+        Optional<BibliotecaEntidad> bibliotecaEntidad = this.buscarPorId(idBiblioteca);
+        if (bibliotecaEntidad.isEmpty()) {
+            return false;
         }
+        session.remove(bibliotecaEntidad);
+        return true;
+    }
+
+    @Override
+    public List<BibliotecaEntidad> buscarPorUsuario(Long idUsuario) {
+        Session session = sessionManager.getSession();
+
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<BibliotecaEntidad> criteriaQuery = criteriaBuilder.createQuery(BibliotecaEntidad.class);
+        Root<BibliotecaEntidad> root = criteriaQuery.from(BibliotecaEntidad.class);
+        criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("idUsuario"), idUsuario));
+
+        return session.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public Optional<BibliotecaEntidad> buscarPorUsuarioYJuego(Long idUsuario, Long idJuego) {
+        Session session = sessionManager.getSession();
+
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<BibliotecaEntidad> criteriaQuery = criteriaBuilder.createQuery(BibliotecaEntidad.class);
+        Root<BibliotecaEntidad> root = criteriaQuery.from(BibliotecaEntidad.class);
+
+        Predicate p1 = criteriaBuilder.equal(root.get("idUsuario"), idUsuario);
+        Predicate p2 = criteriaBuilder.equal(root.get("idJuego"), idJuego);
+        criteriaQuery.select(root).where(criteriaBuilder.and(p1,p2));
+
+        return session.createQuery(criteriaQuery).getResultStream().findFirst();
     }
 }

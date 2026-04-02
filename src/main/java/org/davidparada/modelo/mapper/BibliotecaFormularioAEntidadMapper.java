@@ -18,17 +18,16 @@ public class BibliotecaFormularioAEntidadMapper {
                 idBiblioteca,
                 formulario.getIdUsuario(),
                 formulario.getIdJuego(),
-                Instant.now(),     // FechaAdquisicion automática
-                HORAS_DE_JUEGO_POR_DEFECTO,                 // HorasDeJuego inicial
-                null,                // "ultimaFechaDeJuego" -> aún no ha jugado
-                false                // No instalado por defecto
+                Instant.now(),              // FechaAdquisicion automática
+                HORAS_DE_JUEGO_POR_DEFECTO, // HorasDeJuego inicial
+                null,                       // "ultimaFechaDeJuego" -> aún no ha jugado
+                false                       // No instalado por defecto
         );
     }
 
     public static BibliotecaEntidad crearBibliotecaEntidad(BibliotecaForm formulario) {
         return crearBibliotecaEntidad(null, formulario);
     }
-
 
     public static BibliotecaEntidad actualizarBibliotecaEntidad(Long idBibliteca, BibliotecaForm formulario) {
         return new BibliotecaEntidad(
