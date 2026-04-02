@@ -12,6 +12,7 @@ import org.davidparada.modelo.formulario.validacion.ErrorModel;
 import org.davidparada.modelo.formulario.validacion.UsuarioFormValidador;
 import org.davidparada.modelo.mapper.UsuarioEntidadADtoMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,27 +26,32 @@ public class UsuarioControlador implements IUsuarioControlador {
     public static final int CERO = 0;
     private final IUsuarioRepo usuarioRepo;
     private final ObtenerEntidadesOptional obtenerEntidades;
+    private final IGestorTransacciones gestorTransacciones;
 
-    public UsuarioControlador(IUsuarioRepo usuarioRepo, ObtenerEntidadesOptional obtenerEntidades) {
+    public UsuarioControlador(IUsuarioRepo usuarioRepo, ObtenerEntidadesOptional obtenerEntidades, IGestorTransacciones gestorTransacciones) {
         this.usuarioRepo = usuarioRepo;
         this.obtenerEntidades = obtenerEntidades;
+        this.gestorTransacciones = gestorTransacciones;
     }
 
     @Override
-    public UsuarioDto registrarUsuario(UsuarioForm form) throws ValidationException {
+    public UsuarioDto registrarUsuario(UsuarioForm formulario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-        UsuarioFormValidador.validarUsuario(form);
 
-        if (usuarioRepo.buscarPorEmail(form.getEmail()).isPresent()) {
-            errores.add(new ErrorModel("email", TipoErrorEnum.DUPLICADO));
-        }
-        if (usuarioRepo.buscarPorNombreUsuario(form.getNombreUsuario()).isPresent()) {
-            errores.add(new ErrorModel("nombre", TipoErrorEnum.DUPLICADO));
-        }
-        comprobarListaErrores(errores);
+        UsuarioFormValidador.validarUsuario(formulario);
+        UsuarioEntidad usuarioCreado = gestorTransacciones.inTransaction(() -> {
+            if (usuarioRepo.buscarPorEmail(formulario.getEmail()).isPresent()) {
+                errores.add(new ErrorModel("email", TipoErrorEnum.DUPLICADO));
+                throw new IllegalStateException();
+            }
+            if (usuarioRepo.buscarPorNombreUsuario(formulario.getNombreUsuario()).isPresent()) {
+                errores.add(new ErrorModel("nombre", TipoErrorEnum.DUPLICADO));
+                throw new IllegalStateException();
+            }
+            return usuarioRepo.crear(formulario);
+        });
 
-        UsuarioEntidad usuario = usuarioRepo.crear(form);
-        return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+        return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioCreado);
     }
 
 
@@ -57,21 +63,31 @@ public class UsuarioControlador implements IUsuarioControlador {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
-        UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
-        return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+        return gestorTransacciones.inTransaction(() -> {
+            try {
+                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+
+                return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
-    public UsuarioDto consultarPerfil(String nombreUsuario) {
-
+    public UsuarioDto consultarPerfil(String nombreUsuario) throws ValidationException {
+        List<ErrorModel> errores = new ArrayList<>();
         if (nombreUsuario == null || nombreUsuario.isBlank()) {
-            return null;
+            errores.add(new ErrorModel("nombre", TipoErrorEnum.OBLIGATORIO));
         }
-
-        return usuarioRepo.buscarPorNombreUsuario(nombreUsuario)
-                .map(UsuarioEntidadADtoMapper::usuarioEntidadADto)
-                .orElse(null);
+        comprobarListaErrores(errores);
+        return gestorTransacciones.inTransaction(() ->
+                usuarioRepo.buscarPorNombreUsuario(nombreUsuario)
+                        .map(usuarioEntidad -> UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad))
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"))
+        );
     }
 
     @Override
@@ -81,43 +97,51 @@ public class UsuarioControlador implements IUsuarioControlador {
         if (idUsuario == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
-
         if (cantidad == null) {
             errores.add(new ErrorModel("saldo", TipoErrorEnum.OBLIGATORIO));
         } else {
             if (cantidad <= CERO) {
                 errores.add(new ErrorModel("saldo", TipoErrorEnum.VALOR_NEGATIVO));
             }
-
             if (cantidad < SALDO_MIN_A_ANADIR || cantidad > SALDO_MAX_A_ANADIR) {
                 errores.add(new ErrorModel("saldo", TipoErrorEnum.RANGO_INVALIDO));
             }
         }
-
         comprobarListaErrores(errores);
 
-        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+        return gestorTransacciones.inTransaction(() -> {
+            try {
+                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
-        if (usuarioEntidad.getEstadoCuenta() != EstadoCuentaEnum.ACTIVA) {
-            errores.add(new ErrorModel("estadoCuenta", TipoErrorEnum.ESTADO_INCORRECTO));
-        }
+                if (usuario.getEstadoCuenta() != EstadoCuentaEnum.ACTIVA) {
+                    errores.add(new ErrorModel("estadoCuenta", TipoErrorEnum.ESTADO_INCORRECTO));
+                }
 
-        comprobarListaErrores(errores);
+                comprobarListaErrores(errores);
 
-        usuarioRepo.actualizar(usuarioEntidad.getIdUsuario(), new UsuarioForm(
-                usuarioEntidad.getNombreUsuario(),
-                usuarioEntidad.getEmail(),
-                usuarioEntidad.getPassword(),
-                usuarioEntidad.getNombreReal(),
-                usuarioEntidad.getPais(),
-                usuarioEntidad.getFechaNacimiento(),
-                usuarioEntidad.getFechaRegistro(),
-                usuarioEntidad.getAvatar(),
-                usuarioEntidad.getSaldo() + cantidad,
-                usuarioEntidad.getEstadoCuenta()));
+                double nuevoSaldo = usuario.getSaldo() + cantidad;
 
+                usuarioRepo.actualizar(usuario.getIdUsuario(), new UsuarioForm(
+                        usuario.getNombreUsuario(),
+                        usuario.getEmail(),
+                        usuario.getPassword(),
+                        usuario.getNombreReal(),
+                        usuario.getPais(),
+                        usuario.getFechaNacimiento(),
+                        usuario.getFechaRegistro(),
+                        usuario.getAvatar(),
+                        nuevoSaldo,
+                        usuario.getEstadoCuenta()
+                ));
 
-        return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad);
+                UsuarioEntidad usuarioActualizado = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+
+                return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioActualizado);
+
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
@@ -128,21 +152,20 @@ public class UsuarioControlador implements IUsuarioControlador {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
-        UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-        return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+        return gestorTransacciones.inTransaction(() -> {
+            UsuarioEntidad usuario;
+            try {
+                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+            return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+        });
     }
 
-//    /**
-//     * Cambia el estado de la cuenta del usuario que pertenece al ID recibido,
-//     * le pone el valor recibido como segundo parámetro.
-//     * @param idUsuario
-//     * @param nuevoEstado
-//     * @throws ValidationException
-//     */
-//    public void cambiarEstado(Long idUsuario,
-//                                    EstadoCuentaEnum nuevoEstado)
-//            throws ValidationException {
-//
+    // Métodos creados pero se dejan documentados por que no se piden, pero pueden llegar a hacer falta.
+
+//    public UsuarioDto cambiarEstado(Long idUsuario, EstadoCuentaEnum nuevoEstado) throws ValidationException {
 //        List<ErrorModel> errores = new ArrayList<>();
 //
 //        if (idUsuario == null) {
@@ -151,39 +174,49 @@ public class UsuarioControlador implements IUsuarioControlador {
 //        if (nuevoEstado == null) {
 //            errores.add(new ErrorModel("estadoCuenta", TipoErrorEnum.OBLIGATORIO));
 //        }
-//        if (!errores.isEmpty()) {
-//            throw new ValidationException(errores);
-//        }
-//        UsuarioEntidad usuario = obtenerUsuario(idUsuario, errores);
+//        comprobarListaErrores(errores);
 //
-//        usuarioRepo.actualizar(usuario.getIdUsuario(), new UsuarioForm(
-//                usuario.getNombreUsuario(),
-//                usuario.getEmail(),
-//                usuario.getPassword(),
-//                usuario.getNombreReal(),
-//                usuario.getPais(),
-//                usuario.getFechaNacimiento(),
-//                usuario.getFechaRegistro(),
-//                usuario.getAvatar(),
-//                usuario.getSaldo(),
-//                nuevoEstado
-//        ));
+//        return gestorTransacciones.inTransaction(() -> {
+//            try {
+//                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+//
+//                usuarioRepo.actualizar(usuario.getIdUsuario(), new UsuarioForm(
+//                        usuario.getNombreUsuario(),
+//                        usuario.getEmail(),
+//                        usuario.getPassword(),
+//                        usuario.getNombreReal(),
+//                        usuario.getPais(),
+//                        usuario.getFechaNacimiento(),
+//                        usuario.getFechaRegistro(),
+//                        usuario.getAvatar(),
+//                        usuario.getSaldo(),
+//                        nuevoEstado
+//                ));
+//                UsuarioEntidad usuarioActualizado = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+//
+//                return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioActualizado);
+//            } catch (ValidationException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
 //    }
 //
-//    /**
-//     * Elimina el usuario al que pertenece el ID recibido.
-//     * @param id
-//     * @return Indica si la operación ha tenido éxito.
-//     * @throws ValidationException
-//     */
 //    public boolean eliminarUsuario(Long id) throws ValidationException {
 //        List<ErrorModel> errores = new ArrayList<>();
+//
 //        if (id == null) {
 //            errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
 //        }
+//
 //        comprobarListaErrores(errores);
 //
-//        UsuarioEntidad usuario = obtenerUsuario(id, errores);
-//        return usuarioRepo.eliminar(usuario.getIdUsuario());
+//        return gestorTransacciones.inTransaction(() -> {
+//            try {
+//                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(id, errores);
+//                return usuarioRepo.eliminar(usuario.getIdUsuario());
+//            } catch (ValidationException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
 //    }
 }

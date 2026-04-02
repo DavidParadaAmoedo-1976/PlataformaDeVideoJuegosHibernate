@@ -30,7 +30,7 @@ public interface IUsuarioControlador {
      * @param nombreUsuario
      * @return Lo muestra en un objeto DTO.
      */
-    UsuarioDto consultarPerfil(String nombreUsuario);
+    UsuarioDto consultarPerfil(String nombreUsuario) throws ValidationException;
 
     /**
      * Añade la cantidad recibida por parametro al saldo del usuario perteneciente al ID recibido.

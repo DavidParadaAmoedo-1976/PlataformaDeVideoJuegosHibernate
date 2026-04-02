@@ -6,6 +6,7 @@ import org.davidparada.modelo.enums.PaisEnum;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "usuarios")
@@ -166,5 +167,37 @@ public class UsuarioEntidad {
 
     public void setEstadoCuenta(EstadoCuentaEnum estadoCuenta) {
         this.estadoCuenta = estadoCuenta;
+    }
+
+    // toString
+
+    @Override
+    public String toString() {
+        return "UsuarioEntidad{" +
+                "idUsuario=" + idUsuario +
+                ", nombreUsuario='" + nombreUsuario + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", nombreReal='" + nombreReal + '\'' +
+                ", pais=" + pais +
+                ", fechaNacimiento=" + fechaNacimiento +
+                ", fechaRegistro=" + fechaRegistro +
+                ", avatar='" + avatar + '\'' +
+                ", saldo=" + saldo +
+                ", estadoCuenta=" + estadoCuenta +
+                '}';
+    }
+
+    // Equals y hashCode
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        UsuarioEntidad that = (UsuarioEntidad) o;
+        return Objects.equals(idUsuario, that.idUsuario) && Objects.equals(nombreUsuario, that.nombreUsuario) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(nombreReal, that.nombreReal) && pais == that.pais && Objects.equals(fechaNacimiento, that.fechaNacimiento) && Objects.equals(fechaRegistro, that.fechaRegistro) && Objects.equals(avatar, that.avatar) && Objects.equals(saldo, that.saldo) && estadoCuenta == that.estadoCuenta;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idUsuario, nombreUsuario, email, password, nombreReal, pais, fechaNacimiento, fechaRegistro, avatar, saldo, estadoCuenta);
     }
 }

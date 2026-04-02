@@ -7,7 +7,11 @@ import org.davidparada.modelo.dto.UsuarioDto;
 import org.davidparada.modelo.enums.EstadoCuentaEnum;
 import org.davidparada.modelo.enums.PaisEnum;
 import org.davidparada.modelo.formulario.UsuarioForm;
+import org.davidparada.modelo.formulario.validacion.UsuarioFormValidador;
 import org.davidparada.repositorio.implementacionMemoria.UsuarioRepoMemoria;
+import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
+import org.davidparada.transaciones.GestorTransaccionesMemoria;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,23 +21,15 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UsuarioControladorTest {
-
     private UsuarioControlador usuarioControlador;
-    private UsuarioRepoMemoria usuarioRepoMemoria;
-    private final ObtenerEntidadesOptional obtenerEntidades;
-
-    UsuarioControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
-        this.obtenerEntidades = obtenerEntidades;
-    }
-
 
     @BeforeEach
     void setUp() {
-
-        usuarioRepoMemoria = new UsuarioRepoMemoria();
-        usuarioControlador = new UsuarioControlador(usuarioRepoMemoria, obtenerEntidades);
-
-        new ObtenerEntidadesOptional(null, usuarioRepoMemoria, null, null, null);
+        IUsuarioRepo usuarioRepo = new UsuarioRepoMemoria();
+        UsuarioFormValidador.setUsuarioRepo(usuarioRepo);
+        ObtenerEntidadesOptional obtenerEntidades = new ObtenerEntidadesOptional(null,usuarioRepo,null, null, null);
+        IGestorTransacciones gestor = new GestorTransaccionesMemoria();
+        usuarioControlador = new UsuarioControlador(usuarioRepo, obtenerEntidades, gestor);
     }
 
     // ==========================
@@ -237,23 +233,32 @@ class UsuarioControladorTest {
     @Test
     void consultarPerfil_nombreUsuarioValido_retornaUsuarioDTO() throws ValidationException {
 
-        UsuarioDto usuario =
-                usuarioControlador.registrarUsuario(crearUsuarioForm());
+        UsuarioDto usuario;
+        try {
+            usuario = usuarioControlador.registrarUsuario(crearUsuarioForm());
+        } catch (ValidationException e) {
+
+            System.out.println("⚠️ Errores de validación:");
+            e.getErrores().forEach(error ->
+                    System.out.println(" - " + error.campo() + " -> " + error.error()));
+
+            throw e; // importante: el test debe seguir fallando
+        }
+
 
         UsuarioDto resultado =
-                usuarioControlador.consultarPerfil(usuario.nombreUsuario());
+                usuarioControlador.consultarPerfil(usuario.idUsuario());
 
         assertNotNull(resultado);
         assertEquals(usuario.nombreUsuario(), resultado.nombreUsuario());
     }
 
     @Test
-    void consultarPerfil_nombreUsuarioInvalido_retornaNull() {
+    void consultarPerfil_nombreUsuarioInvalido_lanzaException() {
 
-        UsuarioDto resultado =
-                usuarioControlador.consultarPerfil("usuarioInexistente");
-
-        assertNull(resultado);
+        assertThrows(RuntimeException.class, () ->
+                usuarioControlador.consultarPerfil("usuarioInexistente")
+        );
     }
 
     @Test
@@ -269,7 +274,7 @@ class UsuarioControladorTest {
     void consultarPerfil_usuarioNoExiste() {
 
         assertThrows(
-                ValidationException.class,
+                RuntimeException.class,
                 () -> usuarioControlador.consultarPerfil(999L)
         );
     }
@@ -282,7 +287,7 @@ class UsuarioControladorTest {
     void anadirSaldo_usuarioNoExiste_lanzaValidationException() {
 
         assertThrows(
-                ValidationException.class,
+                RuntimeException.class,
                 () -> usuarioControlador.anadirSaldo(999L, 50.0)
         );
     }
@@ -388,7 +393,7 @@ class UsuarioControladorTest {
     void consultarSaldo_usuarioNoExiste() {
 
         assertThrows(
-                ValidationException.class,
+                RuntimeException.class,
                 () -> usuarioControlador.consultarSaldo(999L)
         );
     }

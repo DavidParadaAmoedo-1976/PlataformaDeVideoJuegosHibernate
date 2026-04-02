@@ -81,7 +81,6 @@ public class UsuarioFormValidador {
         ValidacionesComunes.valorNoNegativo("saldo", form.getSaldo(), errores);
         ValidacionesComunes.maxDosDecimales("saldo", form.getSaldo(), errores);
 
-
         if (!errores.isEmpty()) {
             throw new ValidationException(errores);
         }
@@ -133,7 +132,7 @@ public class UsuarioFormValidador {
 
     private static void validarEmailUnico(String email, List<ErrorModel> errores) {
         if (email != null && usuarioRepo != null &&
-                usuarioRepo.buscarPorEmail(email) != null) {
+                usuarioRepo.buscarPorEmail(email).isPresent()) {
 
             errores.add(new ErrorModel("email", TipoErrorEnum.DUPLICADO));
         }
@@ -141,10 +140,9 @@ public class UsuarioFormValidador {
 
     private static void validarNombreUsuarioUnico(String nombre, List<ErrorModel> errores) {
         if (nombre != null && usuarioRepo != null &&
-                usuarioRepo.buscarPorNombreUsuario(nombre) != null) {
+                usuarioRepo.buscarPorNombreUsuario(nombre).isPresent()) {
 
             errores.add(new ErrorModel("nombreUsuario", TipoErrorEnum.DUPLICADO));
         }
     }
-
 }

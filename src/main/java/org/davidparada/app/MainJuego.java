@@ -1,4 +1,4 @@
-package org.davidparada;
+package org.davidparada.app;
 
 import org.davidparada.controlador.*;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
@@ -33,7 +33,7 @@ public class MainJuego {
         ISessionManager sessionManager = (ISessionManager) gestor;
 
         ICompraRepo compraRepo = new  CompraRepoHibernate();
-        IUsuarioRepo usuarioRepo = new  UsuarioRepoHibernate();
+        IUsuarioRepo usuarioRepo = new  UsuarioRepoHibernate(sessionManager);
         IBibliotecaRepo bibliotecaRepo = new  BibliotecaRepoHibernate();
         IResenaRepo resenaRepo = new  ResenaRepoHibernate();
         IJuegoRepo juegoRepo = new JuegoRepoHibernate(sessionManager); // 👈 tu implementación

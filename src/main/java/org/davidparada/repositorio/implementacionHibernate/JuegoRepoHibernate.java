@@ -19,10 +19,77 @@ import java.util.Optional;
 
 public class JuegoRepoHibernate implements IJuegoRepo {
 
-    private ISessionManager sessionManager;
+    private final ISessionManager sessionManager;
 
     public JuegoRepoHibernate(ISessionManager sessionManager) {
         this.sessionManager = sessionManager;
+    }
+
+    @Override
+    public JuegoEntidad crear(JuegoForm formulario) {
+        Session session = sessionManager.getSession();
+
+        JuegoEntidad juegoEntidad = JuegoFormularioAEntidadMapper.crearJuegoEntidad(formulario);
+        session.persist(juegoEntidad);
+
+        return juegoEntidad;
+    }
+
+    @Override
+    public Optional<JuegoEntidad> buscarPorId(Long idJuego) {
+        Session session = sessionManager.getSession();
+
+        return Optional.ofNullable(session.find(JuegoEntidad.class, idJuego));
+    }
+
+    @Override
+    public List<JuegoEntidad> listarTodos() {
+        Session session = sessionManager.getSession();
+
+        CriteriaBuilder criteria = session.getCriteriaBuilder();
+        CriteriaQuery<JuegoEntidad> criteriaQuery = criteria.createQuery(JuegoEntidad.class);
+        Root<JuegoEntidad> root = criteriaQuery.from(JuegoEntidad.class);
+
+        criteriaQuery.select(root);
+
+        return session.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public Optional<JuegoEntidad> actualizar(Long idJuego, JuegoForm formulario) {
+        Session session = sessionManager.getSession();
+
+        Optional<JuegoEntidad> juegoEntidad = this.buscarPorId(idJuego);
+        if (juegoEntidad.isEmpty()) {
+            return Optional.empty();
+        }
+
+        session.merge(new JuegoEntidad(idJuego,
+                formulario.getTitulo(),
+                formulario.getDescripcion(),
+                formulario.getDesarrollador(),
+                formulario.getFechaLanzamiento(),
+                formulario.getPrecioBase(),
+                formulario.getDescuento(),
+                formulario.getCategoria(),
+                formulario.getClasificacionPorEdad(),
+                formulario.getIdiomas(),
+                formulario.getEstado()
+        ));
+
+        return buscarPorId(idJuego);
+    }
+
+    @Override
+    public boolean eliminar(Long idJuego) {
+        Session session = sessionManager.getSession();
+
+        Optional<JuegoEntidad> juegoEntidad = this.buscarPorId(idJuego);
+        if (juegoEntidad.isEmpty()) {
+            return false;
+        }
+        session.remove(juegoEntidad);
+        return true;
     }
 
     @Override
@@ -48,95 +115,26 @@ public class JuegoRepoHibernate implements IJuegoRepo {
         List<Predicate> filtros = new ArrayList<>();
 
         if (titulo != null && !titulo.isEmpty()) {
-            filtros.add(criteria.like(root.get("titulo"), "%"+titulo+"%"));
+            filtros.add(criteria.like(root.get("titulo"), "%" + titulo + "%"));
         }
-        if(categoria != null) {
+        if (categoria != null) {
             filtros.add(criteria.equal(root.get("categoria"), categoria));
         }
-        if(precioMin != null) {
+        if (precioMin != null) {
             filtros.add(criteria.greaterThanOrEqualTo(root.get("precio"), precioMin));
         }
-        if(precioMax != null) {
+        if (precioMax != null) {
             filtros.add(criteria.lessThanOrEqualTo(root.get("precio"), precioMax));
         }
-        if(clasificacion != null) {
+        if (clasificacion != null) {
             filtros.add(criteria.equal(root.get("clasificacion"), clasificacion));
         }
-        if(estado != null) {
+        if (estado != null) {
             filtros.add(criteria.equal(root.get("estado"), estado));
         }
         criteriaQuery.where(filtros.toArray(new Predicate[0]));
 
         return session.createQuery(criteriaQuery).getResultList();
-    }
-
-    @Override
-    public JuegoEntidad crear(JuegoForm formulario) {
-        Session session = sessionManager.getSession();
-
-        JuegoEntidad juegoEntidad = JuegoFormularioAEntidadMapper.crearJuegoEntidad(formulario);
-        session.persist(juegoEntidad);
-
-        return juegoEntidad;
-    }
-
-    @Override
-    public Optional<JuegoEntidad> buscarPorId(Long idJuego) {
-    Session session = sessionManager.getSession();
-
-        return Optional.ofNullable(session.find(JuegoEntidad.class, idJuego));
-
-    }
-
-    @Override
-    public List<JuegoEntidad> listarTodos() {
-        Session session = sessionManager.getSession();
-
-        CriteriaBuilder criteria = session.getCriteriaBuilder();
-        CriteriaQuery<JuegoEntidad> criteriaQuery = criteria.createQuery(JuegoEntidad.class);
-        Root<JuegoEntidad> root = criteriaQuery.from(JuegoEntidad.class);
-
-        criteriaQuery.select(root);
-
-        return session.createQuery(criteriaQuery).getResultList();
-
-    }
-
-    @Override
-    public Optional<JuegoEntidad> actualizar(Long idJuego, JuegoForm formulario) {
-        Session session = sessionManager.getSession();
-
-        Optional<JuegoEntidad> juegoEntidad = this.buscarPorId(idJuego);
-        if (juegoEntidad.isEmpty()) {
-            return Optional.empty();
-        }
-
-        session.merge(new JuegoEntidad(idJuego,
-                formulario.getTitulo(),
-                formulario.getDescripcion(),
-                formulario.getDesarrollador(),
-                formulario.getFechaLanzamiento(),
-                formulario.getPrecioBase(),
-                formulario.getDescuento(),
-                formulario.getCategoria(),
-                formulario.getClasificacionPorEdad(),
-                formulario.getIdiomas(),
-                formulario.getEstado()
-                ));
-
-        return buscarPorId(idJuego);
-    }
-
-    @Override
-    public boolean eliminar(Long idJuego) {
-        Session session = sessionManager.getSession();
-
-        Optional<JuegoEntidad> juegoEntidad = this.buscarPorId(idJuego);
-        if (juegoEntidad.isEmpty()) {
-            return false;
-        }
-        session.remove(juegoEntidad);
-        return true;
     }
 
     @Override
@@ -154,5 +152,4 @@ public class JuegoRepoHibernate implements IJuegoRepo {
 
         return count > 0;
     }
-
 }

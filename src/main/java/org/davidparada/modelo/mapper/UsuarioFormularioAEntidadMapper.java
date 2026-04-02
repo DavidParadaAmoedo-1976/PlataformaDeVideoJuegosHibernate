@@ -13,36 +13,40 @@ public class UsuarioFormularioAEntidadMapper {
     private UsuarioFormularioAEntidadMapper() {
     }
 
-    public static UsuarioEntidad crearUsuarioEntidad(Long id, UsuarioForm form) {
+    public static UsuarioEntidad crearUsuarioEntidad(Long id, UsuarioForm formulario) {
         return new UsuarioEntidad(
                 id,
-                form.getNombreUsuario(),
-                form.getEmail(),
-                form.getPassword(),
-                form.getNombreReal(),
-                form.getPais(),
-                form.getFechaNacimiento(),
+                formulario.getNombreUsuario(),
+                formulario.getEmail(),
+                formulario.getPassword(),
+                formulario.getNombreReal(),
+                formulario.getPais(),
+                formulario.getFechaNacimiento(),
                 Instant.now(),
-                form.getAvatar(),
+                formulario.getAvatar(),
                 SALDO_POR_DEFECTO,
                 EstadoCuentaEnum.ACTIVA
         );
     }
 
-    public static UsuarioEntidad actualizarUsuarioEntidad(Long id, UsuarioForm form) {
+    public static UsuarioEntidad crearUsuarioEntidad(UsuarioForm formulario) {
+        return crearUsuarioEntidad(null, formulario);
+    }
+
+    public static UsuarioEntidad actualizarUsuarioEntidad(Long id, UsuarioForm formulario) {
 
         return new UsuarioEntidad(
                 id,
-                form.getNombreUsuario(),
-                form.getEmail(),
-                form.getPassword(),
-                form.getNombreReal(),
-                form.getPais(),
-                form.getFechaNacimiento(),
-                form.getFechaRegistro(),
-                form.getAvatar(),
-                form.getSaldo(),
-                form.getEstadoCuenta()
+                formulario.getNombreUsuario(),
+                formulario.getEmail(),
+                formulario.getPassword(),
+                formulario.getNombreReal(),
+                formulario.getPais(),
+                formulario.getFechaNacimiento(),
+                formulario.getFechaRegistro(),
+                formulario.getAvatar(),
+                formulario.getSaldo(),
+                formulario.getEstadoCuenta()
         );
     }
 }

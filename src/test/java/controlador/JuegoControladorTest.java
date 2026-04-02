@@ -23,15 +23,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JuegoControladorTest {
-//
-//    private JuegoControlador juegoControlador;
-//    private final ObtenerEntidadesOptional obtenerEntidades;
-//    private final IGestorTransacciones gestorTransacciones;
-//
-//    JuegoControladorTest(ObtenerEntidadesOptional obtenerEntidades, IGestorTransacciones gestorTransacciones) {
-//        this.obtenerEntidades = obtenerEntidades;
-//        this.gestorTransacciones = gestorTransacciones;
-//    }
 
     private JuegoControlador juegoControlador;
     @BeforeEach

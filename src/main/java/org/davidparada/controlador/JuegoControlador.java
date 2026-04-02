@@ -41,17 +41,19 @@ public class JuegoControlador implements IJuegoControlador {
     @Override
     public JuegoDto crearJuego(JuegoForm formulario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
+        if (formulario == null) {
+            errores.add(new ErrorModel("formulario", TipoErrorEnum.OBLIGATORIO));
+        }
+        comprobarListaErrores(errores);
         JuegoFormValidador.validarJuego(formulario);
         JuegoEntidad juegoCreado = gestorTransacciones.inTransaction(() -> {
-                    Optional<JuegoEntidad> juegoEntidad = juegoRepo.buscarPorTitulo(formulario.getTitulo());
-                    if (juegoRepo.buscarPorTitulo(formulario.getTitulo()).isPresent()) {
-                        errores.add(new ErrorModel("titulo", TipoErrorEnum.DUPLICADO));
-                        throw new IllegalStateException();
-                    }
-                    return juegoRepo.crear(formulario);
-                });
-        comprobarListaErrores(errores);
+            Optional<JuegoEntidad> juegoEntidad = juegoRepo.buscarPorTitulo(formulario.getTitulo());
+            if (juegoEntidad.isPresent()) {
+                errores.add(new ErrorModel("titulo", TipoErrorEnum.DUPLICADO));
+                throw new IllegalStateException();
+            }
+            return juegoRepo.crear(formulario);
+        });
 
         return JuegoEntidadADtoMapper.juegoEntidadADto(juegoCreado);
     }
@@ -74,10 +76,7 @@ public class JuegoControlador implements IJuegoControlador {
             );
 
             return juegos.stream()
-                    .map(j -> {
-                        j.getIdiomas().size();
-                        return JuegoEntidadADtoMapper.juegoEntidadADto(j);
-                    })
+                    .map(juego -> JuegoEntidadADtoMapper.juegoEntidadADto(juego))
                     .toList();
         });
     }
@@ -119,7 +118,6 @@ public class JuegoControlador implements IJuegoControlador {
         return gestorTransacciones.inTransaction(() -> {
             try {
                 JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
-                comprobarListaErrores(errores);
 
                 return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
 
@@ -147,14 +145,12 @@ public class JuegoControlador implements IJuegoControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-
             JuegoEntidad juego;
             try {
                 juego = obtenerEntidades.obtenerJuego(id, errores);
             } catch (ValidationException e) {
                 throw new RuntimeException(e);
             }
-
             juegoRepo.actualizar(juego.getIdJuego(),
                     new JuegoForm(juego.getTitulo(),
                             juego.getDescripcion(),
@@ -185,7 +181,7 @@ public class JuegoControlador implements IJuegoControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            JuegoEntidad juego = null;
+            JuegoEntidad juego;
             try {
                 juego = obtenerEntidades.obtenerJuego(id, errores);
             } catch (ValidationException e) {
