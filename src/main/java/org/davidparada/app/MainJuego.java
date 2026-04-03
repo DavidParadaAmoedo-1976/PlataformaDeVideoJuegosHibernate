@@ -34,7 +34,7 @@ public class MainJuego {
 
         ICompraRepo compraRepo = new  CompraRepoHibernate();
         IUsuarioRepo usuarioRepo = new  UsuarioRepoHibernate(sessionManager);
-        IBibliotecaRepo bibliotecaRepo = new  BibliotecaRepoHibernate();
+        IBibliotecaRepo bibliotecaRepo = new  BibliotecaRepoHibernate(sessionManager);
         IResenaRepo resenaRepo = new  ResenaRepoHibernate();
         IJuegoRepo juegoRepo = new JuegoRepoHibernate(sessionManager); // 👈 tu implementación
         ObtenerEntidadesOptional obtener = new ObtenerEntidadesOptional(compraRepo, usuarioRepo, juegoRepo, bibliotecaRepo, resenaRepo);
@@ -139,56 +139,6 @@ public class MainJuego {
             System.out.println("💥 Error inesperado: " + e.getMessage());
             e.printStackTrace();
         }
-
-        pausa();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        // repositorios
-//        IUsuarioRepo usuarioRepo = new UsuarioRepoHibernate();
-//        IJuegoRepo juegoRepo = new JuegoRepoHibernate();
-//        IBibliotecaRepo bibliotecaRepo = new BibliotecaRepoHibernate();
-//        ICompraRepo compraRepo = new CompraRepoHibernate();
-//        IResenaRepo resenaRepo = new ResenaRepoHibernate();
-//
-//        // controladores
-//        ObtenerEntidadesOptional obtenerEntidades = new ObtenerEntidadesOptional(compraRepo, usuarioRepo,juegoRepo,bibliotecaRepo, resenaRepo);
-//
-//        UsuarioControlador usuarioControlador = new UsuarioControlador(usuarioRepo, obtenerEntidades);
-//        JuegoControlador juegoControlador = new JuegoControlador(juegoRepo, obtenerEntidades);
-//
-//        BibliotecaControlador bibliotecaControlador =
-//                new BibliotecaControlador(bibliotecaRepo, juegoRepo, obtenerEntidades);
-//
-//        CompraControlador compraControlador =
-//                new CompraControlador(compraRepo, usuarioRepo, juegoRepo, bibliotecaRepo, bibliotecaControlador, obtenerEntidades);
-//
-//        ResenaControlador resenaControlador =
-//                new ResenaControlador(resenaRepo, obtenerEntidades);
-//
-//        // datos prueba
-//
-//        DatosPrueba.cargarDatos(usuarioControlador, juegoControlador, bibliotecaControlador, compraControlador, resenaControlador);
-//
-//
     }
-
 }
 

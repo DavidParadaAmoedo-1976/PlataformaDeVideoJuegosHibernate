@@ -84,7 +84,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
         if (bibliotecaEntidad.isEmpty()) {
             return false;
         }
-        session.remove(bibliotecaEntidad);
+        session.remove(bibliotecaEntidad.get());
         return true;
     }
 

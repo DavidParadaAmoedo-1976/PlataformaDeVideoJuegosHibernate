@@ -47,7 +47,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                                  ObtenerEntidadesOptional obtenerEntidades,
                                  IGestorTransacciones gestorTransacciones
     ) {
-
         this.bibliotecaRepo = bibliotecaRepo;
         this.juegoRepo = juegoRepo;
         this.obtenerEntidades = obtenerEntidades;
@@ -63,13 +62,25 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarIdUsuario(idUsuario, errores);
         comprobarIdJuego(idJuego, errores);
 
-        BibliotecaEntidad bibliotecaEntidad = gestorTransacciones.inTransaction(() -> {
-            Optional<BibliotecaEntidad> bibliotecaExistente = bibliotecaRepo.buscarPorUsuarioYJuego(idUsuario, idJuego);
+        return gestorTransacciones.inTransaction(() -> {
+
+            Optional<BibliotecaEntidad> bibliotecaExistente =
+                    bibliotecaRepo.buscarPorUsuarioYJuego(idUsuario, idJuego);
+
             if (bibliotecaExistente.isPresent()) {
                 errores.add(new ErrorModel("juego", TipoErrorEnum.DUPLICADO));
                 throw new IllegalStateException();
-
             }
+
+            UsuarioEntidad usuarioEntidad;
+            JuegoEntidad juegoEntidad;
+            try {
+                usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+                juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+
             BibliotecaForm nuevoJuego = new BibliotecaForm(
                     idUsuario,
                     idJuego,
@@ -79,35 +90,38 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                     false
             );
 
+            BibliotecaEntidad bibliotecaEntidad = bibliotecaRepo.crear(nuevoJuego);
 
-            return bibliotecaRepo.crear(nuevoJuego);
+            return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                    bibliotecaEntidad,
+                    usuarioEntidad,
+                    juegoEntidad
+            );
         });
-        UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-        JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
-
-        return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
     }
 
     // Ver Biblioteca personal
-
     @Override
     public List<BibliotecaDto> verBiblioteca(Long idUsuario, OrdenarJuegosBibliotecaEnum orden) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
         comprobarIdUsuario(idUsuario, errores);
 
-        UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-
         return gestorTransacciones.inTransaction(() -> {
+            UsuarioEntidad usuario;
+            try {
+                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+
             List<BibliotecaDto> juegos = construirBiblioteca(idUsuario, usuario);
             return ordenarBiblioteca(juegos, orden);
         });
     }
 
     private List<BibliotecaDto> construirBiblioteca(Long idUsuario, UsuarioEntidad usuario) {
-
         List<BibliotecaEntidad> juegosEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
-
-        List<BibliotecaDto> juegos = juegosEntidad.stream()
+        return juegosEntidad.stream()
                 .map(b -> {
 
                     JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElseThrow();
@@ -125,46 +139,32 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                     );
                 })
                 .toList();
-
-        return juegos;
     }
 
     private List<BibliotecaDto> ordenarBiblioteca(List<BibliotecaDto> juegos, OrdenarJuegosBibliotecaEnum orden) {
-
         if (orden == null) {
             return juegos;
         }
 
-        switch (orden) {
-
-            case ALFABETICO:
-                return juegos.stream()
-                        .sorted(Comparator.comparing(b -> b.juegoDto().titulo()))
-                        .toList();
-
-            case TIEMPO_DE_JUEGO:
-                return juegos.stream()
-                        .sorted(Comparator.comparing((BibliotecaDto b) -> b.horasDeJuego()).reversed())
-                        .toList();
-
-            case ULTIMA_SESION:
-                return juegos.stream()
-                        .sorted(Comparator.comparing((BibliotecaDto b) -> b.ultimaFechaDeJuego()).reversed())
-                        .toList();
-
-            case FECHA_DE_ADQUISICION:
-                return juegos.stream()
-                        .sorted(Comparator.comparing((BibliotecaDto b) -> b.fechaAdquisicion()).reversed())
-                        .toList();
-
-            default:
-                throw new IllegalArgumentException("No se encontró el orden");
-        }
+        return switch (orden) {
+            case ALFABETICO -> juegos.stream()
+                    .sorted(Comparator.comparing(b -> b.juegoDto().titulo()))
+                    .toList();
+            case TIEMPO_DE_JUEGO -> juegos.stream()
+                    .sorted(Comparator.comparing((BibliotecaDto b) -> b.horasDeJuego()).reversed())
+                    .toList();
+            case ULTIMA_SESION -> juegos.stream()
+                    .sorted(Comparator.comparing((BibliotecaDto b) -> b.ultimaFechaDeJuego()).reversed())
+                    .toList();
+            case FECHA_DE_ADQUISICION -> juegos.stream()
+                    .sorted(Comparator.comparing((BibliotecaDto b) -> b.fechaAdquisicion()).reversed())
+                    .toList();
+            default -> throw new IllegalArgumentException("No se encontró el orden");
+        };
     }
 
 
     // Eliminar juego de biblioteca
-
     @Override
     public BibliotecaDto eliminarJuego(Long idUsuario, Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
@@ -172,25 +172,24 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarIdUsuario(idUsuario, errores);
         comprobarIdJuego(idJuego, errores);
 
-            return gestorTransacciones.inTransaction(() -> {
-                try {
-                    BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-                    UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                    JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
-                    bibliotecaRepo.eliminar(bibliotecaEntidad.getIdBiblioteca());
-                    return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
-                            bibliotecaEntidad,
-                            usuarioEntidad,
-                            juegoEntidad
-                    );
-                } catch (ValidationException e) {
-                    throw new IllegalStateException();
-                }
-            });
+        return gestorTransacciones.inTransaction(() -> {
+            try {
+                BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+                UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+                JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
+                bibliotecaRepo.eliminar(bibliotecaEntidad.getIdBiblioteca());
+                return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                        bibliotecaEntidad,
+                        usuarioEntidad,
+                        juegoEntidad
+                );
+            } catch (ValidationException e) {
+                throw new IllegalStateException();
+            }
+        });
     }
 
     // Actualizar tiempo de juego
-
     @Override
     public BibliotecaDto actualizarTiempoDeJuego(Long idUsuario, Long idJuego, double horas) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
@@ -236,7 +235,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     }
 
     // Consultar última sesión
-
     @Override
     public BibliotecaDto consultarUltimaSesion(Long idUsuario, Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
@@ -359,10 +357,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         });
     }
 
-
-
     // Comprobaciones
-
     private void comprobarIdUsuario(Long idUsuario, List<ErrorModel> errores) throws ValidationException {
         // Compruebo que idUsuario no sea nulo
         if (idUsuario == null) {
@@ -370,7 +365,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         }
         comprobarListaErrores(errores);
     }
-
 
     private void comprobarIdJuego(Long idJuego, List<ErrorModel> errores) throws ValidationException {
         // Compruebo que idJuego no sea nulo

@@ -34,7 +34,7 @@ public class MainUsuario {
 
         ICompraRepo compraRepo = new CompraRepoHibernate();
         IUsuarioRepo usuarioRepo = new UsuarioRepoHibernate(sessionManager);
-        IBibliotecaRepo bibliotecaRepo = new BibliotecaRepoHibernate();
+        IBibliotecaRepo bibliotecaRepo = new BibliotecaRepoHibernate(sessionManager);
         IResenaRepo resenaRepo = new ResenaRepoHibernate();
         IJuegoRepo juegoRepo = new JuegoRepoHibernate(sessionManager);
 
@@ -50,8 +50,8 @@ public class MainUsuario {
             // 👤 1. CREAR USUARIOS
             // =========================
             UsuarioForm usuario1 = new UsuarioForm(
-                    "david123",
-                    "david@email.com",
+                    "qwert",
+                    "qwert@email.com",
                     "1234Pasword",
                     "David Parada",
                     PaisEnum.ESPANA,
@@ -63,10 +63,10 @@ public class MainUsuario {
             );
 
             UsuarioForm usuario2 = new UsuarioForm(
-                    "ana456",
-                    "ana@email.com",
+                    "zxcv",
+                    "zxcv@email.com",
                     "1234Pasword",
-                    "Ana López",
+                    "Lkjh Gfds",
                     PaisEnum.ESPANA,
                     LocalDate.of(1998, 5, 10),
                     Instant.now(),
@@ -128,7 +128,5 @@ public class MainUsuario {
             System.out.println("💥 Error inesperado: " + e.getMessage());
             e.printStackTrace();
         }
-
-        pausa();
     }
 }
