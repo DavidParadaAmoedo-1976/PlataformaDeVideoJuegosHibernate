@@ -97,11 +97,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
             }
             BibliotecaEntidad biblioteca = bibliotecaRepo.crear(nuevaBiblioteca);
 
-            return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
-                    biblioteca,
-                    usuario,
-                    juego
-            );
+            return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(biblioteca, usuario, juego);
         });
     }
 

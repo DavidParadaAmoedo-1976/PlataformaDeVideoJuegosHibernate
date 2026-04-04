@@ -1,15 +1,13 @@
 package org.davidparada.app;
 
-import org.davidparada.controlador.BibliotecaControlador;
-import org.davidparada.controlador.ResenaControlador;
-import org.davidparada.controlador.UsuarioControlador;
+import org.davidparada.controlador.*;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
-import org.davidparada.modelo.dto.ResenaDto;
+import org.davidparada.modelo.dto.CompraDto;
+import org.davidparada.modelo.dto.DetallesCompraDto;
+import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.dto.UsuarioDto;
-import org.davidparada.modelo.enums.EstadoCuentaEnum;
-import org.davidparada.modelo.enums.OrdenarResenaEnum;
-import org.davidparada.modelo.enums.PaisEnum;
+import org.davidparada.modelo.enums.*;
 import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.repositorio.implementacionHibernate.*;
 import org.davidparada.repositorio.interfaceRepositorio.*;
@@ -22,7 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
-public class MainResena {
+public class MainCompra {
 
     public static final Scanner scanner = new Scanner(System.in);
 
@@ -40,11 +38,10 @@ public class MainResena {
         ICompraRepo compraRepo = new CompraRepoHibernate(sessionManager);
         IUsuarioRepo usuarioRepo = new UsuarioRepoHibernate(sessionManager);
         IBibliotecaRepo bibliotecaRepo = new BibliotecaRepoHibernate(sessionManager);
-        IResenaRepo resenaRepo = new ResenaRepoHibernate(sessionManager);
         IJuegoRepo juegoRepo = new JuegoRepoHibernate(sessionManager);
 
         ObtenerEntidadesOptional obtener =
-                new ObtenerEntidadesOptional(compraRepo, usuarioRepo, juegoRepo, bibliotecaRepo, resenaRepo);
+                new ObtenerEntidadesOptional(compraRepo, usuarioRepo, juegoRepo, bibliotecaRepo, null);
 
         // Controladores
         UsuarioControlador usuarioControlador =
@@ -53,122 +50,132 @@ public class MainResena {
         BibliotecaControlador bibliotecaControlador =
                 new BibliotecaControlador(bibliotecaRepo, juegoRepo, obtener, gestor);
 
-        ResenaControlador resenaControlador =
-                new ResenaControlador(resenaRepo, obtener, gestor);
+        CompraControlador compraControlador =
+                new CompraControlador(
+                        compraRepo,
+                        usuarioRepo,
+                        juegoRepo,
+                        bibliotecaRepo,
+                        bibliotecaControlador,
+                        obtener,
+                        gestor
+                );
 
         try {
-
             // =========================
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "userResena",
-                    "resena@email.com",
+                    "userCompra3",
+                    "compra3@email.com",
                     "1234Password",
                     "Nombre Apellido",
                     PaisEnum.ESPANA,
                     LocalDate.of(2000, 1, 1),
                     Instant.now(),
                     "avatar.png",
-                    0.0,
+                    100.0, // saldo para probar cartera
                     EstadoCuentaEnum.ACTIVA
             );
 
             UsuarioDto usuarioCreado = usuarioControlador.registrarUsuario(usuario);
+            UsuarioDto actualizado = usuarioControlador.anadirSaldo(usuarioCreado.idUsuario(), 100.0);
             System.out.println("✅ Usuario creado:");
             System.out.println(usuarioCreado);
+            System.out.println(actualizado);
 
             pausa();
 
             Long idUsuario = usuarioCreado.idUsuario();
 
             // =========================
-            // 🎮 2. AÑADIR JUEGO A BIBLIOTECA
+            // 🛒 2. REALIZAR COMPRA
             // =========================
-            System.out.println("\n🎮 Añadir juego (ID 1):");
+            System.out.println("\n🛒 Crear compra:");
 
-            bibliotecaControlador.anadirJuego(idUsuario, 1L);
-
-            pausa();
-
-            // =========================
-            // ✍️ 3. CREAR RESEÑA
-            // =========================
-            System.out.println("\n✍️ Crear reseña:");
-
-            ResenaDto resena = resenaControlador.escribirResena(
+            CompraDto compra = compraControlador.realizarCompra(
                     idUsuario,
                     1L,
-                    true,
-                    "Muy buen juego 🔥".repeat(5)
+                    MetodoPagoEnum.CARTERA_STEAM
             );
 
-            System.out.println(resena);
+            System.out.println(compra);
 
             pausa();
 
-            Long idResena = resena.idResena();
+            Long idCompra = compra.idCompra();
 
             // =========================
-            // 📋 4. VER RESEÑAS DEL JUEGO
+            // 💳 3. PROCESAR PAGO
             // =========================
-            System.out.println("\n📋 Reseñas del juego:");
+            System.out.println("\n💳 Procesar pago:");
 
-            List<ResenaDto> resenasJuego =
-                    resenaControlador.obtenerResenas(
-                            1L,
-                            true,
-                            OrdenarResenaEnum.RECIENTES
-                    );
-
-            resenasJuego.forEach(System.out::println);
-
-            pausa();
-
-            // =========================
-            // 👤 5. RESEÑAS DEL USUARIO
-            // =========================
-            System.out.println("\n👤 Reseñas del usuario:");
-
-            List<ResenaDto> resenasUsuario =
-                    resenaControlador.obtenerResenasUsuario(idUsuario);
-
-            resenasUsuario.forEach(System.out::println);
-
-            pausa();
-
-            // =========================
-            // 📊 6. ESTADÍSTICAS
-            // =========================
-            System.out.println("\n📊 Estadísticas del juego:");
-
-            System.out.println(
-                    resenaControlador.consultarEstadisticasResenaPorJuego(1L)
+            CompraDto compraPagada = compraControlador.procesarPago(
+                    idCompra,
+                    MetodoPagoEnum.CARTERA_STEAM
             );
 
-            pausa();
-
-            // =========================
-            // 🙈 7. OCULTAR RESEÑA
-            // =========================
-            System.out.println("\n🙈 Ocultar reseña:");
-
-            ResenaDto oculta =
-                    resenaControlador.ocultarResena(idResena, idUsuario);
-
-            System.out.println(oculta);
+            System.out.println(compraPagada);
 
             pausa();
 
             // =========================
-            // ❌ 8. ELIMINAR RESEÑA
+            // 📋 4. LISTAR COMPRAS
             // =========================
-            System.out.println("\n❌ Eliminar reseña:");
+            System.out.println("\n📋 Historial compras:");
 
-            ResenaDto eliminada =
-                    resenaControlador.eliminarResena(idResena, idUsuario);
+            List<CompraDto> compras =
+                    compraControlador.listarCompras(idUsuario);
 
-            System.out.println(eliminada);
+            compras.forEach(System.out::println);
+
+            pausa();
+
+            // =========================
+            // 🔍 5. CONSULTAR COMPRA
+            // =========================
+            System.out.println("\n🔍 Consultar compra:");
+
+            CompraDto consulta =
+                    compraControlador.consultarCompra(idCompra, idUsuario);
+
+            System.out.println(consulta);
+
+            pausa();
+
+            // =========================
+            // 📦 6. DETALLES COMPRA
+            // =========================
+            System.out.println("\n📦 Detalles compra:");
+
+            DetallesCompraDto detalles =
+                    compraControlador.detallesDeUnaCompra(idCompra, idUsuario);
+
+            System.out.println(detalles);
+
+            pausa();
+
+            // =========================
+            // 🧾 7. FACTURA
+            // =========================
+            System.out.println("\n🧾 Factura:");
+
+            FacturaDto factura =
+                    compraControlador.generarFactura(idCompra);
+
+            System.out.println(factura);
+
+            pausa();
+
+            // =========================
+            // 💸 8. REEMBOLSO
+            // =========================
+            System.out.println("\n💸 Solicitar reembolso:");
+
+            CompraDto reembolso =
+                    compraControlador.solicitarReembolso(idCompra);
+
+            System.out.println(reembolso);
 
         } catch (ValidationException e) {
             System.out.println("❌ Error de validación: " + e.getMessage());

@@ -60,7 +60,6 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
         if (bibliotecaEntidad.isEmpty()) {
             return Optional.empty();
         }
-
         session.merge(new BibliotecaEntidad(idBiblioteca,
                 formulario.getIdUsuario(),
                 formulario.getIdJuego(),

@@ -183,27 +183,15 @@ public class ResenaControlador implements IResenaControlador {
 
         List<ResenaEntidad> resenasEntidad = resenaRepo.buscarPorJuego(idJuego);
 
-        Comparator<ResenaEntidad> comparador;
-
-        switch (orden) {
-            case RECIENTES:
-                comparador = (r1, r2) ->
-                        r2.getFechaPublicacion().compareTo(r1.getFechaPublicacion());
-                break;
-
-            case HORAS_JUGADAS:
-                comparador = (r1, r2) ->
-                        r2.getCantidadHorasJugadas().compareTo(r1.getCantidadHorasJugadas());
-                break;
-
-            case ACTUALIZADAS:
-                comparador = (r1, r2) ->
-                        r2.getFechaUltimaEdicion().compareTo(r1.getFechaUltimaEdicion());
-                break;
-
-            default:
-                comparador = Comparator.comparing(ResenaEntidad::getIdResena);
-        }
+        Comparator<ResenaEntidad> comparador = switch (orden) {
+            case RECIENTES -> (r1, r2) ->
+                    r2.getFechaPublicacion().compareTo(r1.getFechaPublicacion());
+            case HORAS_JUGADAS -> (r1, r2) ->
+                    r2.getCantidadHorasJugadas().compareTo(r1.getCantidadHorasJugadas());
+            case ACTUALIZADAS -> (r1, r2) ->
+                    r2.getFechaUltimaEdicion().compareTo(r1.getFechaUltimaEdicion());
+            default -> Comparator.comparing(ResenaEntidad::getIdResena);
+        };
 
         return resenasEntidad.stream()
                 .filter(r -> r.getEstadoPublicacion() == EstadoPublicacionEnum.PUBLICADA)

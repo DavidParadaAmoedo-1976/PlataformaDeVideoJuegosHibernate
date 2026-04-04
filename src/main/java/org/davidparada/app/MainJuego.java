@@ -33,7 +33,7 @@ public class MainJuego {
         IGestorTransacciones gestor = new GestorTransaccionesHibernate();
         ISessionManager sessionManager = (ISessionManager) gestor;
 
-        ICompraRepo compraRepo = new CompraRepoHibernate();
+        ICompraRepo compraRepo = new CompraRepoHibernate(sessionManager);
         IUsuarioRepo usuarioRepo = new UsuarioRepoHibernate(sessionManager);
         IBibliotecaRepo bibliotecaRepo = new BibliotecaRepoHibernate(sessionManager);
         IResenaRepo resenaRepo = new ResenaRepoHibernate(sessionManager);

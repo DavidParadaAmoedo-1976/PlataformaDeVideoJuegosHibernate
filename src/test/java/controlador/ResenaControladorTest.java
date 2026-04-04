@@ -16,9 +16,9 @@ import org.davidparada.repositorio.implementacionMemoria.BibliotecaRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.JuegoRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.ResenaRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.UsuarioRepoMemoria;
+import org.davidparada.transaciones.GestorTransaccionesMemoria;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.davidparada.transaciones.GestorTransaccionesMemoria;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -37,30 +37,30 @@ class ResenaControladorTest {
     private UsuarioEntidad usuario;
     private JuegoEntidad juego;
 
-private ObtenerEntidadesOptional obtenerEntidades;
+    private ObtenerEntidadesOptional obtenerEntidades;
 
-@BeforeEach
-void setUp() {
+    @BeforeEach
+    void setUp() {
 
-    usuarioRepoMemoria = new UsuarioRepoMemoria();
-    juegoRepoMemoria = new JuegoRepoMemoria();
-    resenaRepoMemoria = new ResenaRepoMemoria();
-    bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
+        usuarioRepoMemoria = new UsuarioRepoMemoria();
+        juegoRepoMemoria = new JuegoRepoMemoria();
+        resenaRepoMemoria = new ResenaRepoMemoria();
+        bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
 
-    obtenerEntidades = new ObtenerEntidadesOptional(
-            null,
-            usuarioRepoMemoria,
-            juegoRepoMemoria,
-            bibliotecaRepoMemoria,
-            resenaRepoMemoria
-    );
+        obtenerEntidades = new ObtenerEntidadesOptional(
+                null,
+                usuarioRepoMemoria,
+                juegoRepoMemoria,
+                bibliotecaRepoMemoria,
+                resenaRepoMemoria
+        );
 
-    controlador = new ResenaControlador(
-            resenaRepoMemoria,
-            obtenerEntidades,
-            new GestorTransaccionesMemoria()
-    );
-            // ===== Crear Usuario =====
+        controlador = new ResenaControlador(
+                resenaRepoMemoria,
+                obtenerEntidades,
+                new GestorTransaccionesMemoria()
+        );
+        // ===== Crear Usuario =====
         usuario = usuarioRepoMemoria.crear(
                 new UsuarioForm(
                         "david",
@@ -92,7 +92,7 @@ void setUp() {
                 )
         );
 
-}
+    }
 
 // ==============================
 // ESCRIBIR RESEÑA
