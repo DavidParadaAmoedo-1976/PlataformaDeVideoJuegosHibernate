@@ -3,7 +3,8 @@ package org.davidparada.config;
 import org.davidparada.controlador.*;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.enums.*;
-import org.davidparada.modelo.formulario.*;
+import org.davidparada.modelo.formulario.JuegoForm;
+import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
 
 import java.time.Instant;
@@ -52,7 +53,7 @@ public class DatosPrueba {
             // ==========================
 
             for (int i = 1; i <= 15; i++) {
-                try{
+                try {
 
                     usuarioCtrl.registrarUsuario(new UsuarioForm(
                             "usuario" + i,
@@ -60,7 +61,7 @@ public class DatosPrueba {
                             "Pasword" + i,
                             "Nombre Real " + i,
                             PaisEnum.ESPANA,
-                            LocalDate.of(random.nextInt(1990,2000), 5, 10),
+                            LocalDate.of(random.nextInt(1990, 2000), 5, 10),
                             Instant.now(),
                             null,
                             200.0,
@@ -86,7 +87,7 @@ public class DatosPrueba {
             // ==========================
 
             for (int i = 1; i <= 10; i++) {
-                try{
+                try {
                     compraCtrl.realizarCompra(
                             (long) i,
                             (long) i,

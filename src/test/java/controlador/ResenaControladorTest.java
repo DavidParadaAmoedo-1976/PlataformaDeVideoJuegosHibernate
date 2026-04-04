@@ -49,9 +49,7 @@ class ResenaControladorTest {
         resenaRepoMemoria = new ResenaRepoMemoria();
         bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
 
-        controlador = new ResenaControlador(
-                resenaRepoMemoria,
-                obtenerEntidades);
+        controlador = new ResenaControlador(resenaRepoMemoria, obtenerEntidades,null);
         new ObtenerEntidadesOptional(null, usuarioRepoMemoria, juegoRepoMemoria, bibliotecaRepoMemoria, resenaRepoMemoria);
 
         // ===== Crear Usuario =====

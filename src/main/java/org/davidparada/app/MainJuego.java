@@ -1,6 +1,6 @@
 package org.davidparada.app;
 
-import org.davidparada.controlador.*;
+import org.davidparada.controlador.JuegoControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.JuegoDto;
@@ -26,16 +26,17 @@ public class MainJuego {
         System.out.println("\n⏸️ Pulsa ENTER para continuar...");
         scanner.nextLine();
     }
+
     static void main(String[] args) {
 
         // 🔧 Inicializar dependencias (usa tus implementaciones reales)
         IGestorTransacciones gestor = new GestorTransaccionesHibernate();
         ISessionManager sessionManager = (ISessionManager) gestor;
 
-        ICompraRepo compraRepo = new  CompraRepoHibernate();
-        IUsuarioRepo usuarioRepo = new  UsuarioRepoHibernate(sessionManager);
-        IBibliotecaRepo bibliotecaRepo = new  BibliotecaRepoHibernate(sessionManager);
-        IResenaRepo resenaRepo = new  ResenaRepoHibernate();
+        ICompraRepo compraRepo = new CompraRepoHibernate();
+        IUsuarioRepo usuarioRepo = new UsuarioRepoHibernate(sessionManager);
+        IBibliotecaRepo bibliotecaRepo = new BibliotecaRepoHibernate(sessionManager);
+        IResenaRepo resenaRepo = new ResenaRepoHibernate(sessionManager);
         IJuegoRepo juegoRepo = new JuegoRepoHibernate(sessionManager); // 👈 tu implementación
         ObtenerEntidadesOptional obtener = new ObtenerEntidadesOptional(compraRepo, usuarioRepo, juegoRepo, bibliotecaRepo, resenaRepo);
 

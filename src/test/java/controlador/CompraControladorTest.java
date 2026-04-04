@@ -51,7 +51,7 @@ class CompraControladorTest {
         juegoRepoMemoria = new JuegoRepoMemoria();
         compraRepoMemoria = new CompraRepoMemoria();
         bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
-        bibliotecaControlador = new BibliotecaControlador(bibliotecaRepoMemoria, juegoRepoMemoria, obtenerEntidades);
+        bibliotecaControlador = new BibliotecaControlador(bibliotecaRepoMemoria, juegoRepoMemoria, obtenerEntidades,null);
 
         compraControlador = new CompraControlador(
                 compraRepoMemoria,

@@ -1,191 +1,128 @@
 package org.davidparada.repositorio.implementacionHibernate;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.davidparada.modelo.entidad.ResenaEntidad;
 import org.davidparada.modelo.formulario.ResenaForm;
 import org.davidparada.modelo.mapper.ResenaFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IResenaRepo;
-import org.davidparada.util.HibernateUtil;
-import org.hibernate.HibernateException;
+import org.davidparada.transaciones.interfaceTransaciones.ISessionManager;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.util.List;
 import java.util.Optional;
 
 public class ResenaRepoHibernate implements IResenaRepo {
-    @Override
-    public List<ResenaEntidad> buscarPorUsuario(Long idUsuario) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
 
-            String query = "FROM ResenaEntidad WHERE idUsuario = :idUsuario";
-            List<ResenaEntidad> resenasEntidad = session
-                    .createQuery(query, ResenaEntidad.class)
-                    .setParameter("idUsuario", idUsuario)
-                    .getResultList();
+    private final ISessionManager sessionManager;
 
-            tx.commit();
-            return resenasEntidad;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar reseñas en base de datos", e);
-        }
-    }
-
-    @Override
-    public List<ResenaEntidad> buscarPorJuego(Long idJuego) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-
-            String query = "FROM ResenaEntidad r WHERE r.idJuego = :idJuego";
-            List<ResenaEntidad> resenasEntidad = session
-                    .createQuery(query, ResenaEntidad.class)
-                    .setParameter("idJuego", idJuego)
-                    .getResultList();
-
-            tx.commit();
-            return resenasEntidad;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar reseñas en base de datos", e);
-        }
-    }
-
-    @Override
-    public Optional<ResenaEntidad> buscarPorIdYUsuario(Long idResena, Long idUsuario) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-
-            ResenaEntidad resenaEntidad = session.get(ResenaEntidad.class, idResena);
-
-            if (resenaEntidad == null || !resenaEntidad.getIdUsuario().equals(idUsuario)) {
-                tx.commit();
-                return Optional.empty();
-            }
-
-            tx.commit();
-            return Optional.of(resenaEntidad);
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar reseña en base de datos", e);
-        }
+    public ResenaRepoHibernate(ISessionManager sessionManager) {
+        this.sessionManager = sessionManager;
     }
 
     @Override
     public ResenaEntidad crear(ResenaForm formulario) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            ResenaEntidad resenaEntidad = ResenaFormularioAEntidadMapper.crearReseniaEntidad(formulario);
-            session.persist(resenaEntidad);
+        ResenaEntidad resenaEntidad = ResenaFormularioAEntidadMapper.crearReseniaEntidad(formulario);
+        session.persist(resenaEntidad);
 
-            tx.commit();
-            return resenaEntidad;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al crear reseña en base de datos", e);
-        }
+        return resenaEntidad;
     }
 
     @Override
     public Optional<ResenaEntidad> buscarPorId(Long idResena) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            Optional<ResenaEntidad> resenaEntidad = Optional.ofNullable(session.get(ResenaEntidad.class, idResena));
-
-            tx.commit();
-            return resenaEntidad;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar reseña en base de datos", e);
-        }
+        return Optional.ofNullable(session.find(ResenaEntidad.class, idResena));
     }
 
     @Override
     public List<ResenaEntidad> listarTodos() {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            String query = "FROM ResenaEntidad";
-            List<ResenaEntidad> resenasEntidad = session
-                    .createQuery(query, ResenaEntidad.class)
-                    .getResultList();
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<ResenaEntidad> criteriaQuery = criteriaBuilder.createQuery(ResenaEntidad.class);
+        Root<ResenaEntidad> root = criteriaQuery.from(ResenaEntidad.class);
 
-            tx.commit();
-            return resenasEntidad;
+        criteriaQuery.select(root);
 
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al buscar reseñas en base de datos", e);
-        }
+        return session.createQuery(criteriaQuery).getResultList();
     }
 
     @Override
     public Optional<ResenaEntidad> actualizar(Long idResena, ResenaForm formulario) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            ResenaEntidad resenaEntidad = ResenaFormularioAEntidadMapper.crearReseniaEntidad(idResena, formulario);
-            ResenaEntidad resenaActualizada = session.merge(resenaEntidad);
-
-            tx.commit();
-            return Optional.of(resenaActualizada);
-
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al actualizar reseña en base de datos", e);
+        Optional<ResenaEntidad> resenaEntidad = this.buscarPorId(idResena);
+        if (resenaEntidad.isEmpty()) {
+            return Optional.empty();
         }
+
+        session.merge(new ResenaEntidad(idResena,
+                formulario.getIdUsuario(),
+                formulario.getIdJuego(),
+                formulario.isRecomendado(),
+                formulario.getTextoResena(),
+                formulario.getCantidadHorasJugadas(),
+                formulario.getFechaPublicacion(),
+                formulario.getFechaUltimaEdicion(),
+                formulario.getEstadoPublicacion()
+        ));
+        return buscarPorId(idResena);
     }
 
     @Override
     public boolean eliminar(Long idResena) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
+        Session session = sessionManager.getSession();
 
-            ResenaEntidad resenaEntidad = session.get(ResenaEntidad.class, idResena);
-            if (resenaEntidad == null) {
-                tx.commit();
-                return false;
-            }
-            session.remove(resenaEntidad);
-
-            tx.commit();
-            return true;
-
-        } catch (HibernateException e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw new RuntimeException("Error al  en base de datos", e);
+        Optional<ResenaEntidad> resenaEntidad = this.buscarPorId(idResena);
+        if (resenaEntidad.isEmpty()) {
+            return false;
         }
+        session.remove(resenaEntidad.get());
+        return true;
     }
+
+    @Override
+    public List<ResenaEntidad> buscarPorUsuario(Long idUsuario) {
+        Session session = sessionManager.getSession();
+
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<ResenaEntidad> criteriaQuery = criteriaBuilder.createQuery(ResenaEntidad.class);
+        Root<ResenaEntidad> root = criteriaQuery.from(ResenaEntidad.class);
+        criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("idUsuario"), idUsuario));
+
+        return session.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public List<ResenaEntidad> buscarPorJuego(Long idJuego) {
+        Session session = sessionManager.getSession();
+
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<ResenaEntidad> criteriaQuery = criteriaBuilder.createQuery(ResenaEntidad.class);
+        Root<ResenaEntidad> root = criteriaQuery.from(ResenaEntidad.class);
+        criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("idJuego"), idJuego));
+
+        return session.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public Optional<ResenaEntidad> buscarPorIdYUsuario(Long idResena, Long idUsuario) {
+        Session session = sessionManager.getSession();
+
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<ResenaEntidad> criteriaQuery = criteriaBuilder.createQuery(ResenaEntidad.class);
+        Root<ResenaEntidad> root = criteriaQuery.from(ResenaEntidad.class);
+
+        Predicate p1 = criteriaBuilder.equal(root.get("idResena"), idResena);
+        Predicate p2 = criteriaBuilder.equal(root.get("idUsuario"), idUsuario);
+        criteriaQuery.select(root).where(criteriaBuilder.and(p1, p2));
+
+        return session.createQuery(criteriaQuery).getResultStream().findFirst();
+    }
+
 }

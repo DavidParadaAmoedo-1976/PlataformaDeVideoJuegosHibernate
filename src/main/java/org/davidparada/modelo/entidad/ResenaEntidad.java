@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import org.davidparada.modelo.enums.EstadoPublicacionEnum;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(name = "resenas")
@@ -107,7 +108,6 @@ public class ResenaEntidad {
     }
 
     // Setters
-
     public void setIdResena(Long idResena) {
         this.idResena = idResena;
     }
@@ -142,5 +142,34 @@ public class ResenaEntidad {
 
     public void setEstadoPublicacion(EstadoPublicacionEnum estadoPublicacion) {
         this.estadoPublicacion = estadoPublicacion;
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "ResenaEntidad{" +
+                "idResena=" + idResena +
+                ", idUsuario=" + idUsuario +
+                ", idJuego=" + idJuego +
+                ", recomendado=" + recomendado +
+                ", textoResena='" + textoResena + '\'' +
+                ", cantidadHorasJugadas=" + cantidadHorasJugadas +
+                ", fechaPublicacion=" + fechaPublicacion +
+                ", fechaUltimaEdicion=" + fechaUltimaEdicion +
+                ", estadoPublicacion=" + estadoPublicacion +
+                '}';
+    }
+
+    // Equals y hashCode
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ResenaEntidad that = (ResenaEntidad) o;
+        return recomendado == that.recomendado && Objects.equals(idResena, that.idResena) && Objects.equals(idUsuario, that.idUsuario) && Objects.equals(idJuego, that.idJuego) && Objects.equals(textoResena, that.textoResena) && Objects.equals(cantidadHorasJugadas, that.cantidadHorasJugadas) && Objects.equals(fechaPublicacion, that.fechaPublicacion) && Objects.equals(fechaUltimaEdicion, that.fechaUltimaEdicion) && estadoPublicacion == that.estadoPublicacion;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idResena, idUsuario, idJuego, recomendado, textoResena, cantidadHorasJugadas, fechaPublicacion, fechaUltimaEdicion, estadoPublicacion);
     }
 }

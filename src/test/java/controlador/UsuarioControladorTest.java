@@ -27,7 +27,7 @@ class UsuarioControladorTest {
     void setUp() {
         IUsuarioRepo usuarioRepo = new UsuarioRepoMemoria();
         UsuarioFormValidador.setUsuarioRepo(usuarioRepo);
-        ObtenerEntidadesOptional obtenerEntidades = new ObtenerEntidadesOptional(null,usuarioRepo,null, null, null);
+        ObtenerEntidadesOptional obtenerEntidades = new ObtenerEntidadesOptional(null, usuarioRepo, null, null, null);
         IGestorTransacciones gestor = new GestorTransaccionesMemoria();
         usuarioControlador = new UsuarioControlador(usuarioRepo, obtenerEntidades, gestor);
     }

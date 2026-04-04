@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class JuegoControladorTest {
 
     private JuegoControlador juegoControlador;
+
     @BeforeEach
     void setUp() {
         IJuegoRepo juegoRepo = new JuegoRepoMemoria();

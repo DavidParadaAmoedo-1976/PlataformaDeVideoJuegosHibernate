@@ -35,7 +35,7 @@ public class MainUsuario {
         ICompraRepo compraRepo = new CompraRepoHibernate();
         IUsuarioRepo usuarioRepo = new UsuarioRepoHibernate(sessionManager);
         IBibliotecaRepo bibliotecaRepo = new BibliotecaRepoHibernate(sessionManager);
-        IResenaRepo resenaRepo = new ResenaRepoHibernate();
+        IResenaRepo resenaRepo = new ResenaRepoHibernate(sessionManager);
         IJuegoRepo juegoRepo = new JuegoRepoHibernate(sessionManager);
 
         ObtenerEntidadesOptional obtener =
@@ -50,8 +50,8 @@ public class MainUsuario {
             // 👤 1. CREAR USUARIOS
             // =========================
             UsuarioForm usuario1 = new UsuarioForm(
-                    "qwert",
-                    "qwert@email.com",
+                    "qwer",
+                    "qwer@email.com",
                     "1234Pasword",
                     "David Parada",
                     PaisEnum.ESPANA,
@@ -99,7 +99,7 @@ public class MainUsuario {
             // =========================
             System.out.println("\n🔎 Consultar perfil por username:");
 
-            UsuarioDto perfilNombre = controlador.consultarPerfil("david123");
+            UsuarioDto perfilNombre = controlador.consultarPerfil("zxcv");
             System.out.println(perfilNombre);
 
             pausa();

@@ -38,7 +38,8 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
         } catch (Exception e) {
 
             if (tx != null && tx.isActive()) {
-                tx.rollback(); // ✅ ahora sí funciona
+                tx.rollback();
+                System.out.println("ROLLBACK");
             }
 
             throw new RuntimeException(e);
@@ -46,7 +47,7 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
         } finally {
 
             if (s != null && s.isOpen()) {
-                s.close(); // ✅ cerrar al final
+                s.close();
             }
 
             session = null;
@@ -70,7 +71,9 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
 //        }
 //    }
 
-    /** Devuelve la sesión activa dentro de un bloque {@link #inTransaction}. */
+    /**
+     * Devuelve la sesión activa dentro de un bloque {@link #inTransaction}.
+     */
     public Session getSession() {
         return session;
     }

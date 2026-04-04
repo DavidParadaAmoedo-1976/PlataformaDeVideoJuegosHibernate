@@ -11,6 +11,7 @@ import org.davidparada.modelo.entidad.UsuarioEntidad;
 import org.davidparada.modelo.enums.OrdenarJuegosBibliotecaEnum;
 import org.davidparada.modelo.enums.TipoErrorEnum;
 import org.davidparada.modelo.formulario.BibliotecaForm;
+import org.davidparada.modelo.formulario.validacion.BibliotecaFormValidador;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
 import org.davidparada.modelo.mapper.BibliotecaEntidadADtoMapper;
 import org.davidparada.modelo.mapper.JuegoEntidadADtoMapper;
@@ -72,16 +73,16 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                 throw new IllegalStateException();
             }
 
-            UsuarioEntidad usuarioEntidad;
-            JuegoEntidad juegoEntidad;
+            UsuarioEntidad usuario;
+            JuegoEntidad juego;
             try {
-                usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
+                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+                juego = obtenerEntidades.obtenerJuego(idJuego, errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException();
             }
 
-            BibliotecaForm nuevoJuego = new BibliotecaForm(
+            BibliotecaForm nuevaBiblioteca = new BibliotecaForm(
                     idUsuario,
                     idJuego,
                     Instant.now(),
@@ -89,13 +90,17 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                     null,
                     false
             );
-
-            BibliotecaEntidad bibliotecaEntidad = bibliotecaRepo.crear(nuevoJuego);
+            try {
+                BibliotecaFormValidador.validarBiblioteca(nuevaBiblioteca);
+            } catch (ValidationException e) {
+                throw new RuntimeException();
+            }
+            BibliotecaEntidad biblioteca = bibliotecaRepo.crear(nuevaBiblioteca);
 
             return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
-                    bibliotecaEntidad,
-                    usuarioEntidad,
-                    juegoEntidad
+                    biblioteca,
+                    usuario,
+                    juego
             );
         });
     }
@@ -173,19 +178,23 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarIdJuego(idJuego, errores);
 
         return gestorTransacciones.inTransaction(() -> {
+            BibliotecaEntidad biblioteca;
+            UsuarioEntidad usuario;
+            JuegoEntidad juego;
             try {
-                BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-                UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
-                bibliotecaRepo.eliminar(bibliotecaEntidad.getIdBiblioteca());
-                return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
-                        bibliotecaEntidad,
-                        usuarioEntidad,
-                        juegoEntidad
-                );
+                biblioteca = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+                juego = obtenerEntidades.obtenerJuego(idJuego, errores);
             } catch (ValidationException e) {
                 throw new IllegalStateException();
             }
+            bibliotecaRepo.eliminar(biblioteca.getIdBiblioteca());
+
+            return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                    biblioteca,
+                    usuario,
+                    juego
+            );
         });
     }
 

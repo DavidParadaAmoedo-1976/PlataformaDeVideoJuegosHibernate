@@ -1,14 +1,13 @@
 package org.davidparada.app;
 
-import org.davidparada.controlador.BibliotecaControlador;
+import org.davidparada.controlador.ResenaControlador;
 import org.davidparada.controlador.UsuarioControlador;
+import org.davidparada.controlador.BibliotecaControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
-import org.davidparada.modelo.dto.BibliotecaDto;
+import org.davidparada.modelo.dto.ResenaDto;
 import org.davidparada.modelo.dto.UsuarioDto;
-import org.davidparada.modelo.enums.EstadoCuentaEnum;
-import org.davidparada.modelo.enums.OrdenarJuegosBibliotecaEnum;
-import org.davidparada.modelo.enums.PaisEnum;
+import org.davidparada.modelo.enums.*;
 import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.repositorio.implementacionHibernate.*;
 import org.davidparada.repositorio.interfaceRepositorio.*;
@@ -21,7 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
-public class MainBiblioteca {
+public class MainResena {
 
     public static final Scanner scanner = new Scanner(System.in);
 
@@ -32,7 +31,7 @@ public class MainBiblioteca {
 
     public static void main(String[] args) {
 
-        // 🔧 Inicializar dependencias
+        // 🔧 Dependencias
         IGestorTransacciones gestor = new GestorTransaccionesHibernate();
         ISessionManager sessionManager = (ISessionManager) gestor;
 
@@ -52,16 +51,19 @@ public class MainBiblioteca {
         BibliotecaControlador bibliotecaControlador =
                 new BibliotecaControlador(bibliotecaRepo, juegoRepo, obtener, gestor);
 
+        ResenaControlador resenaControlador =
+                new ResenaControlador(resenaRepo, obtener, gestor);
+
         try {
 
             // =========================
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "qwerr3",
-                    "qwerr3@email.com",
-                    "1234Pasword",
-                    "Asdf ghjk",
+                    "userResena",
+                    "resena@email.com",
+                    "1234Password",
+                    "Nombre Apellido",
                     PaisEnum.ESPANA,
                     LocalDate.of(2000, 1, 1),
                     Instant.now(),
@@ -76,82 +78,95 @@ public class MainBiblioteca {
 
             pausa();
 
-            // ⚠️ IMPORTANTE:
-            // Aquí debes asegurarte de que EXISTAN juegos en BD
-            // (o crearlos antes si tienes controlador de juegos)
-
             Long idUsuario = usuarioCreado.idUsuario();
 
             // =========================
-            // 🎮 2. AÑADIR JUEGO
+            // 🎮 2. AÑADIR JUEGO A BIBLIOTECA
             // =========================
             System.out.println("\n🎮 Añadir juego (ID 1):");
 
-            BibliotecaDto b1 = bibliotecaControlador.anadirJuego(idUsuario, 1L);
-            System.out.println(b1);
+            bibliotecaControlador.anadirJuego(idUsuario, 1L);
 
             pausa();
 
             // =========================
-            // 📚 3. VER BIBLIOTECA
+            // ✍️ 3. CREAR RESEÑA
             // =========================
-            System.out.println("\n📚 Biblioteca del usuario:");
+            System.out.println("\n✍️ Crear reseña:");
 
-            List<BibliotecaDto> biblioteca =
-                    bibliotecaControlador.verBiblioteca(idUsuario, null);
+            ResenaDto resena = resenaControlador.escribirResena(
+                    idUsuario,
+                    1L,
+                    true,
+                    "Muy buen juego 🔥".repeat(5)
+            );
 
-            biblioteca.forEach(System.out::println);
+            System.out.println(resena);
 
             pausa();
 
-            // =========================
-            // ⏱️ 4. ACTUALIZAR HORAS
-            // =========================
-            System.out.println("\n⏱️ Añadir 5 horas de juego:");
-
-            BibliotecaDto actualizado =
-                    bibliotecaControlador.actualizarTiempoDeJuego(idUsuario, 1L, 5.0);
-
-            System.out.println(actualizado);
-
-            pausa();
+            Long idResena = resena.idResena();
 
             // =========================
-            // 🔎 5. ORDENAR BIBLIOTECA
+            // 📋 4. VER RESEÑAS DEL JUEGO
             // =========================
-            System.out.println("\n🔎 Biblioteca ordenada por horas:");
+            System.out.println("\n📋 Reseñas del juego:");
 
-            List<BibliotecaDto> ordenados =
-                    bibliotecaControlador.verBiblioteca(
-                            idUsuario,
-                            OrdenarJuegosBibliotecaEnum.TIEMPO_DE_JUEGO
+            List<ResenaDto> resenasJuego =
+                    resenaControlador.obtenerResenas(
+                            1L,
+                            true,
+                            OrdenarResenaEnum.RECIENTES
                     );
 
-            ordenados.forEach(System.out::println);
+            resenasJuego.forEach(System.out::println);
 
             pausa();
 
             // =========================
-            // 🔍 6. FILTRAR
+            // 👤 5. RESEÑAS DEL USUARIO
             // =========================
-            System.out.println("\n🔍 Buscar por texto 'game':");
+            System.out.println("\n👤 Reseñas del usuario:");
 
-            List<BibliotecaDto> filtrados =
-                    bibliotecaControlador.buscarSegunCriterios(idUsuario, "game", null);
+            List<ResenaDto> resenasUsuario =
+                    resenaControlador.obtenerResenasUsuario(idUsuario);
 
-            filtrados.forEach(System.out::println);
+            resenasUsuario.forEach(System.out::println);
 
             pausa();
 
             // =========================
-            // ❌ 7. ELIMINAR JUEGO
+            // 📊 6. ESTADÍSTICAS
             // =========================
-            System.out.println("\n❌ Eliminar juego:");
+            System.out.println("\n📊 Estadísticas del juego:");
 
-            BibliotecaDto eliminado =
-                    bibliotecaControlador.eliminarJuego(idUsuario, 1L);
+            System.out.println(
+                    resenaControlador.consultarEstadisticasResenaPorJuego(1L)
+            );
 
-            System.out.println(eliminado);
+            pausa();
+
+            // =========================
+            // 🙈 7. OCULTAR RESEÑA
+            // =========================
+            System.out.println("\n🙈 Ocultar reseña:");
+
+            ResenaDto oculta =
+                    resenaControlador.ocultarResena(idResena, idUsuario);
+
+            System.out.println(oculta);
+
+            pausa();
+
+            // =========================
+            // ❌ 8. ELIMINAR RESEÑA
+            // =========================
+            System.out.println("\n❌ Eliminar reseña:");
+
+            ResenaDto eliminada =
+                    resenaControlador.eliminarResena(idResena, idUsuario);
+
+            System.out.println(eliminada);
 
         } catch (ValidationException e) {
             System.out.println("❌ Error de validación: " + e.getMessage());

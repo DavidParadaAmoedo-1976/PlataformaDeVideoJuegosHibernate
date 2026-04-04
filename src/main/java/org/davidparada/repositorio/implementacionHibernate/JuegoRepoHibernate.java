@@ -88,7 +88,7 @@ public class JuegoRepoHibernate implements IJuegoRepo {
         if (juegoEntidad.isEmpty()) {
             return false;
         }
-        session.remove(juegoEntidad);
+        session.remove(juegoEntidad.get());
         return true;
     }
 

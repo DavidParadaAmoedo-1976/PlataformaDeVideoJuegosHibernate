@@ -45,7 +45,7 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
         CriteriaBuilder criteria = session.getCriteriaBuilder();
         CriteriaQuery<UsuarioEntidad> criteriaQuery = criteria.createQuery(UsuarioEntidad.class);
         Root<UsuarioEntidad> root = criteriaQuery.from(UsuarioEntidad.class);
-        
+
         criteriaQuery.select(root);
         return session.createQuery(criteriaQuery).getResultList();
     }
@@ -53,12 +53,12 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
     @Override
     public Optional<UsuarioEntidad> actualizar(Long idUsuario, UsuarioForm formulario) {
         Session session = sessionManager.getSession();
-        
+
         Optional<UsuarioEntidad> usuarioEntidad = this.buscarPorId(idUsuario);
         if (usuarioEntidad.isEmpty()) {
             return Optional.empty();
         }
-        
+
         session.merge(new UsuarioEntidad(idUsuario,
                 formulario.getNombreUsuario(),
                 formulario.getEmail(),
@@ -70,20 +70,20 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
                 formulario.getAvatar(),
                 formulario.getSaldo(),
                 formulario.getEstadoCuenta()
-                ));
-        
+        ));
+
         return buscarPorId(idUsuario);
     }
 
     @Override
     public boolean eliminar(Long idUsuario) {
         Session session = sessionManager.getSession();
-        
+
         Optional<UsuarioEntidad> usuarioEntidad = this.buscarPorId(idUsuario);
         if (usuarioEntidad.isEmpty()) {
             return false;
         }
-        session.remove(usuarioEntidad);
+        session.remove(usuarioEntidad.get());
         return true;
     }
 
@@ -95,7 +95,7 @@ public class UsuarioRepoHibernate implements IUsuarioRepo {
         CriteriaQuery<UsuarioEntidad> criteriaQuery = criteria.createQuery(UsuarioEntidad.class);
         Root<UsuarioEntidad> root = criteriaQuery.from(UsuarioEntidad.class);
         criteriaQuery.select(root).where(criteria.equal(root.get("email"), email));
-        
+
         return session.createQuery(criteriaQuery).getResultStream().findFirst();
     }
 

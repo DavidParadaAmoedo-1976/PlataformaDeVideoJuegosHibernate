@@ -9,10 +9,7 @@ import org.davidparada.modelo.formulario.BibliotecaForm;
 import org.davidparada.modelo.mapper.BibliotecaFormularioAEntidadMapper;
 import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
 import org.davidparada.transaciones.interfaceTransaciones.ISessionManager;
-import org.davidparada.util.HibernateUtil;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,17 +26,17 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
     public BibliotecaEntidad crear(BibliotecaForm formulario) {
         Session session = sessionManager.getSession();
 
-            BibliotecaEntidad bibliotecaEntidad = BibliotecaFormularioAEntidadMapper.crearBibliotecaEntidad(formulario);
-            session.persist(bibliotecaEntidad);
+        BibliotecaEntidad bibliotecaEntidad = BibliotecaFormularioAEntidadMapper.crearBibliotecaEntidad(formulario);
+        session.persist(bibliotecaEntidad);
 
-            return bibliotecaEntidad;
+        return bibliotecaEntidad;
     }
 
     @Override
     public Optional<BibliotecaEntidad> buscarPorId(Long idBiblioteca) {
         Session session = sessionManager.getSession();
 
-            return Optional.ofNullable(session.find(BibliotecaEntidad.class, idBiblioteca));
+        return Optional.ofNullable(session.find(BibliotecaEntidad.class, idBiblioteca));
     }
 
     @Override
@@ -71,7 +68,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
                 formulario.getHorasDeJuego(),
                 formulario.getUltimaFechaDeJuego(),
                 formulario.isEstadoInstalacion()
-                ));
+        ));
 
         return buscarPorId(idBiblioteca);
     }
@@ -110,7 +107,7 @@ public class BibliotecaRepoHibernate implements IBibliotecaRepo {
 
         Predicate p1 = criteriaBuilder.equal(root.get("idUsuario"), idUsuario);
         Predicate p2 = criteriaBuilder.equal(root.get("idJuego"), idJuego);
-        criteriaQuery.select(root).where(criteriaBuilder.and(p1,p2));
+        criteriaQuery.select(root).where(criteriaBuilder.and(p1, p2));
 
         return session.createQuery(criteriaQuery).getResultStream().findFirst();
     }
