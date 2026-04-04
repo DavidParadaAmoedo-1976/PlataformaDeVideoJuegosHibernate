@@ -62,8 +62,8 @@ public class MainResena {
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "userResena",
-                    "resena@email.com",
+                    "userResena12",
+                    "resena12@email.com",
                     "1234Password",
                     "Nombre Apellido",
                     PaisEnum.ESPANA,

@@ -3,6 +3,8 @@ package org.davidparada.modelo.mapper;
 import org.davidparada.modelo.dto.UsuarioDto;
 import org.davidparada.modelo.entidad.UsuarioEntidad;
 
+import java.time.ZoneId;
+
 public class UsuarioEntidadADtoMapper {
 
     private UsuarioEntidadADtoMapper() {
@@ -18,7 +20,7 @@ public class UsuarioEntidadADtoMapper {
                 usuario.getIdUsuario(),
                 usuario.getNombreUsuario(),
                 usuario.getEmail(),
-                usuario.getPassword(),
+//                usuario.getPassword(),
                 usuario.getNombreReal(),
                 usuario.getPais(),
                 usuario.getFechaNacimiento(),

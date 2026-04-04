@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public record UsuarioDto(Long idUsuario,
                          String nombreUsuario,
                          String email,
-                         String password,
+//                         String password,
                          String nombreReal,
                          PaisEnum pais,
                          LocalDate fechaNacimiento,

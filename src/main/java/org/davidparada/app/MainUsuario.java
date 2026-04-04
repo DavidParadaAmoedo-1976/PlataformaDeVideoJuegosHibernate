@@ -15,6 +15,8 @@ import org.davidparada.transaciones.interfaceTransaciones.ISessionManager;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class MainUsuario {
@@ -50,8 +52,8 @@ public class MainUsuario {
             // 👤 1. CREAR USUARIOS
             // =========================
             UsuarioForm usuario1 = new UsuarioForm(
-                    "qwer",
-                    "qwer@email.com",
+                    "qwer12",
+                    "qwer12@email.com",
                     "1234Pasword",
                     "David Parada",
                     PaisEnum.ESPANA,
@@ -63,8 +65,8 @@ public class MainUsuario {
             );
 
             UsuarioForm usuario2 = new UsuarioForm(
-                    "zxcv",
-                    "zxcv@email.com",
+                    "zxcv12",
+                    "zxcv12@email.com",
                     "1234Pasword",
                     "Lkjh Gfds",
                     PaisEnum.ESPANA,
@@ -81,6 +83,16 @@ public class MainUsuario {
             System.out.println("✅ Usuarios creados:");
             System.out.println(creado1);
             System.out.println(creado2);
+
+            // Pruebas en muestra de fechas
+            System.out.println(creado1.nombreUsuario() + " -> " + creado1.fechaRegistro().atZone(ZoneId.systemDefault()));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm VV");
+
+            String fecha = creado2.fechaRegistro()
+                    .atZone(ZoneId.systemDefault())
+                    .format(formatter);
+
+            System.out.println(creado2.nombreUsuario() + " -> " + fecha);
 
             pausa();
 

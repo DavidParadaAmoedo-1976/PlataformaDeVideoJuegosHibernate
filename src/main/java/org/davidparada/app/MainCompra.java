@@ -17,6 +17,8 @@ import org.davidparada.transaciones.interfaceTransaciones.ISessionManager;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -66,8 +68,8 @@ public class MainCompra {
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "userCompra3",
-                    "compra3@email.com",
+                    "userCompra123",
+                    "compra123@email.com",
                     "1234Password",
                     "Nombre Apellido",
                     PaisEnum.ESPANA,
