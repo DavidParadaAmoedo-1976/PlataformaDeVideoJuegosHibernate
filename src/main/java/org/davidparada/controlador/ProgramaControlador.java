@@ -15,9 +15,11 @@ import org.davidparada.modelo.enums.TipoErrorEnum;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
 import org.davidparada.modelo.mapper.JuegoEntidadADtoMapper;
 import org.davidparada.repositorio.interfaceRepositorio.*;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
 
@@ -36,6 +38,7 @@ public class ProgramaControlador implements IProgramaControlador {
     private final IBibliotecaRepo bibliotecaRepo;
     private final IResenaRepo resenaRepo;
     private final ObtenerEntidadesOptional obtenerEntidades;
+    private final IGestorTransacciones gestorTransacciones;
 
 
     public ProgramaControlador(
@@ -44,7 +47,7 @@ public class ProgramaControlador implements IProgramaControlador {
             IUsuarioRepo usuarioRepo,
             IBibliotecaRepo bibliotecaRepo,
             IResenaRepo resenaRepo,
-            ObtenerEntidadesOptional obtenerEntidades
+            ObtenerEntidadesOptional obtenerEntidades, IGestorTransacciones gestorTransacciones
     ) {
         this.compraRepo = compraRepo;
         this.juegoRepo = juegoRepo;
@@ -52,6 +55,7 @@ public class ProgramaControlador implements IProgramaControlador {
         this.bibliotecaRepo = bibliotecaRepo;
         this.resenaRepo = resenaRepo;
         this.obtenerEntidades = obtenerEntidades;
+        this.gestorTransacciones = gestorTransacciones;
     }
 
     // Generar reportes de ventas
@@ -74,34 +78,36 @@ public class ProgramaControlador implements IProgramaControlador {
         Instant inicioSeguro = java.util.Objects.requireNonNull(inicio);
         Instant finSeguro = java.util.Objects.requireNonNull(fin);
 
-        List<CompraEntidad> comprasFiltradas = compraRepo.listarTodos().stream()
+        return gestorTransacciones.inTransaction(() -> {
+            List<CompraEntidad> comprasFiltradas = compraRepo.listarTodos().stream()
 
-                .filter(c -> c.getFechaCompra().isAfter(inicioSeguro))
-                .filter(c -> c.getFechaCompra().isBefore(finSeguro))
+                    .filter(c -> c.getFechaCompra().isAfter(inicioSeguro))
+                    .filter(c -> c.getFechaCompra().isBefore(finSeguro))
 
-                .filter(c -> idJuego == null || c.getIdJuego().equals(idJuego))
+                    .filter(c -> idJuego == null || c.getIdJuego().equals(idJuego))
 
-                .filter(c -> {
-                    if (desarrollador == null) {
-                        return true;
-                    }
+                    .filter(c -> {
+                        if (desarrollador == null) {
+                            return true;
+                        }
 
-                    Optional<JuegoEntidad> juego = juegoRepo.buscarPorId(c.getIdJuego());
+                        Optional<JuegoEntidad> juego = juegoRepo.buscarPorId(c.getIdJuego());
 
-                    return juego
-                            .map(j -> j.getDesarrollador().equalsIgnoreCase(desarrollador))
-                            .orElse(false);
-                })
+                        return juego
+                                .map(j -> j.getDesarrollador().equalsIgnoreCase(desarrollador))
+                                .orElse(false);
+                    })
 
-                .toList();
+                    .toList();
 
-        int totalVentas = comprasFiltradas.size();
+            int totalVentas = comprasFiltradas.size();
 
-        double ingresosTotales = comprasFiltradas.stream()
-                .mapToDouble(c -> c.getPrecioBase() * (1 - c.getDescuento() / POR_CIENTO_DOUBLE))
-                .sum();
+            double ingresosTotales = comprasFiltradas.stream()
+                    .mapToDouble(c -> c.getPrecioBase() * (1 - c.getDescuento() / POR_CIENTO_DOUBLE))
+                    .sum();
 
-        return new ReporteVentasDto(inicio, fin, totalVentas, ingresosTotales);
+            return new ReporteVentasDto(inicio, fin, totalVentas, ingresosTotales);
+        });
     }
 
     // Generar reportes de usuarios
@@ -119,17 +125,19 @@ public class ProgramaControlador implements IProgramaControlador {
         Instant inicioSeguro = java.util.Objects.requireNonNull(inicio);
         Instant finSeguro = java.util.Objects.requireNonNull(fin);
 
-        int nuevosUsuarios = (int) usuarioRepo.listarTodos().stream()
-                .filter(u -> u.getFechaRegistro().isAfter(inicioSeguro))
-                .filter(u -> u.getFechaRegistro().isBefore(finSeguro))
-                .count();
+        return gestorTransacciones.inTransaction(() -> {
+            int nuevosUsuarios = (int) usuarioRepo.listarTodos().stream()
+                    .filter(u -> u.getFechaRegistro().isAfter(inicioSeguro))
+                    .filter(u -> u.getFechaRegistro().isBefore(finSeguro))
+                    .count();
 
-        int usuariosActivos = (int) compraRepo.listarTodos().stream()
-                .map(c -> c.getIdUsuario())
-                .distinct()
-                .count();
+            int usuariosActivos = (int) compraRepo.listarTodos().stream()
+                    .map(c -> c.getIdUsuario())
+                    .distinct()
+                    .count();
 
-        return new ReporteUsuariosDto(inicio, fin, nuevosUsuarios, usuariosActivos);
+            return new ReporteUsuariosDto(inicio, fin, nuevosUsuarios, usuariosActivos);
+        });
     }
 
     // Consultar juegos mas populares
@@ -137,7 +145,6 @@ public class ProgramaControlador implements IProgramaControlador {
     @Override
     public List<JuegosPopularesDto> consultarJuegosMasPopulares(CriterioPopularidadEnum criterio, Integer limite) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-        List<JuegosPopularesDto> resultado;
         if (criterio == null) {
             errores.add(new ErrorModel("criterio", TipoErrorEnum.OBLIGATORIO));
         } else if (limite == null) {
@@ -148,14 +155,17 @@ public class ProgramaControlador implements IProgramaControlador {
         comprobarListaErrores(errores);
         Objects.requireNonNull(criterio);
 
-        switch (criterio) {
-
-            case MAS_VENDIDOS -> resultado = juegosMasVendidos(limite);
-            case MEJOR_VALORADOS -> resultado = juegosMejorValorados(limite);
-            case MAS_JUGADOS -> resultado = juegosMasJugados(limite);
-            default -> resultado = List.of();
-        }
-        return resultado;
+        return gestorTransacciones.inTransaction(() -> {
+            try {
+                return switch (criterio) {
+                    case MAS_VENDIDOS -> juegosMasVendidos(limite);
+                    case MEJOR_VALORADOS -> juegosMejorValorados(limite);
+                    case MAS_JUGADOS -> juegosMasJugados(limite);
+                };
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private List<JuegosPopularesDto> juegosMasVendidos(Integer limite) throws ValidationException {
