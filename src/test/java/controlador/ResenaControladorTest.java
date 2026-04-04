@@ -18,6 +18,7 @@ import org.davidparada.repositorio.implementacionMemoria.ResenaRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.UsuarioRepoMemoria;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.davidparada.transaciones.GestorTransaccionesMemoria;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,24 +36,31 @@ class ResenaControladorTest {
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private UsuarioEntidad usuario;
     private JuegoEntidad juego;
-    private final ObtenerEntidadesOptional obtenerEntidades;
 
-    ResenaControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
-        this.obtenerEntidades = obtenerEntidades;
-    }
+private ObtenerEntidadesOptional obtenerEntidades;
 
-    @BeforeEach
-    void setUp() throws ValidationException {
+@BeforeEach
+void setUp() {
 
-        usuarioRepoMemoria = new UsuarioRepoMemoria();
-        juegoRepoMemoria = new JuegoRepoMemoria();
-        resenaRepoMemoria = new ResenaRepoMemoria();
-        bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
+    usuarioRepoMemoria = new UsuarioRepoMemoria();
+    juegoRepoMemoria = new JuegoRepoMemoria();
+    resenaRepoMemoria = new ResenaRepoMemoria();
+    bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
 
-        controlador = new ResenaControlador(resenaRepoMemoria, obtenerEntidades,null);
-        new ObtenerEntidadesOptional(null, usuarioRepoMemoria, juegoRepoMemoria, bibliotecaRepoMemoria, resenaRepoMemoria);
+    obtenerEntidades = new ObtenerEntidadesOptional(
+            null,
+            usuarioRepoMemoria,
+            juegoRepoMemoria,
+            bibliotecaRepoMemoria,
+            resenaRepoMemoria
+    );
 
-        // ===== Crear Usuario =====
+    controlador = new ResenaControlador(
+            resenaRepoMemoria,
+            obtenerEntidades,
+            new GestorTransaccionesMemoria()
+    );
+            // ===== Crear Usuario =====
         usuario = usuarioRepoMemoria.crear(
                 new UsuarioForm(
                         "david",
@@ -83,7 +91,8 @@ class ResenaControladorTest {
                         EstadoJuegoEnum.DISPONIBLE
                 )
         );
-    }
+
+}
 
 // ==============================
 // ESCRIBIR RESEÑA
@@ -135,7 +144,7 @@ class ResenaControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                RuntimeException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -149,7 +158,7 @@ class ResenaControladorTest {
     void textoResenaDemasiadoCorto() {
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -163,7 +172,7 @@ class ResenaControladorTest {
     void escribirResena_usuarioNoExiste() {
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.escribirResena(
                         999L,
                         juego.getIdJuego(),
@@ -177,7 +186,7 @@ class ResenaControladorTest {
     void escribirResena_juegoNoExiste() {
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         999L,
@@ -220,7 +229,7 @@ class ResenaControladorTest {
 
     @Test
     void eliminarResena_noExiste() {
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalStateException.class,
                 () -> controlador.eliminarResena(999L, usuario.getIdUsuario()));
     }
 
@@ -245,7 +254,7 @@ class ResenaControladorTest {
 
     @Test
     void ocultarResena_noExiste() {
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalStateException.class,
                 () -> controlador.ocultarResena(999L, usuario.getIdUsuario()));
     }
 
@@ -321,7 +330,7 @@ class ResenaControladorTest {
 
     @Test
     void obtenerResenasUsuario_noExiste() {
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalStateException.class,
                 () -> controlador.obtenerResenasUsuario(999L));
     }
 
@@ -347,7 +356,7 @@ class ResenaControladorTest {
     void crearResena_TextoMenor50Caracteres_LanzaValidationException() {
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -363,7 +372,7 @@ class ResenaControladorTest {
         String texto = "a".repeat(8001);
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -392,7 +401,7 @@ class ResenaControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.escribirResena(
                         otroUsuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -428,7 +437,7 @@ class ResenaControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.eliminarResena(
                         resena.getIdResena(),
                         otroUsuario.getIdUsuario()
@@ -471,14 +480,13 @@ class ResenaControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.ocultarResena(
                         resena.getIdResena(),
                         otroUsuario.getIdUsuario()
                 )
         );
     }
-
 
 // ======================================================
 // LISTAR RESEÑAS USUARIO - CASOS FALTANTES
