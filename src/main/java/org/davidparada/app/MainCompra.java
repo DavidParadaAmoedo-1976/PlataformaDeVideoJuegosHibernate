@@ -1,24 +1,33 @@
 package org.davidparada.app;
 
-import org.davidparada.controlador.*;
+import org.davidparada.controlador.BibliotecaControlador;
+import org.davidparada.controlador.CompraControlador;
+import org.davidparada.controlador.UsuarioControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.CompraDto;
 import org.davidparada.modelo.dto.DetallesCompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.dto.UsuarioDto;
-import org.davidparada.modelo.enums.*;
+import org.davidparada.modelo.enums.EstadoCuentaEnum;
+import org.davidparada.modelo.enums.MetodoPagoEnum;
+import org.davidparada.modelo.enums.PaisEnum;
 import org.davidparada.modelo.formulario.UsuarioForm;
-import org.davidparada.repositorio.implementacionHibernate.*;
-import org.davidparada.repositorio.interfaceRepositorio.*;
+import org.davidparada.repositorio.implementacionHibernate.BibliotecaRepoHibernate;
+import org.davidparada.repositorio.implementacionHibernate.CompraRepoHibernate;
+import org.davidparada.repositorio.implementacionHibernate.JuegoRepoHibernate;
+import org.davidparada.repositorio.implementacionHibernate.UsuarioRepoHibernate;
+import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
+import org.davidparada.repositorio.interfaceRepositorio.ICompraRepo;
+import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
+import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
+import org.davidparada.servicio.PdfServicio;
 import org.davidparada.transaciones.GestorTransaccionesHibernate;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import org.davidparada.transaciones.interfaceTransaciones.ISessionManager;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -68,8 +77,8 @@ public class MainCompra {
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "userCompra123",
-                    "compra123@email.com",
+                    "userCompra224",
+                    "compra224@email.com",
                     "1234Password",
                     "Nombre Apellido",
                     PaisEnum.ESPANA,
@@ -158,7 +167,7 @@ public class MainCompra {
             pausa();
 
             // =========================
-            // 🧾 7. FACTURA
+            // 🧾 7. FACTURA + PDF
             // =========================
             System.out.println("\n🧾 Factura:");
 
@@ -166,6 +175,16 @@ public class MainCompra {
                     compraControlador.generarFactura(idCompra);
 
             System.out.println(factura);
+
+            // Generar PDF
+            PdfServicio pdfService = new PdfServicio();
+
+            // Crear carpeta si no existe
+            new java.io.File("facturas").mkdirs();
+
+            String rutaPdf = pdfService.generarFacturaPDF(factura);
+
+            System.out.println("📄 PDF generado en: " + rutaPdf);
 
             pausa();
 

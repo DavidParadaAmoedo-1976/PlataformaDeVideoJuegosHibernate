@@ -23,6 +23,7 @@ import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
 import org.davidparada.repositorio.interfaceRepositorio.ICompraRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
+import org.davidparada.servicio.PdfServicio;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.time.Duration;
@@ -517,6 +518,18 @@ public class CompraControlador implements ICompraControlador {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public String generarFacturaPDF(Long idCompra) throws ValidationException {
+
+        // 1. Generar datos de factura (YA LO TIENES)
+        FacturaDto factura = generarFactura(idCompra);
+
+        // 2. Generar PDF
+        PdfServicio pdfService = new PdfServicio();
+        String ruta = pdfService.generarFacturaPDF(factura);
+
+        return ruta;
     }
 
     private void completarCompra(CompraEntidad compraEntidad) throws ValidationException {
