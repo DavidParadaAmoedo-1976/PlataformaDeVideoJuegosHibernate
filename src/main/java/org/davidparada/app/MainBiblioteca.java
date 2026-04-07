@@ -58,8 +58,8 @@ public class MainBiblioteca {
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "qwerr3",
-                    "qwerr3@email.com",
+                    "qwerr",
+                    "qwerr@email.com",
                     "1234Pasword",
                     "Asdf ghjk",
                     PaisEnum.ESPANA,

@@ -52,8 +52,8 @@ public class MainUsuario {
             // 👤 1. CREAR USUARIOS
             // =========================
             UsuarioForm usuario1 = new UsuarioForm(
-                    "qwer12",
-                    "qwer12@email.com",
+                    "qwer",
+                    "qwer@email.com",
                     "1234Pasword",
                     "David Parada",
                     PaisEnum.ESPANA,
@@ -65,8 +65,8 @@ public class MainUsuario {
             );
 
             UsuarioForm usuario2 = new UsuarioForm(
-                    "zxcv12",
-                    "zxcv12@email.com",
+                    "zxcv",
+                    "zxcv@email.com",
                     "1234Pasword",
                     "Lkjh Gfds",
                     PaisEnum.ESPANA,
