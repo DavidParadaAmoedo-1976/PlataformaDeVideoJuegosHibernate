@@ -77,8 +77,8 @@ public class MainCompra {
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "userCompra224",
-                    "compra224@email.com",
+                    "userCompra235",
+                    "compra235@email.com",
                     "1234Password",
                     "Nombre Apellido",
                     PaisEnum.ESPANA,
