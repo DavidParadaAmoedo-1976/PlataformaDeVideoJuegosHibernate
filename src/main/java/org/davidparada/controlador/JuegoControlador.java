@@ -122,7 +122,7 @@ public class JuegoControlador implements IJuegoControlador {
                 return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
 
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -149,7 +149,7 @@ public class JuegoControlador implements IJuegoControlador {
             try {
                 juego = obtenerEntidades.obtenerJuego(id, errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
             juegoRepo.actualizar(juego.getIdJuego(),
                     new JuegoForm(juego.getTitulo(),
@@ -185,7 +185,7 @@ public class JuegoControlador implements IJuegoControlador {
             try {
                 juego = obtenerEntidades.obtenerJuego(id, errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
 
             juegoRepo.actualizar(juego.getIdJuego(),

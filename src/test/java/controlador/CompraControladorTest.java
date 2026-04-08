@@ -20,6 +20,8 @@ import org.davidparada.repositorio.implementacionMemoria.BibliotecaRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.CompraRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.JuegoRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.UsuarioRepoMemoria;
+import org.davidparada.transaciones.GestorTransaccionesMemoria;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,11 +41,8 @@ class CompraControladorTest {
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private BibliotecaControlador bibliotecaControlador;
     private JuegoControlador juegoControlador;
-    private final ObtenerEntidadesOptional obtenerEntidades;
-
-    CompraControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
-        this.obtenerEntidades = obtenerEntidades;
-    }
+    private ObtenerEntidadesOptional obtenerEntidades;
+    private IGestorTransacciones gestorTransacciones;
 
     @BeforeEach
     void setup() {
@@ -51,7 +50,22 @@ class CompraControladorTest {
         juegoRepoMemoria = new JuegoRepoMemoria();
         compraRepoMemoria = new CompraRepoMemoria();
         bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
-        bibliotecaControlador = new BibliotecaControlador(bibliotecaRepoMemoria, juegoRepoMemoria, obtenerEntidades, null);
+        gestorTransacciones = new GestorTransaccionesMemoria();
+
+        obtenerEntidades = new ObtenerEntidadesOptional(
+                compraRepoMemoria,
+                usuarioRepoMemoria,
+                juegoRepoMemoria,
+                bibliotecaRepoMemoria,
+                null
+        );
+
+        bibliotecaControlador = new BibliotecaControlador(
+                bibliotecaRepoMemoria,
+                juegoRepoMemoria,
+                obtenerEntidades,
+                gestorTransacciones);
+
 
         compraControlador = new CompraControlador(
                 compraRepoMemoria,
@@ -60,10 +74,10 @@ class CompraControladorTest {
                 bibliotecaRepoMemoria,
                 bibliotecaControlador,
                 obtenerEntidades,
-                null
+                gestorTransacciones
         );
 
-        new ObtenerEntidadesOptional(compraRepoMemoria, usuarioRepoMemoria, juegoRepoMemoria, bibliotecaRepoMemoria, null);
+
     }
 
 // =========================
@@ -108,7 +122,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.get().getIdJuego(),
@@ -138,7 +152,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.get().getIdJuego(),
@@ -174,7 +188,7 @@ class CompraControladorTest {
         var juego = crearJuego();
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -196,7 +210,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -209,7 +223,7 @@ class CompraControladorTest {
     void realizarCompra_usuarioNoExiste() {
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.realizarCompra(
                         1L,
                         1L,
@@ -241,7 +255,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -322,7 +336,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -362,7 +376,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.procesarPago(
                         compra.get().getIdCompra(),
                         MetodoPagoEnum.PAYPAL
@@ -386,7 +400,7 @@ class CompraControladorTest {
     void procesarPagoCompraNoExiste() {
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.procesarPago(
                         999L,
                         MetodoPagoEnum.PAYPAL
@@ -488,7 +502,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> compraControlador.consultarCompra(
                         compra.getIdCompra(),
                         usuario2.getIdUsuario()

@@ -91,7 +91,7 @@ public class CompraControlador implements ICompraControlador {
                 usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
                 juego = obtenerEntidades.obtenerJuego(idJuego, errores);
             } catch (ValidationException e) {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException(e);
             }
             // Compruebo Estado del juego
             if (juego.getEstado() == EstadoJuegoEnum.NO_DISPONIBLE) {
@@ -116,7 +116,7 @@ public class CompraControlador implements ICompraControlador {
             try {
                 comprobarListaErrores(errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
 
             // Comprueba si ya está en biblioteca
@@ -144,7 +144,7 @@ public class CompraControlador implements ICompraControlador {
             try {
                 comprobarListaErrores(errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
 
             CompraForm nuevaCompra = new CompraForm(
@@ -204,14 +204,14 @@ public class CompraControlador implements ICompraControlador {
                         case TRANSFERENCIA -> pagoConTransferencia(idCompra);
                         case CARTERA_STEAM -> pagoConCarteraSteam(idCompra);
                         case SALIR -> salir(idCompra);
-                        default -> throw new IllegalArgumentException("Método de pago no válido");
+                        default -> throw new IllegalStateException("Método de pago no válido");
                     }
                 }
 
                 return CompraEntidadADtoMapper.compraEntidadADto(compra, usuario, juego);
 
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -318,7 +318,7 @@ public class CompraControlador implements ICompraControlador {
                 return comprasEntidad.stream()
                         .map(c -> {
                             JuegoEntidad juego = juegoRepo.buscarPorId(c.getIdJuego()).orElseThrow(() ->
-                                    new RuntimeException("Juego no encontrado"));
+                                    new IllegalStateException("Juego no encontrado"));
 
                             return new CompraDto(
                                     c.getIdCompra(),
@@ -335,7 +335,7 @@ public class CompraControlador implements ICompraControlador {
                         })
                         .toList();
             } catch (ValidationException e) {
-                throw new RuntimeException();
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -367,7 +367,7 @@ public class CompraControlador implements ICompraControlador {
 
                 return CompraEntidadADtoMapper.compraEntidadADto(compra, usuario, juego);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -404,7 +404,7 @@ public class CompraControlador implements ICompraControlador {
 
                 return new DetallesCompraDto(compraDto, juegoDto, facturaDto);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -485,7 +485,7 @@ public class CompraControlador implements ICompraControlador {
 
                 return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad, usuarioEntidad, juegoEntidad);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -515,22 +515,22 @@ public class CompraControlador implements ICompraControlador {
                         compraEntidad.getDescuento(),
                         compraEntidad.getMetodoPago());
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }
 
-    public String generarFacturaPDF(Long idCompra) throws ValidationException {
-
-        // 1. Generar datos de factura (YA LO TIENES)
-        FacturaDto factura = generarFactura(idCompra);
-
-        // 2. Generar PDF
-        PdfServicio pdfService = new PdfServicio();
-        String ruta = pdfService.generarFacturaPDF(factura);
-
-        return ruta;
-    }
+//    public String generarFacturaPDF(Long idCompra) throws ValidationException {
+//
+//        // 1. Generar datos de factura
+//        FacturaDto factura = generarFactura(idCompra);
+//
+//        // 2. Generar PDF
+//        PdfServicio pdfService = new PdfServicio();
+//        String ruta = pdfService.generarFacturaPDF(factura);
+//
+//        return ruta;
+//    }
 
     private void completarCompra(CompraEntidad compraEntidad) throws ValidationException {
         CompraForm nuevaCompra = new CompraForm(

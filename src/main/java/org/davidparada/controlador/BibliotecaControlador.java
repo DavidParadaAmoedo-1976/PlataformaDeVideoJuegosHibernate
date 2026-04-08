@@ -93,7 +93,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
             try {
                 BibliotecaFormValidador.validarBiblioteca(nuevaBiblioteca);
             } catch (ValidationException e) {
-                throw new RuntimeException();
+                throw new IllegalStateException(e);
             }
             BibliotecaEntidad biblioteca = bibliotecaRepo.crear(nuevaBiblioteca);
 
@@ -112,7 +112,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
             try {
                 usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
 
             List<BibliotecaDto> juegos = construirBiblioteca(idUsuario, usuario);
@@ -182,7 +182,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                 usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
                 juego = obtenerEntidades.obtenerJuego(idJuego, errores);
             } catch (ValidationException e) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(e);
             }
             bibliotecaRepo.eliminar(biblioteca.getIdBiblioteca());
 
@@ -234,7 +234,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                 );
 
             } catch (ValidationException e) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -275,7 +275,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
                 return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
             } catch (ValidationException e) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -312,7 +312,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                         .filter(dto -> texto == null || dto.juegoDto().titulo().toLowerCase().contains(texto.toLowerCase()))
                         .toList();
             } catch (ValidationException e) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(e);
             }
         });
     }

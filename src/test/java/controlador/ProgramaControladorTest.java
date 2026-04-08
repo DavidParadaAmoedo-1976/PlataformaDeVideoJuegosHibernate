@@ -9,6 +9,8 @@ import org.davidparada.modelo.dto.ReporteVentasDto;
 import org.davidparada.modelo.enums.*;
 import org.davidparada.modelo.formulario.*;
 import org.davidparada.repositorio.implementacionMemoria.*;
+import org.davidparada.transaciones.GestorTransaccionesMemoria;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,41 +25,44 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProgramaControladorTest {
 
-    private ProgramaControlador controlador;
+    private ProgramaControlador programaControlador;
 
     private UsuarioRepoMemoria usuarioRepoMemoria;
     private JuegoRepoMemoria juegoRepoMemoria;
     private CompraRepoMemoria compraRepoMemoria;
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private ResenaRepoMemoria resenaRepoMemoria;
-    private final ObtenerEntidadesOptional obtenerEntidades;
-
+    private ObtenerEntidadesOptional obtenerEntidades;
+    private IGestorTransacciones gestorTransacciones;
     private Instant ahora;
-
-    ProgramaControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
-        this.obtenerEntidades = obtenerEntidades;
-    }
 
     @BeforeEach
     void setUp() {
-
-        ahora = Instant.now();   // ← AÑADE ESTO
+        ahora = Instant.now();
 
         usuarioRepoMemoria = new UsuarioRepoMemoria();
         juegoRepoMemoria = new JuegoRepoMemoria();
         compraRepoMemoria = new CompraRepoMemoria();
         bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
         resenaRepoMemoria = new ResenaRepoMemoria();
+        gestorTransacciones = new GestorTransaccionesMemoria();
 
-        controlador = new ProgramaControlador(
+        obtenerEntidades = new ObtenerEntidadesOptional(
+                compraRepoMemoria,
+                usuarioRepoMemoria,
+                juegoRepoMemoria,
+                bibliotecaRepoMemoria,
+                resenaRepoMemoria);
+
+        programaControlador = new ProgramaControlador(
                 compraRepoMemoria,
                 juegoRepoMemoria,
                 usuarioRepoMemoria,
                 bibliotecaRepoMemoria,
                 resenaRepoMemoria,
-                obtenerEntidades
+                obtenerEntidades,
+                gestorTransacciones
         );
-        new ObtenerEntidadesOptional(compraRepoMemoria, usuarioRepoMemoria, juegoRepoMemoria, bibliotecaRepoMemoria, resenaRepoMemoria);
         cargarDatosBase();
     }
 
@@ -274,7 +279,7 @@ class ProgramaControladorTest {
         Instant fin = Instant.now();
 
         ReporteVentasDto reporte =
-                controlador.generarReporteVentas(inicio, fin, null, null);
+                programaControlador.generarReporteVentas(inicio, fin, null, null);
 
         assertEquals(3, reporte.getTotalVentas());
         assertEquals(138.0, reporte.getIngresosTotales());
@@ -287,7 +292,7 @@ class ProgramaControladorTest {
         Instant fin = Instant.now();
 
         ReporteVentasDto reporte =
-                controlador.generarReporteVentas(inicio, fin, 1L, null);
+                programaControlador.generarReporteVentas(inicio, fin, 1L, null);
 
         assertEquals(2, reporte.getTotalVentas());
         assertEquals(100.0, reporte.getIngresosTotales());
@@ -300,7 +305,7 @@ class ProgramaControladorTest {
         Instant fin = Instant.now();
 
         ReporteVentasDto reporte =
-                controlador.generarReporteVentas(inicio, fin, null, "Dev2");
+                programaControlador.generarReporteVentas(inicio, fin, null, "Dev2");
 
         assertEquals(1, reporte.getTotalVentas());
         assertEquals(38.0, reporte.getIngresosTotales());
@@ -314,7 +319,7 @@ class ProgramaControladorTest {
 
         assertThrows(
                 ValidationException.class,
-                () -> controlador.generarReporteVentas(inicio, fin, null, null)
+                () -> programaControlador.generarReporteVentas(inicio, fin, null, null)
         );
     }
 
@@ -329,7 +334,7 @@ class ProgramaControladorTest {
         Instant fin = ahora;
 
         ReporteUsuariosDto reporte =
-                controlador.generarReporteUsuarios(inicio, fin);
+                programaControlador.generarReporteUsuarios(inicio, fin);
 
         assertEquals(1, reporte.getNuevosUsuarios());
         assertEquals(2, reporte.getUsuariosActivos());
@@ -343,7 +348,7 @@ class ProgramaControladorTest {
 
         assertThrows(
                 ValidationException.class,
-                () -> controlador.generarReporteUsuarios(inicio, fin)
+                () -> programaControlador.generarReporteUsuarios(inicio, fin)
         );
     }
 
@@ -355,7 +360,7 @@ class ProgramaControladorTest {
     void consultarMasJugados_debeOrdenarYAsignarPosicionesCorrectamente() throws Exception {
 
         List<JuegosPopularesDto> lista =
-                controlador.consultarJuegosMasPopulares(
+                programaControlador.consultarJuegosMasPopulares(
                         CriterioPopularidadEnum.MAS_JUGADOS,
                         2
                 );
@@ -375,7 +380,7 @@ class ProgramaControladorTest {
     void consultarMasVendidos_debeOrdenarCorrectamente() throws Exception {
 
         List<JuegosPopularesDto> lista =
-                controlador.consultarJuegosMasPopulares(
+                programaControlador.consultarJuegosMasPopulares(
                         CriterioPopularidadEnum.MAS_VENDIDOS,
                         2
                 );
@@ -389,7 +394,7 @@ class ProgramaControladorTest {
     void consultarMejorValorados_debeCalcularMedia() throws Exception {
 
         List<JuegosPopularesDto> lista =
-                controlador.consultarJuegosMasPopulares(
+                programaControlador.consultarJuegosMasPopulares(
                         CriterioPopularidadEnum.MEJOR_VALORADOS,
                         1
                 );
@@ -404,7 +409,7 @@ class ProgramaControladorTest {
 
         assertThrows(
                 ValidationException.class,
-                () -> controlador.consultarJuegosMasPopulares(null, 2)
+                () -> programaControlador.consultarJuegosMasPopulares(null, 2)
         );
     }
 
@@ -413,7 +418,7 @@ class ProgramaControladorTest {
 
         assertThrows(
                 ValidationException.class,
-                () -> controlador.consultarJuegosMasPopulares(
+                () -> programaControlador.consultarJuegosMasPopulares(
                         CriterioPopularidadEnum.MAS_VENDIDOS,
                         0
                 )

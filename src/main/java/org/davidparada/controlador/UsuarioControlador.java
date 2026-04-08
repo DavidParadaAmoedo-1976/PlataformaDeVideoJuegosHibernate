@@ -52,7 +52,7 @@ public class UsuarioControlador implements IUsuarioControlador {
             try {
                 comprobarListaErrores(errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
 
             String passwordHash = EncriptarPassword.generarHash(formulario.getPassword());
@@ -93,7 +93,7 @@ public class UsuarioControlador implements IUsuarioControlador {
                 return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
 
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -108,7 +108,7 @@ public class UsuarioControlador implements IUsuarioControlador {
         return gestorTransacciones.inTransaction(() ->
                 usuarioRepo.buscarPorNombreUsuario(nombreUsuario)
                         .map(usuarioEntidad -> UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad))
-                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"))
+                        .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"))
         );
     }
 
@@ -161,7 +161,7 @@ public class UsuarioControlador implements IUsuarioControlador {
                 return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioActualizado);
 
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }
@@ -179,7 +179,7 @@ public class UsuarioControlador implements IUsuarioControlador {
             try {
                 usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
             return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
         });
@@ -209,7 +209,7 @@ public class UsuarioControlador implements IUsuarioControlador {
             try {
                 comprobarListaErrores(errores);
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
 
             return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
@@ -249,7 +249,7 @@ public class UsuarioControlador implements IUsuarioControlador {
 //
 //                return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioActualizado);
 //            } catch (ValidationException e) {
-//                throw new RuntimeException(e);
+//                throw new IllegalStateException(e);
 //            }
 //        });
 //    }
@@ -268,7 +268,7 @@ public class UsuarioControlador implements IUsuarioControlador {
 //                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(id, errores);
 //                return usuarioRepo.eliminar(usuario.getIdUsuario());
 //            } catch (ValidationException e) {
-//                throw new RuntimeException(e);
+//                throw new IllegalStateException(e);
 //            }
 //        });
 //    }

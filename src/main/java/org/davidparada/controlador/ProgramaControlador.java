@@ -163,7 +163,7 @@ public class ProgramaControlador implements IProgramaControlador {
                     case MAS_JUGADOS -> juegosMasJugados(limite);
                 };
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         });
     }

@@ -15,6 +15,8 @@ import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.repositorio.implementacionMemoria.BibliotecaRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.JuegoRepoMemoria;
 import org.davidparada.repositorio.implementacionMemoria.UsuarioRepoMemoria;
+import org.davidparada.transaciones.GestorTransaccionesMemoria;
+import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,15 +33,11 @@ class BibliotecaControladorTest {
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private UsuarioRepoMemoria usuarioRepoMemoria;
     private JuegoRepoMemoria juegoRepoMemoria;
-    private final ObtenerEntidadesOptional obtenerEntidades;
-
+    private ObtenerEntidadesOptional obtenerEntidades;
+    private IGestorTransacciones gestorTransacciones;
 
     private Long idUsuario;
     private Long idJuego;
-
-    BibliotecaControladorTest(ObtenerEntidadesOptional obtenerEntidades) {
-        this.obtenerEntidades = obtenerEntidades;
-    }
 
     @BeforeEach
     void setUp() {
@@ -47,8 +45,14 @@ class BibliotecaControladorTest {
         bibliotecaRepoMemoria = new BibliotecaRepoMemoria();
         usuarioRepoMemoria = new UsuarioRepoMemoria();
         juegoRepoMemoria = new JuegoRepoMemoria();
+        gestorTransacciones = new GestorTransaccionesMemoria();
 
-        new ObtenerEntidadesOptional(null, usuarioRepoMemoria, juegoRepoMemoria, bibliotecaRepoMemoria, null);
+        obtenerEntidades = new ObtenerEntidadesOptional(
+                null,
+                usuarioRepoMemoria,
+                juegoRepoMemoria,
+                bibliotecaRepoMemoria,
+                null);
 
 
         UsuarioForm usuarioForm = new UsuarioForm(
@@ -86,7 +90,7 @@ class BibliotecaControladorTest {
                 bibliotecaRepoMemoria,
                 juegoRepoMemoria,
                 obtenerEntidades,
-                null
+                gestorTransacciones
         );
     }
 
@@ -117,7 +121,7 @@ class BibliotecaControladorTest {
     void anadirJuego_usuarioNoExiste() {
 
         assertThrows(
-                ValidationException.class,
+                IllegalStateException.class,
                 () -> controlador.anadirJuego(999L, idJuego)
         );
     }
@@ -132,7 +136,7 @@ class BibliotecaControladorTest {
     @Test
     void anadirJuego_duplicado() throws Exception {
         controlador.anadirJuego(idUsuario, idJuego);
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalStateException.class,
                 () -> controlador.anadirJuego(idUsuario, idJuego));
     }
 
@@ -149,7 +153,7 @@ class BibliotecaControladorTest {
 
     @Test
     void eliminarJuego_noExiste() {
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalStateException.class,
                 () -> controlador.eliminarJuego(idUsuario, idJuego));
     }
 
@@ -212,7 +216,7 @@ class BibliotecaControladorTest {
 
     @Test
     void anadirTiempo_horasNull() {
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalStateException.class,
                 () -> controlador.actualizarTiempoDeJuego(idUsuario, idJuego, 0));
     }
 
@@ -313,7 +317,7 @@ class BibliotecaControladorTest {
     @Test
     void buscarSegunCriterios_usuarioInvalido() {
 
-        assertThrows(ValidationException.class,
+        assertThrows(IllegalStateException.class,
                 () -> controlador.buscarSegunCriterios(999L, null, null));
     }
 
