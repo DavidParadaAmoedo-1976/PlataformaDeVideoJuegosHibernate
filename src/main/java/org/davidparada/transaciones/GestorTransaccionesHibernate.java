@@ -42,7 +42,7 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
                 System.out.println("ROLLBACK");
             }
 
-            throw new RuntimeException(e);
+            throw e;
 
         } finally {
 
@@ -53,23 +53,6 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
             session = null;
         }
     }
-
-//    @Override
-//    public <T> T inTransaction(Supplier<T> work) {
-//        Transaction tx = null;
-//        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
-//            session = s;
-//            tx = s.beginTransaction();
-//            T result = work.get();
-//            tx.commit();
-//            return result;
-//        } catch (Exception e) {
-//            if (tx != null) tx.rollback();
-//            throw e;
-//        } finally {
-//            session = null;
-//        }
-//    }
 
     /**
      * Devuelve la sesión activa dentro de un bloque {@link #inTransaction}.

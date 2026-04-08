@@ -23,7 +23,6 @@ import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
 import org.davidparada.repositorio.interfaceRepositorio.ICompraRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
-import org.davidparada.servicio.PdfServicio;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.time.Duration;

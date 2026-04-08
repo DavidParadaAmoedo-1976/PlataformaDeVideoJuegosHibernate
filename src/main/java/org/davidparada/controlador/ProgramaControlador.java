@@ -19,7 +19,6 @@ import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
 

@@ -3,8 +3,6 @@ package org.davidparada.modelo.mapper;
 import org.davidparada.modelo.dto.UsuarioDto;
 import org.davidparada.modelo.entidad.UsuarioEntidad;
 
-import java.time.ZoneId;
-
 public class UsuarioEntidadADtoMapper {
 
     private UsuarioEntidadADtoMapper() {
