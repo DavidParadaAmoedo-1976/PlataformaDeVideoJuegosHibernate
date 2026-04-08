@@ -5,6 +5,7 @@ import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.BibliotecaDto;
 import org.davidparada.modelo.dto.EstadisticasBibliotecaDto;
+import org.davidparada.modelo.dto.JuegoDto;
 import org.davidparada.modelo.entidad.BibliotecaEntidad;
 import org.davidparada.modelo.entidad.JuegoEntidad;
 import org.davidparada.modelo.entidad.UsuarioEntidad;
@@ -329,10 +330,10 @@ public class BibliotecaControlador implements IBibliotecaControlador {
             int totalJuegos = biblioteca.size();
             double horasTotales = INICIO_VARIABLE_DOUBLE;
             double valorTotal = INICIO_VARIABLE_DOUBLE;
-            String juegoMasJugado = null;
+            Optional<JuegoEntidad> juegoMasJugado = Optional.empty();
             double maxHoras = INICIO_VARIABLE_NEG;
-            List<String> juegosInstalados = new ArrayList<>();
-            List<String> juegosNuncaJugados = new ArrayList<>();
+            List<JuegoEntidad> juegosInstalados = new ArrayList<>();
+            List<JuegoEntidad> juegosNuncaJugados = new ArrayList<>();
             for (BibliotecaEntidad b : biblioteca) {
                 JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElse(null);
                 if (juego == null) {
@@ -341,23 +342,30 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                 horasTotales += b.getHorasDeJuego();
                 valorTotal += juego.getPrecioBase();
                 if (b.isEstadoInstalacion()) {
-                    juegosInstalados.add(juego.getTitulo());
+                    juegosInstalados.add(juego);
                 }
                 if (b.getHorasDeJuego() == HORAS_DE_JUEGO_POR_DEFECTO) {
-                    juegosNuncaJugados.add(juego.getTitulo());
+                    juegosNuncaJugados.add(juego);
                 }
                 if (b.getHorasDeJuego() > maxHoras) {
                     maxHoras = b.getHorasDeJuego();
-                    juegoMasJugado = juego.getTitulo();
+                    juegoMasJugado = Optional.of(juego);
                 }
             }
+            List<JuegoDto> juegosInstaladosDto = juegosInstalados.stream()
+                    .map(j -> JuegoEntidadADtoMapper.juegoEntidadADto(j))
+                    .toList();
+
+            List<JuegoDto> juegosNuncaJugadosDto = juegosNuncaJugados.stream()
+                    .map(j -> JuegoEntidadADtoMapper.juegoEntidadADto(j))
+                    .toList();
             return new EstadisticasBibliotecaDto(
                     totalJuegos,
                     horasTotales,
-                    juegosInstalados,
-                    juegoMasJugado,
+                    juegosInstaladosDto,
+                    juegoMasJugado.map(j -> JuegoEntidadADtoMapper.juegoEntidadADto(j)),
                     valorTotal,
-                    juegosNuncaJugados
+                    juegosNuncaJugadosDto
             );
         });
     }
