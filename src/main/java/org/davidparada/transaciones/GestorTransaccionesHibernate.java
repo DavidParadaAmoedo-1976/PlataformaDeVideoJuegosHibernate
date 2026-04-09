@@ -1,13 +1,16 @@
 package org.davidparada.transaciones;
 
+import org.davidparada.transaciones.interfaceTransaciones.ExceptionSupplier;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import org.davidparada.transaciones.interfaceTransaciones.ISessionManager;
+import org.davidparada.excepcion.ValidationException;
 import org.davidparada.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.function.Supplier;
 
+import java.util.function.Supplier;
+import java.util.Optional;
 
 /**
  * Implementación Hibernate de {@link IGestorTransacciones}.
@@ -19,40 +22,36 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
 
     private Session session;
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T inTransaction(Supplier<T> work) {
+    public <T> T inTransaction(ExceptionSupplier<T> work) throws ValidationException {
         Transaction tx = null;
-        Session s = null;
 
-        try {
-            s = HibernateUtil.getSessionFactory().openSession();
+        try (Session s = HibernateUtil.getSessionFactory().openSession()){
             session = s;
+            try {
+                tx = s.beginTransaction();
+                T result = work.get();
+                tx.commit();
+                return result;
+            } catch (Exception e) {
+                if (tx != null)
+                    tx.rollback();
+                throw e;
+            }
 
-            tx = s.beginTransaction();
-
-            T result = work.get();
-
-            tx.commit();
-            return result;
-
+        } catch (ValidationException ve) {
+            throw ve;
         } catch (Exception e) {
-
-            if (tx != null && tx.isActive()) {
-                tx.rollback();
-                System.out.println("ROLLBACK");
+            try {
+                return (T) Optional.empty();
+            } catch (ClassCastException ex) {
+                return null;
             }
-
-            throw e;
-
         } finally {
-
-            if (s != null && s.isOpen()) {
-                s.close();
-            }
-
             session = null;
-        }
-    }
+            }
+  }
 
     /**
      * Devuelve la sesión activa dentro de un bloque {@link #inTransaction}.

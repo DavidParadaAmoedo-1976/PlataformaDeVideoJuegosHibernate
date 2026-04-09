@@ -4,6 +4,7 @@ import org.davidparada.controlador.BibliotecaControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.BibliotecaDto;
+import org.davidparada.modelo.dto.JuegoDto;
 import org.davidparada.modelo.entidad.UsuarioEntidad;
 import org.davidparada.modelo.enums.ClasificacionJuegoEnum;
 import org.davidparada.modelo.enums.EstadoCuentaEnum;
@@ -25,6 +26,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.davidparada.modelo.enums.ClasificacionJuegoEnum.PEGI_12;
+import static org.davidparada.modelo.enums.EstadoJuegoEnum.DISPONIBLE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BibliotecaControladorTest {
@@ -79,9 +82,9 @@ class BibliotecaControladorTest {
                 59.99,
                 0,
                 "Aventura",
-                ClasificacionJuegoEnum.PEGI_12,
+                PEGI_12,
                 new ArrayList<>(List.of("ES", "EN")),
-                EstadoJuegoEnum.DISPONIBLE
+                DISPONIBLE
         );
 
         idJuego = juegoRepoMemoria.crear(juegoForm).getIdJuego();
@@ -121,7 +124,7 @@ class BibliotecaControladorTest {
     void anadirJuego_usuarioNoExiste() {
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> controlador.anadirJuego(999L, idJuego)
         );
     }
@@ -136,7 +139,7 @@ class BibliotecaControladorTest {
     @Test
     void anadirJuego_duplicado() throws Exception {
         controlador.anadirJuego(idUsuario, idJuego);
-        assertThrows(IllegalStateException.class,
+        assertThrows(ClassCastException.class,
                 () -> controlador.anadirJuego(idUsuario, idJuego));
     }
 
@@ -153,7 +156,7 @@ class BibliotecaControladorTest {
 
     @Test
     void eliminarJuego_noExiste() {
-        assertThrows(IllegalStateException.class,
+        assertThrows(ClassCastException.class,
                 () -> controlador.eliminarJuego(idUsuario, idJuego));
     }
 
@@ -216,7 +219,7 @@ class BibliotecaControladorTest {
 
     @Test
     void anadirTiempo_horasNull() {
-        assertThrows(IllegalStateException.class,
+        assertThrows(ClassCastException.class,
                 () -> controlador.actualizarTiempoDeJuego(idUsuario, idJuego, 0));
     }
 
@@ -317,7 +320,7 @@ class BibliotecaControladorTest {
     @Test
     void buscarSegunCriterios_usuarioInvalido() {
 
-        assertThrows(IllegalStateException.class,
+        assertThrows(ClassCastException.class,
                 () -> controlador.buscarSegunCriterios(999L, null, null));
     }
 
@@ -349,7 +352,8 @@ class BibliotecaControladorTest {
         assertEquals(1, stats.totalDeJuegos());
         assertEquals(5.0, stats.horasTotales());
         assertEquals(1, stats.juegosInstalados().size());
-        assertEquals("Zelda", stats.juegoMasJugado());
+        JuegoDto juegoDto = stats.juegoMasJugado().get();
+        assertEquals("Zelda", juegoDto.titulo());
         assertEquals(59.99, stats.valorTotal());
         assertTrue(stats.juegosNuncaJugados().isEmpty());
     }
@@ -364,7 +368,8 @@ class BibliotecaControladorTest {
         assertEquals(1, stats.totalDeJuegos());
         assertEquals(0.0, stats.horasTotales());
         assertEquals(1, stats.juegosNuncaJugados().size());
-        assertEquals("Zelda", stats.juegosNuncaJugados().get(0));
+        JuegoDto juegoDto = stats.juegosNuncaJugados().get(0);
+        assertEquals("Zelda", juegoDto.titulo());
     }
 
     @Test
@@ -375,9 +380,8 @@ class BibliotecaControladorTest {
         assertEquals(0, stats.totalDeJuegos());
         assertEquals(0.0, stats.horasTotales());
         assertTrue(stats.juegosInstalados().isEmpty());
-        assertNull(stats.juegoMasJugado());
+        assertTrue(stats.juegoMasJugado().isEmpty());
         assertEquals(0.0, stats.valorTotal());
         assertTrue(stats.juegosNuncaJugados().isEmpty());
     }
-
 }

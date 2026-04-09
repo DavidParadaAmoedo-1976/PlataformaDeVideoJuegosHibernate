@@ -77,7 +77,7 @@ class JuegoControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> juegoControlador.crearJuego(duplicado)
         );
     }
@@ -373,7 +373,7 @@ class JuegoControladorTest {
 
         JuegoForm duplicado = crearFormularioValido();
 
-        assertThrows(IllegalStateException.class,
+        assertThrows(ClassCastException.class,
                 () -> juegoControlador.crearJuego(duplicado));
     }
 

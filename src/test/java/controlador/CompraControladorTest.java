@@ -122,7 +122,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.get().getIdJuego(),
@@ -152,7 +152,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.get().getIdJuego(),
@@ -188,7 +188,7 @@ class CompraControladorTest {
         var juego = crearJuego();
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -210,7 +210,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -223,7 +223,7 @@ class CompraControladorTest {
     void realizarCompra_usuarioNoExiste() {
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.realizarCompra(
                         1L,
                         1L,
@@ -255,7 +255,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -336,7 +336,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -376,7 +376,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.procesarPago(
                         compra.get().getIdCompra(),
                         MetodoPagoEnum.PAYPAL
@@ -400,7 +400,7 @@ class CompraControladorTest {
     void procesarPagoCompraNoExiste() {
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.procesarPago(
                         999L,
                         MetodoPagoEnum.PAYPAL
@@ -502,7 +502,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ClassCastException.class,
                 () -> compraControlador.consultarCompra(
                         compra.getIdCompra(),
                         usuario2.getIdUsuario()

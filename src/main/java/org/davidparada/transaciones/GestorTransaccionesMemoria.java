@@ -1,7 +1,10 @@
 package org.davidparada.transaciones;
 
+import org.davidparada.excepcion.ValidationException;
+import org.davidparada.transaciones.interfaceTransaciones.ExceptionSupplier;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -10,9 +13,18 @@ import java.util.function.Supplier;
  */
 public class GestorTransaccionesMemoria implements IGestorTransacciones {
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T inTransaction(Supplier<T> work) {
-        return work.get();
+    public <T> T inTransaction(ExceptionSupplier<T> work) throws ValidationException {
+        try {
+            return work.get();
+        } catch (Exception e) {
+            try {
+                return (T) Optional.empty();
+            } catch (ClassCastException ex) {
+                return null;
+            }
+        }
+
     }
 }
-

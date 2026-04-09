@@ -28,7 +28,7 @@ public interface IJuegoControlador {
             Double precioMax,
             ClasificacionJuegoEnum clasificacion,
             EstadoJuegoEnum estado
-    );
+    ) throws ValidationException;
 
     /**
      * Muestra una lista de juegos en el orden especificado.
@@ -36,7 +36,7 @@ public interface IJuegoControlador {
      * @param orden
      * @return Lista de objetos DTO.
      */
-    List<JuegoDto> consultarCatalogo(OrdenarJuegosEnum orden);
+    List<JuegoDto> consultarCatalogo(OrdenarJuegosEnum orden) throws ValidationException;
 
     /**
      * Muestra las especificaciones de un juego recibido por ID.

@@ -50,11 +50,11 @@ public class JuegoControlador implements IJuegoControlador {
             Optional<JuegoEntidad> juegoEntidad = juegoRepo.buscarPorTitulo(formulario.getTitulo());
             if (juegoEntidad.isPresent()) {
                 errores.add(new ErrorModel("titulo", TipoErrorEnum.DUPLICADO));
-                throw new IllegalStateException();
             }
+            comprobarListaErrores(errores);
             return juegoRepo.crear(formulario);
         });
-
+        comprobarListaErrores(errores);
         return JuegoEntidadADtoMapper.juegoEntidadADto(juegoCreado);
     }
 
@@ -67,7 +67,7 @@ public class JuegoControlador implements IJuegoControlador {
             Double precioMax,
             ClasificacionJuegoEnum clasificacion,
             EstadoJuegoEnum estado
-    ) {
+    ) throws ValidationException {
 
         return gestorTransacciones.inTransaction(() -> {
 
@@ -83,7 +83,7 @@ public class JuegoControlador implements IJuegoControlador {
 
     // Consultar catalogo completo
     @Override
-    public List<JuegoDto> consultarCatalogo(OrdenarJuegosEnum orden) {
+    public List<JuegoDto> consultarCatalogo(OrdenarJuegosEnum orden) throws ValidationException {
 
         return gestorTransacciones.inTransaction(() -> {
 
