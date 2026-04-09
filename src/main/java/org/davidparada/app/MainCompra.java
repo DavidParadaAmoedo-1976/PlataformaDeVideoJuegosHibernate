@@ -97,7 +97,7 @@ public class MainCompra {
 
             pausa();
 
-            Long idUsuario = usuarioCreado.idUsuario();
+            Long idUsuario = actualizado.idUsuario();
 
             // =========================
             // 🛒 2. REALIZAR COMPRA

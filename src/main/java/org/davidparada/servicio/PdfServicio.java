@@ -1,8 +1,14 @@
 package org.davidparada.servicio;
 
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.HorizontalAlignment;
@@ -15,115 +21,50 @@ import java.time.format.DateTimeFormatter;
 
 public class PdfServicio {
 
-    /**
-     * Genera factura estilo Steam con múltiples productos
-     */
     public String generarFacturaPDF(FacturaDto factura) {
 
-        String ruta = "facturas/factura_" + factura.numeroFactura() + "_steam.pdf";
+        // Ruta de las facturas
+        String ruta = "facturas/factura_" + factura.numeroFactura() + "_TeisGame.pdf";
+
+        // Ruta de la imagen
+        String rutaImagen = "src/main/resources/imagen/logo.png";
+
 
         try {
+            // Crea directorio
             new File("facturas").mkdirs();
+
+            // CREAR PDF
 
             PdfWriter writer = new PdfWriter(ruta);
             PdfDocument pdf = new PdfDocument(writer);
-            Document document = new Document(pdf);
+            Document document = new Document(pdf, PageSize.A4);
+            // CARGAR IMAGEN
+            ImageData imageData = ImageDataFactory.create(rutaImagen);
 
-            // =========================
-            // 🎮 CABECERA (TIPO STEAM)
-            // =========================
-            Paragraph titulo = new Paragraph("FACTURA")
-                    .setBold()
-                    .setFontSize(18)
-                    .setTextAlignment(TextAlignment.RIGHT);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-            document.add(titulo);
+            String fecha = factura.fechaEmision()
+                    .atZone(ZoneId.systemDefault())
+                    .format(formatter);
 
-            DateTimeFormatter formatter =
-                    DateTimeFormatter.ofPattern("dd/MM/yyyy")
-                            .withZone(ZoneId.systemDefault());
+            // Logo
 
-            document.add(new Paragraph("Factura Nº: " + factura.numeroFactura())
-                    .setTextAlignment(TextAlignment.RIGHT));
+            Image imgBorder = new Image(imageData);
+            imgBorder.scaleToFit(50, 50);
+            DeviceRgb borderColor = new DeviceRgb(85, 150, 240);
+            imgBorder.setBorder(new SolidBorder(borderColor, 2));
 
-            document.add(new Paragraph("Fecha: " + formatter.format(factura.fechaEmision()))
-                    .setTextAlignment(TextAlignment.RIGHT));
+            document.add(imgBorder);
+            document.add(new Paragraph(""));
 
-            document.add(new Paragraph("\n"));
 
-            // =========================
-            // 👤 CLIENTE (ARRIBA)
-            // =========================
-            document.add(new Paragraph("Cliente: " + factura.nombreReal()).setBold());
-            document.add(new Paragraph(factura.email()));
 
-            document.add(new Paragraph("\n"));
-
-            // =========================
-            // 📊 TABLA DE PRODUCTOS
-            // =========================
-            Table tabla = new Table(new float[]{4, 2}).useAllAvailableWidth();
-
-            tabla.addHeaderCell(new Paragraph("Producto").setBold());
-            tabla.addHeaderCell(new Paragraph("Precio").setBold());
-
-            double subtotal = 0;
-
-//            // 👉 MULTIPLES PRODUCTOS
-//            for (int i = 0; i < juegos.size(); i++) {
-//                tabla.addCell(juegos.get(i));
-//
-//                tabla.addCell(
-//                        new Paragraph(precios.get(i) + "€")
-//                                .setTextAlignment(TextAlignment.RIGHT)
-//                );
-//
-//                subtotal += precios.get(i);
-//            }
-//
-//            document.add(tabla);
-//
-//            document.add(new Paragraph("\n"));
-
-            // =========================
-            // 💰 TOTALES
-            // =========================
-            Table totales = new Table(1)
-                    .setWidth(250)
-                    .setHorizontalAlignment(HorizontalAlignment.RIGHT);
-
-            double descuento = factura.descuento() != null
-                    ? subtotal * factura.descuento() / 100
-                    : 0;
-
-            double base = subtotal - descuento;
-            double iva = base * 0.21;
-            double total = base + iva;
-
-            totales.addCell(new Paragraph("Subtotal: " + subtotal + "€"));
-
-            if (descuento > 0) {
-                totales.addCell(new Paragraph("Descuento: -" + descuento + "€"));
-            }
-
-            totales.addCell(new Paragraph("IVA (21%): " + iva + "€"));
-
-            totales.addCell(
-                    new Paragraph("TOTAL: " + total + "€")
-                            .setBold()
-                            .setFontSize(14)
-            );
-
-            document.add(totales);
-
-            document.add(new Paragraph("\n"));
-
-            // =========================
-            // 💳 MÉTODO DE PAGO
-            // =========================
-            document.add(new Paragraph("Método de pago: " + factura.metodoPago()));
+            // Cerrar
 
             document.close();
+
+            System.out.println("PDF generado correctamente");
 
         } catch (Exception e) {
             e.printStackTrace();
