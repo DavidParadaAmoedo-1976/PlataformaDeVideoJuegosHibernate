@@ -61,8 +61,13 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     public BibliotecaDto anadirJuego(Long idUsuario, Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
-        comprobarIdUsuario(idUsuario, errores);
-        comprobarIdJuego(idJuego, errores);
+        if (idUsuario == null) {
+            errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
+        }
+        if (idJuego == null) {
+            errores.add(new ErrorModel("juego", TipoErrorEnum.OBLIGATORIO));
+        }
+        comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
 
@@ -71,7 +76,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
             if (bibliotecaExistente.isPresent()) {
                 errores.add(new ErrorModel("juego", TipoErrorEnum.DUPLICADO));
-                throw new IllegalStateException();
+                throw new ValidationException(errores);
             }
 
             UsuarioEntidad usuario;
@@ -104,7 +109,10 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     @Override
     public List<BibliotecaDto> verBiblioteca(Long idUsuario, OrdenarJuegosBibliotecaEnum orden) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-        comprobarIdUsuario(idUsuario, errores);
+        if (idUsuario == null) {
+            errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
+        }
+        comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
             UsuarioEntidad usuario;
@@ -169,8 +177,13 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     public BibliotecaDto eliminarJuego(Long idUsuario, Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
-        comprobarIdUsuario(idUsuario, errores);
-        comprobarIdJuego(idJuego, errores);
+        if (idUsuario == null) {
+            errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
+        }
+        if (idJuego == null) {
+            errores.add(new ErrorModel("juego", TipoErrorEnum.OBLIGATORIO));
+        }
+        comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
             BibliotecaEntidad biblioteca;
@@ -198,8 +211,12 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     public BibliotecaDto actualizarTiempoDeJuego(Long idUsuario, Long idJuego, double horas) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
-        comprobarIdUsuario(idUsuario, errores);
-        comprobarIdJuego(idJuego, errores);
+        if (idUsuario == null) {
+            errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
+        }
+        if (idJuego == null) {
+            errores.add(new ErrorModel("juego", TipoErrorEnum.OBLIGATORIO));
+        }
         if (horas < CERO) {
             errores.add(new ErrorModel("horas", TipoErrorEnum.RANGO_INVALIDO));
         }
@@ -224,7 +241,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                 BibliotecaEntidad actualizado = bibliotecaRepo.actualizar(
                         bibliotecaEntidad.getIdBiblioteca(),
                         bibliotecaFormActualizada
-                ).orElseThrow(() -> new IllegalStateException());
+                ).orElseThrow(() -> new ValidationException(errores));
 
                 return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
                         actualizado,
@@ -243,8 +260,13 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     public BibliotecaDto consultarUltimaSesion(Long idUsuario, Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
-        comprobarIdUsuario(idUsuario, errores);
-        comprobarIdJuego(idJuego, errores);
+        if (idUsuario == null) {
+            errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
+        }
+        if (idJuego == null) {
+            errores.add(new ErrorModel("juego", TipoErrorEnum.OBLIGATORIO));
+        }
+        comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
             try {
@@ -284,7 +306,10 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     public List<BibliotecaDto> buscarSegunCriterios(Long idUsuario, String texto, Boolean estadoInstalacion) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
-        comprobarIdUsuario(idUsuario, errores);
+        if (idUsuario == null) {
+            errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
+        }
+        comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
             try {
@@ -311,7 +336,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                         .filter(dto -> texto == null || dto.juegoDto().titulo().toLowerCase().contains(texto.toLowerCase()))
                         .toList();
             } catch (ValidationException e) {
-                throw new IllegalStateException(e);
+                throw new ValidationException(errores);
             }
         });
     }
@@ -321,7 +346,11 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     @Override
     public EstadisticasBibliotecaDto estadisticasBiblioteca(Long idUsuario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-        comprobarIdUsuario(idUsuario, errores);
+
+        if (idUsuario == null) {
+            errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
+        }
+        comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
             List<BibliotecaEntidad> biblioteca = bibliotecaRepo.buscarPorUsuario(idUsuario);
@@ -366,22 +395,5 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                     juegosNuncaJugadosDto
             );
         });
-    }
-
-    // Comprobaciones
-    private void comprobarIdUsuario(Long idUsuario, List<ErrorModel> errores) throws ValidationException {
-        // Compruebo que idUsuario no sea nulo
-        if (idUsuario == null) {
-            errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
-        }
-        comprobarListaErrores(errores);
-    }
-
-    private void comprobarIdJuego(Long idJuego, List<ErrorModel> errores) throws ValidationException {
-        // Compruebo que idJuego no sea nulo
-        if (idJuego == null) {
-            errores.add(new ErrorModel("juego", TipoErrorEnum.OBLIGATORIO));
-        }
-        comprobarListaErrores(errores);
     }
 }

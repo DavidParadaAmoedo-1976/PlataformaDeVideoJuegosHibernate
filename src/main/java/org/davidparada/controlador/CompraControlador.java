@@ -451,8 +451,8 @@ public class CompraControlador implements ICompraControlador {
                 UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(compraEntidad.getIdUsuario(), errores);
                 JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(), errores);
                 comprobarListaErrores(errores);
-                // Devolver dinero a cartera
 
+                // Devolver dinero a cartera
                 Double precioJuego = precioFinal(compraEntidad.getPrecioBase(), compraEntidad.getDescuento());
                 Double nuevoSaldo = usuarioEntidad.getSaldo() + precioJuego;
                 usuarioRepo.actualizar(usuarioEntidad.getIdUsuario(), new UsuarioForm(
