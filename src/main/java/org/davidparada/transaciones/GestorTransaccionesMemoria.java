@@ -18,9 +18,15 @@ public class GestorTransaccionesMemoria implements IGestorTransacciones {
     public <T> T inTransaction(ExceptionSupplier<T> work) throws ValidationException {
         try {
             return work.get();
-        } catch (Exception e) {
+        }
+        catch (ValidationException ex) {
+            throw ex;
+        }
+        catch (Exception e) {
             try {
-                return (T) Optional.empty();
+
+                T temp = (T) Optional.empty();
+                return temp;
             } catch (ClassCastException ex) {
                 return null;
             }

@@ -76,12 +76,10 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
             UsuarioEntidad usuario;
             JuegoEntidad juego;
-            try {
-                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                juego = obtenerEntidades.obtenerJuego(idJuego, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException();
-            }
+
+            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+
 
             BibliotecaForm nuevaBiblioteca = new BibliotecaForm(
                     idUsuario,

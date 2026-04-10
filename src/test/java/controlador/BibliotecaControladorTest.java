@@ -124,7 +124,7 @@ class BibliotecaControladorTest {
     void anadirJuego_usuarioNoExiste() {
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> controlador.anadirJuego(999L, idJuego)
         );
     }
