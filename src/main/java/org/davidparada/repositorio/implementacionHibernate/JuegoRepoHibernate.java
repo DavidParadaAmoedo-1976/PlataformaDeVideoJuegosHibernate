@@ -76,7 +76,6 @@ public class JuegoRepoHibernate implements IJuegoRepo {
                 formulario.getIdiomas(),
                 formulario.getEstado()
         ));
-
         return buscarPorId(idJuego);
     }
 

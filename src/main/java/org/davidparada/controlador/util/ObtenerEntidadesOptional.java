@@ -10,11 +10,11 @@ import java.util.List;
 
 public class ObtenerEntidadesOptional {
 
-    private ICompraRepo compraRepo;
-    private IUsuarioRepo usuarioRepo;
-    private IJuegoRepo juegoRepo;
-    private IBibliotecaRepo bibliotecaRepo;
-    private IResenaRepo resenaRepo;
+    private final ICompraRepo compraRepo;
+    private final IUsuarioRepo usuarioRepo;
+    private final IJuegoRepo juegoRepo;
+    private final IBibliotecaRepo bibliotecaRepo;
+    private final IResenaRepo resenaRepo;
 
     public ObtenerEntidadesOptional(ICompraRepo compraRepo,
                                     IUsuarioRepo usuarioRepo,

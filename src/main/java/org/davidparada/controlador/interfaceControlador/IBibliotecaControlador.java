@@ -6,6 +6,7 @@ import org.davidparada.modelo.dto.EstadisticasBibliotecaDto;
 import org.davidparada.modelo.enums.OrdenarJuegosBibliotecaEnum;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IBibliotecaControlador {
 
@@ -56,7 +57,7 @@ public interface IBibliotecaControlador {
      * @return Mensaje con los datos.
      * @throws ValidationException
      */
-    BibliotecaDto consultarUltimaSesion(Long idUsuario, Long idJuego) throws ValidationException;
+    Optional<BibliotecaDto> consultarUltimaSesion(Long idUsuario, Long idJuego) throws ValidationException;
 
     /**
      * Buscar segun estado de instalacion recibido y con el texto indicado en el título.

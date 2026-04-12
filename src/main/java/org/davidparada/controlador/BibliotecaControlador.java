@@ -21,11 +21,7 @@ import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
-import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -60,7 +56,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     @Override
     public BibliotecaDto anadirJuego(Long idUsuario, Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
         }
@@ -70,9 +65,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-
             Optional<BibliotecaEntidad> bibliotecaExistente = bibliotecaRepo.buscarPorUsuarioYJuego(idUsuario, idJuego);
-
             if (bibliotecaExistente.isPresent()) {
                 errores.add(new ErrorModel("juego", TipoErrorEnum.DUPLICADO));
             }
@@ -80,8 +73,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
             UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
             JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
-
-
             BibliotecaForm nuevaBiblioteca = new BibliotecaForm(
                     idUsuario,
                     idJuego,
@@ -108,9 +99,7 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            UsuarioEntidad usuario;
-
-            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
             List<BibliotecaDto> juegos = construirBiblioteca(idUsuario, usuario);
             return ordenarBiblioteca(juegos, orden);
@@ -164,12 +153,10 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         };
     }
 
-
     // Eliminar juego de biblioteca
     @Override
     public BibliotecaDto eliminarJuego(Long idUsuario, Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
         }
@@ -179,13 +166,9 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            BibliotecaEntidad biblioteca;
-            UsuarioEntidad usuario;
-            JuegoEntidad juego;
-
-            biblioteca = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-            juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+            BibliotecaEntidad biblioteca = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
             bibliotecaRepo.eliminar(biblioteca.getIdBiblioteca());
 
@@ -201,7 +184,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     @Override
     public BibliotecaDto actualizarTiempoDeJuego(Long idUsuario, Long idJuego, double horas) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
         }
@@ -214,7 +196,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-
             BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
             UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
             JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
@@ -240,15 +221,13 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                     usuarioEntidad,
                     juegoEntidad
             );
-
         });
     }
 
     // Consultar última sesión
     @Override
-    public BibliotecaDto consultarUltimaSesion(Long idUsuario, Long idJuego) throws ValidationException {
+    public Optional<BibliotecaDto> consultarUltimaSesion(Long idUsuario, Long idJuego) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
         }
@@ -262,27 +241,11 @@ public class BibliotecaControlador implements IBibliotecaControlador {
             UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
             JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-            if (bibliotecaEntidad.getUltimaFechaDeJuego() == null) {
-                return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
-                        bibliotecaEntidad, usuarioEntidad, juegoEntidad
-                );
-            }
-            Instant ultimaFechaHoraDeJuego = bibliotecaEntidad.getUltimaFechaDeJuego();
-            Instant horaActual = Instant.now();
-
-            // Diferencia real
-            Duration duracion = Duration.between(ultimaFechaHoraDeJuego, horaActual);
-
-            long horasEnTotal = duracion.toHours();
-
-            // Convertimos para mostrar
-            ZonedDateTime fechaLocal = ultimaFechaHoraDeJuego
-                    .atZone(ZoneId.systemDefault());
-
-            DateTimeFormatter formato =
-                    DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
-            return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
+            return Optional.of(
+                    BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                            bibliotecaEntidad, usuarioEntidad, juegoEntidad
+                    )
+            );
         });
     }
 
@@ -290,7 +253,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     @Override
     public List<BibliotecaDto> buscarSegunCriterios(Long idUsuario, String texto, Boolean estadoInstalacion) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
         }
@@ -327,7 +289,6 @@ public class BibliotecaControlador implements IBibliotecaControlador {
     @Override
     public EstadisticasBibliotecaDto estadisticasBiblioteca(Long idUsuario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("usuario", TipoErrorEnum.OBLIGATORIO));
         }

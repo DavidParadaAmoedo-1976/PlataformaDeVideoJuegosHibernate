@@ -19,7 +19,6 @@ import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
 

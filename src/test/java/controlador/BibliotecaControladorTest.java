@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.davidparada.modelo.enums.ClasificacionJuegoEnum.PEGI_12;
 import static org.davidparada.modelo.enums.EstadoJuegoEnum.DISPONIBLE;
@@ -156,7 +157,7 @@ class BibliotecaControladorTest {
 
     @Test
     void eliminarJuego_noExiste() {
-        assertThrows(ClassCastException.class,
+        assertThrows(ValidationException.class,
                 () -> controlador.eliminarJuego(idUsuario, idJuego));
     }
 
@@ -219,7 +220,7 @@ class BibliotecaControladorTest {
 
     @Test
     void anadirTiempo_horasNull() {
-        assertThrows(ClassCastException.class,
+        assertThrows(ValidationException.class,
                 () -> controlador.actualizarTiempoDeJuego(idUsuario, idJuego, 0));
     }
 
@@ -231,10 +232,10 @@ class BibliotecaControladorTest {
     void consultarUltimaSesion_nuncaJugado() throws Exception {
         controlador.anadirJuego(idUsuario, idJuego);
 
-        BibliotecaDto dto =
+        Optional<BibliotecaDto> dto =
                 controlador.consultarUltimaSesion(idUsuario, idJuego);
 
-        assertNull(dto.ultimaFechaDeJuego());
+        assertNull(dto.get().ultimaFechaDeJuego());
     }
 
     @Test
@@ -258,11 +259,11 @@ class BibliotecaControladorTest {
 
         bibliotecaRepoMemoria.actualizar(entidad.get().getIdBiblioteca(), form);
 
-        BibliotecaDto dto =
+        Optional<BibliotecaDto> dto =
                 controlador.consultarUltimaSesion(idUsuario, idJuego);
 
         assertNotNull(dto);
-        assertEquals(fechaUltimaSesion, dto.ultimaFechaDeJuego());
+        assertEquals(fechaUltimaSesion, dto.get().ultimaFechaDeJuego());
     }
 
     // ======================================================
