@@ -367,10 +367,6 @@ public class CompraControlador implements ICompraControlador {
     /**
      * El reembolso, se realiza siempre a cartera, no se devuelve el dinero
      * por política de la empresa.
-     *
-     * @param idCompra
-     * @return
-     * @throws ValidationException
      */
     @Override
     public CompraDto solicitarReembolso(Long idCompra) throws ValidationException {
