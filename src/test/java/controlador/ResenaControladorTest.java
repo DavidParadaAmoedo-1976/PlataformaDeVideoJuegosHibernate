@@ -158,7 +158,7 @@ class ResenaControladorTest {
     void textoResenaDemasiadoCorto() {
 
         assertThrows(
-                IllegalStateException.class,
+                ValidationException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -172,7 +172,7 @@ class ResenaControladorTest {
     void escribirResena_usuarioNoExiste() {
 
         assertThrows(
-                IllegalStateException.class,
+                ValidationException.class,
                 () -> controlador.escribirResena(
                         999L,
                         juego.getIdJuego(),
@@ -186,7 +186,7 @@ class ResenaControladorTest {
     void escribirResena_juegoNoExiste() {
 
         assertThrows(
-                IllegalStateException.class,
+                ValidationException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         999L,
@@ -229,7 +229,7 @@ class ResenaControladorTest {
 
     @Test
     void eliminarResena_noExiste() {
-        assertThrows(IllegalStateException.class,
+        assertThrows(ValidationException.class,
                 () -> controlador.eliminarResena(999L, usuario.getIdUsuario()));
     }
 
@@ -254,7 +254,7 @@ class ResenaControladorTest {
 
     @Test
     void ocultarResena_noExiste() {
-        assertThrows(IllegalStateException.class,
+        assertThrows(ValidationException.class,
                 () -> controlador.ocultarResena(999L, usuario.getIdUsuario()));
     }
 
@@ -330,7 +330,7 @@ class ResenaControladorTest {
 
     @Test
     void obtenerResenasUsuario_noExiste() {
-        assertThrows(IllegalStateException.class,
+        assertThrows(ValidationException.class,
                 () -> controlador.obtenerResenasUsuario(999L));
     }
 
@@ -356,7 +356,7 @@ class ResenaControladorTest {
     void crearResena_TextoMenor50Caracteres_LanzaValidationException() {
 
         assertThrows(
-                IllegalStateException.class,
+                ValidationException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -372,7 +372,7 @@ class ResenaControladorTest {
         String texto = "a".repeat(8001);
 
         assertThrows(
-                IllegalStateException.class,
+                ValidationException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -401,7 +401,7 @@ class ResenaControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ValidationException.class,
                 () -> controlador.escribirResena(
                         otroUsuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -437,7 +437,7 @@ class ResenaControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ValidationException.class,
                 () -> controlador.eliminarResena(
                         resena.getIdResena(),
                         otroUsuario.getIdUsuario()
@@ -480,7 +480,7 @@ class ResenaControladorTest {
         );
 
         assertThrows(
-                IllegalStateException.class,
+                ValidationException.class,
                 () -> controlador.ocultarResena(
                         resena.getIdResena(),
                         otroUsuario.getIdUsuario()

@@ -1,9 +1,7 @@
 package org.davidparada.transaciones.interfaceTransaciones;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import org.davidparada.excepcion.ValidationException;
+
 /**
  * Abstracción de unidad de trabajo atómica.
  * Desacopla el manejo de transacciones de los repositorios y el controlador.

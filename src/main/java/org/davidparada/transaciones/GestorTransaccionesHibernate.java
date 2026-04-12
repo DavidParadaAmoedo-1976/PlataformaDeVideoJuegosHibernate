@@ -1,15 +1,13 @@
 package org.davidparada.transaciones;
 
+import org.davidparada.excepcion.ValidationException;
 import org.davidparada.transaciones.interfaceTransaciones.ExceptionSupplier;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import org.davidparada.transaciones.interfaceTransaciones.ISessionManager;
-import org.davidparada.excepcion.ValidationException;
 import org.davidparada.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-
-import java.util.function.Supplier;
 import java.util.Optional;
 
 /**
@@ -27,7 +25,7 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
     public <T> T inTransaction(ExceptionSupplier<T> work) throws ValidationException {
         Transaction tx = null;
 
-        try (Session s = HibernateUtil.getSessionFactory().openSession()){
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             session = s;
             try {
                 tx = s.beginTransaction();
@@ -50,8 +48,8 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
             }
         } finally {
             session = null;
-            }
-  }
+        }
+    }
 
     /**
      * Devuelve la sesión activa dentro de un bloque {@link #inTransaction}.

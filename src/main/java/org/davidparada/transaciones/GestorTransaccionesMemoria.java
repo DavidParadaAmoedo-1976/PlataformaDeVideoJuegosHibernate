@@ -5,7 +5,6 @@ import org.davidparada.transaciones.interfaceTransaciones.ExceptionSupplier;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Implementación no-op de {@link IGestorTransacciones}.
@@ -18,11 +17,9 @@ public class GestorTransaccionesMemoria implements IGestorTransacciones {
     public <T> T inTransaction(ExceptionSupplier<T> work) throws ValidationException {
         try {
             return work.get();
-        }
-        catch (ValidationException ex) {
+        } catch (ValidationException ex) {
             throw ex;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             try {
 
                 T temp = (T) Optional.empty();

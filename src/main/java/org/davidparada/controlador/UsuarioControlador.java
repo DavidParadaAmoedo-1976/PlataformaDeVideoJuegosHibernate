@@ -37,9 +37,7 @@ public class UsuarioControlador implements IUsuarioControlador {
 
     @Override
     public UsuarioDto registrarUsuario(UsuarioForm formulario) throws ValidationException {
-
         List<ErrorModel> errores = new ArrayList<>();
-
         UsuarioFormValidador.validarUsuario(formulario);
 
         return gestorTransacciones.inTransaction(() -> {
@@ -49,11 +47,7 @@ public class UsuarioControlador implements IUsuarioControlador {
             if (usuarioRepo.buscarPorNombreUsuario(formulario.getNombreUsuario()).isPresent()) {
                 errores.add(new ErrorModel("nombreUsuario", TipoErrorEnum.DUPLICADO));
             }
-            try {
-                comprobarListaErrores(errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            comprobarListaErrores(errores);
 
             String passwordHash = EncriptarPassword.generarHash(formulario.getPassword());
 
@@ -80,21 +74,16 @@ public class UsuarioControlador implements IUsuarioControlador {
     @Override
     public UsuarioDto consultarPerfil(Long idUsuario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            try {
-                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
-                return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
+            return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
 
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
         });
     }
 
@@ -105,17 +94,19 @@ public class UsuarioControlador implements IUsuarioControlador {
             errores.add(new ErrorModel("nombre", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
-        return gestorTransacciones.inTransaction(() ->
-                usuarioRepo.buscarPorNombreUsuario(nombreUsuario)
-                        .map(usuarioEntidad -> UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad))
-                        .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"))
-        );
+
+        return gestorTransacciones.inTransaction(() -> {
+
+            return usuarioRepo.buscarPorNombreUsuario(nombreUsuario)
+                    .map(usuarioEntidad -> UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad))
+                    .orElseThrow(() -> new ValidationException(errores));
+
+        });
     }
 
     @Override
     public UsuarioDto anadirSaldo(Long idUsuario, Double cantidad) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
@@ -132,55 +123,43 @@ public class UsuarioControlador implements IUsuarioControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            try {
-                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-
-                if (usuario.getEstadoCuenta() != EstadoCuentaEnum.ACTIVA) {
-                    errores.add(new ErrorModel("estadoCuenta", TipoErrorEnum.ESTADO_INCORRECTO));
-                }
-
-                comprobarListaErrores(errores);
-
-                double nuevoSaldo = usuario.getSaldo() + cantidad;
-
-                usuarioRepo.actualizar(usuario.getIdUsuario(), new UsuarioForm(
-                        usuario.getNombreUsuario(),
-                        usuario.getEmail(),
-                        usuario.getPassword(),
-                        usuario.getNombreReal(),
-                        usuario.getPais(),
-                        usuario.getFechaNacimiento(),
-                        usuario.getFechaRegistro(),
-                        usuario.getAvatar(),
-                        nuevoSaldo,
-                        usuario.getEstadoCuenta()
-                ));
-
-                UsuarioEntidad usuarioActualizado = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-
-                return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioActualizado);
-
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
+            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            if (usuario.getEstadoCuenta() != EstadoCuentaEnum.ACTIVA) {
+                errores.add(new ErrorModel("estadoCuenta", TipoErrorEnum.ESTADO_INCORRECTO));
             }
+            comprobarListaErrores(errores);
+
+            double nuevoSaldo = usuario.getSaldo() + cantidad;
+            usuarioRepo.actualizar(usuario.getIdUsuario(), new UsuarioForm(
+                    usuario.getNombreUsuario(),
+                    usuario.getEmail(),
+                    usuario.getPassword(),
+                    usuario.getNombreReal(),
+                    usuario.getPais(),
+                    usuario.getFechaNacimiento(),
+                    usuario.getFechaRegistro(),
+                    usuario.getAvatar(),
+                    nuevoSaldo,
+                    usuario.getEstadoCuenta()
+            ));
+
+            UsuarioEntidad usuarioActualizado = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+
+            return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioActualizado);
         });
     }
 
     @Override
     public UsuarioDto consultarSaldo(Long idUsuario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
+
         return gestorTransacciones.inTransaction(() -> {
-            UsuarioEntidad usuario;
-            try {
-                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+
             return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
         });
     }
@@ -188,7 +167,6 @@ public class UsuarioControlador implements IUsuarioControlador {
     @Override
     public UsuarioDto login(String nombreUsuario, String password) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (nombreUsuario == null || nombreUsuario.isBlank()) {
             errores.add(new ErrorModel("nombreUsuario", TipoErrorEnum.OBLIGATORIO));
         }
@@ -199,18 +177,14 @@ public class UsuarioControlador implements IUsuarioControlador {
 
         return gestorTransacciones.inTransaction(() -> {
             UsuarioEntidad usuario = usuarioRepo.buscarPorNombreUsuario(nombreUsuario)
-                    .orElseThrow(() -> new RuntimeException());
+                    .orElse(null);
             if (usuario == null) {
                 errores.add(new ErrorModel("usuario", TipoErrorEnum.NO_ENCONTRADO));
             }
             if (!EncriptarPassword.verificarPassword(password, usuario.getPassword())) {
                 errores.add(new ErrorModel("password", TipoErrorEnum.NO_COINCIDE));
             }
-            try {
-                comprobarListaErrores(errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            comprobarListaErrores(errores);
 
             return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario);
         });
@@ -220,7 +194,6 @@ public class UsuarioControlador implements IUsuarioControlador {
 
 //    public UsuarioDto cambiarEstado(Long idUsuario, EstadoCuentaEnum nuevoEstado) throws ValidationException {
 //        List<ErrorModel> errores = new ArrayList<>();
-//
 //        if (idUsuario == null) {
 //            errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
 //        }
@@ -230,46 +203,39 @@ public class UsuarioControlador implements IUsuarioControlador {
 //        comprobarListaErrores(errores);
 //
 //        return gestorTransacciones.inTransaction(() -> {
-//            try {
 //                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 //
-//                usuarioRepo.actualizar(usuario.getIdUsuario(), new UsuarioForm(
-//                        usuario.getNombreUsuario(),
-//                        usuario.getEmail(),
-//                        usuario.getPassword(),
-//                        usuario.getNombreReal(),
-//                        usuario.getPais(),
-//                        usuario.getFechaNacimiento(),
-//                        usuario.getFechaRegistro(),
-//                        usuario.getAvatar(),
-//                        usuario.getSaldo(),
-//                        nuevoEstado
-//                ));
+//            UsuarioForm usuarioNuevoEstado = new UsuarioForm(
+//                    usuario.getNombreUsuario(),
+//                    usuario.getEmail(),
+//                    usuario.getPassword(),
+//                    usuario.getNombreReal(),
+//                    usuario.getPais(),
+//                    usuario.getFechaNacimiento(),
+//                    usuario.getFechaRegistro(),
+//                    usuario.getAvatar(),
+//                    usuario.getSaldo(),
+//                    nuevoEstado
+//            );
+//            UsuarioFormValidador.validarUsuario(usuarioNuevoEstado);
+//
+//                usuarioRepo.actualizar(usuario.getIdUsuario(),usuarioNuevoEstado);
 //                UsuarioEntidad usuarioActualizado = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 //
 //                return UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioActualizado);
-//            } catch (ValidationException e) {
-//                throw new IllegalStateException(e);
-//            }
 //        });
 //    }
 //
 //    public boolean eliminarUsuario(Long id) throws ValidationException {
 //        List<ErrorModel> errores = new ArrayList<>();
-//
 //        if (id == null) {
 //            errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
 //        }
-//
 //        comprobarListaErrores(errores);
 //
 //        return gestorTransacciones.inTransaction(() -> {
-//            try {
 //                UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(id, errores);
 //                return usuarioRepo.eliminar(usuario.getIdUsuario());
-//            } catch (ValidationException e) {
-//                throw new IllegalStateException(e);
-//            }
 //        });
 //    }
 }

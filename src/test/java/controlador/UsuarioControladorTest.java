@@ -256,7 +256,7 @@ class UsuarioControladorTest {
     @Test
     void consultarPerfil_nombreUsuarioInvalido_lanzaException() {
 
-        assertThrows(RuntimeException.class, () ->
+        assertThrows(ValidationException.class, () ->
                 usuarioControlador.consultarPerfil("usuarioInexistente")
         );
     }
@@ -274,7 +274,7 @@ class UsuarioControladorTest {
     void consultarPerfil_usuarioNoExiste() {
 
         assertThrows(
-                RuntimeException.class,
+                ValidationException.class,
                 () -> usuarioControlador.consultarPerfil(999L)
         );
     }
@@ -287,7 +287,7 @@ class UsuarioControladorTest {
     void anadirSaldo_usuarioNoExiste_lanzaValidationException() {
 
         assertThrows(
-                RuntimeException.class,
+                ValidationException.class,
                 () -> usuarioControlador.anadirSaldo(999L, 50.0)
         );
     }
@@ -393,7 +393,7 @@ class UsuarioControladorTest {
     void consultarSaldo_usuarioNoExiste() {
 
         assertThrows(
-                RuntimeException.class,
+                ValidationException.class,
                 () -> usuarioControlador.consultarSaldo(999L)
         );
     }

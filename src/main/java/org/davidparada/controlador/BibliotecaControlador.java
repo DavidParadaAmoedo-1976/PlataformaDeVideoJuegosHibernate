@@ -71,19 +71,15 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
         return gestorTransacciones.inTransaction(() -> {
 
-            Optional<BibliotecaEntidad> bibliotecaExistente =
-                    bibliotecaRepo.buscarPorUsuarioYJuego(idUsuario, idJuego);
+            Optional<BibliotecaEntidad> bibliotecaExistente = bibliotecaRepo.buscarPorUsuarioYJuego(idUsuario, idJuego);
 
             if (bibliotecaExistente.isPresent()) {
                 errores.add(new ErrorModel("juego", TipoErrorEnum.DUPLICADO));
-                throw new ValidationException(errores);
             }
+            comprobarListaErrores(errores);
 
-            UsuarioEntidad usuario;
-            JuegoEntidad juego;
-
-            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-            juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
 
             BibliotecaForm nuevaBiblioteca = new BibliotecaForm(
@@ -94,11 +90,8 @@ public class BibliotecaControlador implements IBibliotecaControlador {
                     null,
                     false
             );
-            try {
-                BibliotecaFormValidador.validarBiblioteca(nuevaBiblioteca);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            BibliotecaFormValidador.validarBiblioteca(nuevaBiblioteca);
+
             BibliotecaEntidad biblioteca = bibliotecaRepo.crear(nuevaBiblioteca);
 
             return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(biblioteca, usuario, juego);
@@ -116,37 +109,37 @@ public class BibliotecaControlador implements IBibliotecaControlador {
 
         return gestorTransacciones.inTransaction(() -> {
             UsuarioEntidad usuario;
-            try {
-                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+
+            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
 
             List<BibliotecaDto> juegos = construirBiblioteca(idUsuario, usuario);
             return ordenarBiblioteca(juegos, orden);
         });
     }
 
-    private List<BibliotecaDto> construirBiblioteca(Long idUsuario, UsuarioEntidad usuario) {
+    private List<BibliotecaDto> construirBiblioteca(Long idUsuario, UsuarioEntidad usuario) throws ValidationException {
+        List<ErrorModel> errores = new ArrayList<>();
         List<BibliotecaEntidad> juegosEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
-        return juegosEntidad.stream()
-                .map(b -> {
 
-                    JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElseThrow();
+        List<BibliotecaDto> bibliotecasDto = new ArrayList<>();
 
-                    return new BibliotecaDto(
-                            b.getIdBiblioteca(),
-                            b.getIdUsuario(),
-                            UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario),
-                            b.getIdJuego(),
-                            JuegoEntidadADtoMapper.juegoEntidadADto(juego),
-                            b.getFechaAdquisicion(),
-                            b.getHorasDeJuego(),
-                            b.getUltimaFechaDeJuego(),
-                            b.isEstadoInstalacion()
-                    );
-                })
-                .toList();
+        for (BibliotecaEntidad b : juegosEntidad) {
+            JuegoEntidad juego = obtenerEntidades.obtenerJuego(b.getIdJuego(), errores);
+
+            bibliotecasDto.add(
+        new BibliotecaDto(
+                b.getIdBiblioteca(),
+                b.getIdUsuario(),
+                UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario),
+                b.getIdJuego(),
+                JuegoEntidadADtoMapper.juegoEntidadADto(juego),
+                b.getFechaAdquisicion(),
+                b.getHorasDeJuego(),
+                b.getUltimaFechaDeJuego(),
+                b.isEstadoInstalacion()
+        ));
+            }
+        return bibliotecasDto;
     }
 
     private List<BibliotecaDto> ordenarBiblioteca(List<BibliotecaDto> juegos, OrdenarJuegosBibliotecaEnum orden) {
@@ -189,13 +182,11 @@ public class BibliotecaControlador implements IBibliotecaControlador {
             BibliotecaEntidad biblioteca;
             UsuarioEntidad usuario;
             JuegoEntidad juego;
-            try {
-                biblioteca = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                juego = obtenerEntidades.obtenerJuego(idJuego, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+
+            biblioteca = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+
             bibliotecaRepo.eliminar(biblioteca.getIdBiblioteca());
 
             return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
@@ -223,35 +214,33 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            try {
-                BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-                UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-                double horasTotales = bibliotecaEntidad.getHorasDeJuego() + horas;
-                BibliotecaForm bibliotecaFormActualizada = new BibliotecaForm(
-                        idUsuario,
-                        idJuego,
-                        bibliotecaEntidad.getFechaAdquisicion(),
-                        horasTotales,
-                        Instant.now(),
-                        bibliotecaEntidad.isEstadoInstalacion()
-                );
+            BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+            UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-                BibliotecaEntidad actualizado = bibliotecaRepo.actualizar(
-                        bibliotecaEntidad.getIdBiblioteca(),
-                        bibliotecaFormActualizada
-                ).orElseThrow(() -> new ValidationException(errores));
+            double horasTotales = bibliotecaEntidad.getHorasDeJuego() + horas;
+            BibliotecaForm bibliotecaFormActualizada = new BibliotecaForm(
+                    idUsuario,
+                    idJuego,
+                    bibliotecaEntidad.getFechaAdquisicion(),
+                    horasTotales,
+                    Instant.now(),
+                    bibliotecaEntidad.isEstadoInstalacion()
+            );
+            BibliotecaFormValidador.validarBiblioteca(bibliotecaFormActualizada);
 
-                return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
-                        actualizado,
-                        usuarioEntidad,
-                        juegoEntidad
-                );
+            BibliotecaEntidad actualizado = bibliotecaRepo.actualizar(
+                    bibliotecaEntidad.getIdBiblioteca(),
+                    bibliotecaFormActualizada
+            ).orElseThrow(() -> new IllegalStateException("Error al actualizar biblioteca"));
 
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                    actualizado,
+                    usuarioEntidad,
+                    juegoEntidad
+            );
+
         });
     }
 
@@ -269,35 +258,31 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            try {
-                BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-                UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
+            BibliotecaEntidad bibliotecaEntidad = obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+            UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-                if (bibliotecaEntidad.getUltimaFechaDeJuego() == null) {
-                    return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
-                            bibliotecaEntidad, usuarioEntidad, juegoEntidad
-                    );
-                }
-                Instant ultimaFechaHoraDeJuego = bibliotecaEntidad.getUltimaFechaDeJuego();
-                Instant horaActual = Instant.now();
-
-                // Diferencia real
-                Duration duracion = Duration.between(ultimaFechaHoraDeJuego, horaActual);
-
-                long horasEnTotal = duracion.toHours();
-
-                // Convertimos para mostrar
-                ZonedDateTime fechaLocal = ultimaFechaHoraDeJuego
-                        .atZone(ZoneId.systemDefault());
-
-                DateTimeFormatter formato =
-                        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
-                return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
+            if (bibliotecaEntidad.getUltimaFechaDeJuego() == null) {
+                return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(
+                        bibliotecaEntidad, usuarioEntidad, juegoEntidad
+                );
             }
+            Instant ultimaFechaHoraDeJuego = bibliotecaEntidad.getUltimaFechaDeJuego();
+            Instant horaActual = Instant.now();
+
+            // Diferencia real
+            Duration duracion = Duration.between(ultimaFechaHoraDeJuego, horaActual);
+
+            long horasEnTotal = duracion.toHours();
+
+            // Convertimos para mostrar
+            ZonedDateTime fechaLocal = ultimaFechaHoraDeJuego
+                    .atZone(ZoneId.systemDefault());
+
+            DateTimeFormatter formato =
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+            return BibliotecaEntidadADtoMapper.bibliotecaEntidadADto(bibliotecaEntidad, usuarioEntidad, juegoEntidad);
         });
     }
 
@@ -312,32 +297,28 @@ public class BibliotecaControlador implements IBibliotecaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            try {
-                UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                List<BibliotecaEntidad> bibliotecaEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
-                return bibliotecaEntidad.stream()
-                        .filter(b ->
-                                estadoInstalacion == null ||
-                                        b.isEstadoInstalacion() == estadoInstalacion
-                        )
-                        .map(b -> {
-                            JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElseThrow();
-                            return new BibliotecaDto(b.getIdBiblioteca(),
-                                    b.getIdUsuario(),
-                                    UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad),
-                                    b.getIdJuego(),
-                                    JuegoEntidadADtoMapper.juegoEntidadADto(juego),
-                                    b.getFechaAdquisicion(),
-                                    b.getHorasDeJuego(),
-                                    b.getUltimaFechaDeJuego(),
-                                    b.isEstadoInstalacion()
-                            );
-                        })
-                        .filter(dto -> texto == null || dto.juegoDto().titulo().toLowerCase().contains(texto.toLowerCase()))
-                        .toList();
-            } catch (ValidationException e) {
-                throw new ValidationException(errores);
-            }
+            UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            List<BibliotecaEntidad> bibliotecaEntidad = bibliotecaRepo.buscarPorUsuario(idUsuario);
+            return bibliotecaEntidad.stream()
+                    .filter(b ->
+                            estadoInstalacion == null ||
+                                    b.isEstadoInstalacion() == estadoInstalacion
+                    )
+                    .map(b -> {
+                        JuegoEntidad juego = juegoRepo.buscarPorId(b.getIdJuego()).orElseThrow();
+                        return new BibliotecaDto(b.getIdBiblioteca(),
+                                b.getIdUsuario(),
+                                UsuarioEntidadADtoMapper.usuarioEntidadADto(usuarioEntidad),
+                                b.getIdJuego(),
+                                JuegoEntidadADtoMapper.juegoEntidadADto(juego),
+                                b.getFechaAdquisicion(),
+                                b.getHorasDeJuego(),
+                                b.getUltimaFechaDeJuego(),
+                                b.isEstadoInstalacion()
+                        );
+                    })
+                    .filter(dto -> texto == null || dto.juegoDto().titulo().toLowerCase().contains(texto.toLowerCase()))
+                    .toList();
         });
     }
 

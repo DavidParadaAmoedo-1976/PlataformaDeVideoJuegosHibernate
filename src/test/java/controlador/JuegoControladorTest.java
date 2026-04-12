@@ -77,7 +77,7 @@ class JuegoControladorTest {
         );
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> juegoControlador.crearJuego(duplicado)
         );
     }
@@ -158,7 +158,7 @@ class JuegoControladorTest {
 
     @Test
     void consultarDetallesFallaSiNoExiste() {
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             juegoControlador.consultarDetalles(999L);
         });
     }
@@ -225,7 +225,7 @@ class JuegoControladorTest {
 
     @Test
     void aplicarDescuentoFallaSiJuegoNoExiste() {
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             juegoControlador.aplicarDescuento(999L, 20);
         });
     }
@@ -293,7 +293,7 @@ class JuegoControladorTest {
     @Test
     void cambiarEstadoFallaSiJuegoNoExiste() {
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             juegoControlador.cambiarEstado(
                     999L,
                     EstadoJuegoEnum.NO_DISPONIBLE
@@ -373,7 +373,7 @@ class JuegoControladorTest {
 
         JuegoForm duplicado = crearFormularioValido();
 
-        assertThrows(ClassCastException.class,
+        assertThrows(ValidationException.class,
                 () -> juegoControlador.crearJuego(duplicado));
     }
 

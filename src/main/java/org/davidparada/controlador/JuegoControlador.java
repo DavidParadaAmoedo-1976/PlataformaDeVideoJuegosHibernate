@@ -41,20 +41,17 @@ public class JuegoControlador implements IJuegoControlador {
     @Override
     public JuegoDto crearJuego(JuegoForm formulario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-        if (formulario == null) {
-            errores.add(new ErrorModel("formulario", TipoErrorEnum.OBLIGATORIO));
-        }
-        comprobarListaErrores(errores);
         JuegoFormValidador.validarJuego(formulario);
+
         JuegoEntidad juegoCreado = gestorTransacciones.inTransaction(() -> {
-            Optional<JuegoEntidad> juegoEntidad = juegoRepo.buscarPorTitulo(formulario.getTitulo());
-            if (juegoEntidad.isPresent()) {
+            if (juegoRepo.buscarPorTitulo(formulario.getTitulo()).isPresent()) {
                 errores.add(new ErrorModel("titulo", TipoErrorEnum.DUPLICADO));
             }
             comprobarListaErrores(errores);
+
             return juegoRepo.crear(formulario);
         });
-        comprobarListaErrores(errores);
+
         return JuegoEntidadADtoMapper.juegoEntidadADto(juegoCreado);
     }
 
@@ -112,29 +109,21 @@ public class JuegoControlador implements IJuegoControlador {
         if (idJuego == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
-
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            try {
                 JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
                 return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
-
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
         });
     }
 
     // Aplicar descuento
     @Override
-    public JuegoDto aplicarDescuento(Long id, Integer descuento) throws ValidationException {
+    public JuegoDto aplicarDescuento(Long idJuego, Integer descuento) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
-        if (id == null)
+        if (idJuego == null)
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
-
         comprobarListaErrores(errores);
 
         if (descuento == null) {
@@ -145,12 +134,8 @@ public class JuegoControlador implements IJuegoControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            JuegoEntidad juego;
-            try {
-                juego = obtenerEntidades.obtenerJuego(id, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+
             juegoRepo.actualizar(juego.getIdJuego(),
                     new JuegoForm(juego.getTitulo(),
                             juego.getDescripcion(),
@@ -169,10 +154,9 @@ public class JuegoControlador implements IJuegoControlador {
 
     // Cambiar estado del juego
     @Override
-    public JuegoDto cambiarEstado(Long id, EstadoJuegoEnum nuevoEstado) throws ValidationException {
+    public JuegoDto cambiarEstado(Long idJuego, EstadoJuegoEnum nuevoEstado) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
-        if (id == null) {
+        if (idJuego == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
         }
         if (nuevoEstado == null) {
@@ -181,12 +165,7 @@ public class JuegoControlador implements IJuegoControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            JuegoEntidad juego;
-            try {
-                juego = obtenerEntidades.obtenerJuego(id, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
             juegoRepo.actualizar(juego.getIdJuego(),
                     new JuegoForm(
@@ -216,7 +195,7 @@ public class JuegoControlador implements IJuegoControlador {
 //        if (id == null) {
 //            errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
 //        }
-//        obtenerJuego(id, errores);
+//        obtenerEntidades.obtenerJuego(id, errores);
 //
 //        return juegoRepo.eliminar(id);
 //    }

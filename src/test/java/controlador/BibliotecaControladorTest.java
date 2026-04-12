@@ -139,7 +139,7 @@ class BibliotecaControladorTest {
     @Test
     void anadirJuego_duplicado() throws Exception {
         controlador.anadirJuego(idUsuario, idJuego);
-        assertThrows(ClassCastException.class,
+        assertThrows(ValidationException.class,
                 () -> controlador.anadirJuego(idUsuario, idJuego));
     }
 
@@ -320,7 +320,7 @@ class BibliotecaControladorTest {
     @Test
     void buscarSegunCriterios_usuarioInvalido() {
 
-        assertThrows(ClassCastException.class,
+        assertThrows(ValidationException.class,
                 () -> controlador.buscarSegunCriterios(999L, null, null));
     }
 

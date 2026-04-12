@@ -72,13 +72,10 @@ public class ResenaControlador implements IResenaControlador {
         return gestorTransacciones.inTransaction(() -> {
             UsuarioEntidad usuario;
             JuegoEntidad juego;
-            try {
-                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                juego = obtenerEntidades.obtenerJuego(idJuego, errores);
-                obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+            obtenerEntidades.obtenerBiblioteca(idUsuario, idJuego, errores);
+
 
             List<ResenaEntidad> resenasEntidad = resenaRepo.buscarPorJuego(idJuego);
 
@@ -87,11 +84,9 @@ public class ResenaControlador implements IResenaControlador {
             if (yaExiste) {
                 errores.add(new ErrorModel("resena", TipoErrorEnum.DUPLICADO));
             }
-            try {
-                comprobarListaErrores(errores);
-            } catch (ValidationException e) {
-                throw new RuntimeException(e);
-            }
+
+            comprobarListaErrores(errores);
+
 
             ResenaForm nuevaResena = new ResenaForm(
                     idUsuario,
@@ -103,11 +98,8 @@ public class ResenaControlador implements IResenaControlador {
                     null,
                     EstadoPublicacionEnum.PUBLICADA
             );
-            try {
-                ResenaFormValidador.validarResena(nuevaResena);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            ResenaFormValidador.validarResena(nuevaResena);
+
 
             ResenaEntidad resena = resenaRepo.crear(nuevaResena);
 
@@ -129,13 +121,11 @@ public class ResenaControlador implements IResenaControlador {
             ResenaEntidad resena;
             UsuarioEntidad usuario;
             JuegoEntidad juego;
-            try {
-                resena = obtenerEntidades.obtenerResenaPorIdYUsuario(idResena, idUsuario, errores);
-                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                juego = obtenerEntidades.obtenerJuego(resena.getIdJuego(), errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+
+            resena = obtenerEntidades.obtenerResenaPorIdYUsuario(idResena, idUsuario, errores);
+            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            juego = obtenerEntidades.obtenerJuego(resena.getIdJuego(), errores);
+
             resenaRepo.eliminar(resena.getIdResena());
 
             return ResenaEntidadADtoMapper.resenaEntidadADto(resena, usuario, juego);
@@ -157,23 +147,16 @@ public class ResenaControlador implements IResenaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            JuegoEntidad juego;
-            try {
-                juego = obtenerEntidades.obtenerJuego(idJuego, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
             JuegoDto juegoDto = JuegoEntidadADtoMapper.juegoEntidadADto(juego);
 
             List<ResenaEntidad> resenasFiltradas =
                     filtrarYOrdenarResenas(idJuego, recomendado, orden);
 
-            try {
-                return convertirADto(resenasFiltradas, juegoDto, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+
+            return convertirADto(resenasFiltradas, juegoDto, errores);
+
         });
     }
 
@@ -242,11 +225,8 @@ public class ResenaControlador implements IResenaControlador {
         return gestorTransacciones.inTransaction(() -> {
 
             ResenaEntidad resena;
-            try {
-                resena = obtenerEntidades.obtenerResenaPorIdYUsuario(idResena, idUsuario, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+
+            resena = obtenerEntidades.obtenerResenaPorIdYUsuario(idResena, idUsuario, errores);
 
             ResenaForm nuevaResena = new ResenaForm(
                     resena.getIdUsuario(),
@@ -262,12 +242,10 @@ public class ResenaControlador implements IResenaControlador {
             ResenaEntidad resenaGuardada = resenaActualizada.orElseThrow();
             UsuarioEntidad usuario;
             JuegoEntidad juego;
-            try {
-                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-                juego = obtenerEntidades.obtenerJuego(resena.getIdJuego(), errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+
+            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            juego = obtenerEntidades.obtenerJuego(resena.getIdJuego(), errores);
+
             return ResenaEntidadADtoMapper.resenaEntidadADto(
                     resenaGuardada,
                     usuario,
@@ -285,11 +263,8 @@ public class ResenaControlador implements IResenaControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            try {
-                obtenerEntidades.obtenerJuego(idJuego, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+
+            obtenerEntidades.obtenerJuego(idJuego, errores);
 
             List<ResenaEntidad> resenas = resenaRepo.buscarPorJuego(idJuego);
             int total = resenas.size();
@@ -339,22 +314,18 @@ public class ResenaControlador implements IResenaControlador {
 
         return gestorTransacciones.inTransaction(() -> {
             UsuarioEntidad usuario;
-            try {
-                usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
+            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            comprobarListaErrores(errores);
 
             List<ResenaEntidad> resenasEntidad = resenaRepo.buscarPorUsuario(idUsuario);
             List<ResenaDto> resenasDto = new ArrayList<>();
 
             for (ResenaEntidad r : resenasEntidad) {
                 JuegoEntidad juegoEntidad;
-                try {
-                    juegoEntidad = obtenerEntidades.obtenerJuego(r.getIdJuego(), errores);
-                } catch (ValidationException e) {
-                    throw new IllegalStateException(e);
-                }
+
+                juegoEntidad = obtenerEntidades.obtenerJuego(r.getIdJuego(), errores);
+                comprobarListaErrores(errores);
+
                 resenasDto.add(new ResenaDto(
                         r.getIdResena(),
                         r.getIdUsuario(),

@@ -155,26 +155,18 @@ public class ProgramaControlador implements IProgramaControlador {
         Objects.requireNonNull(criterio);
 
         return gestorTransacciones.inTransaction(() -> {
-            try {
                 return switch (criterio) {
                     case MAS_VENDIDOS -> juegosMasVendidos(limite);
                     case MEJOR_VALORADOS -> juegosMejorValorados(limite);
                     case MAS_JUGADOS -> juegosMasJugados(limite);
                 };
-            } catch (ValidationException e) {
-                throw new IllegalStateException(e);
-            }
         });
     }
 
     private List<JuegosPopularesDto> juegosMasVendidos(Integer limite) throws ValidationException {
-
         Map<Long, Double> ranking = new HashMap<>();
-
         for (CompraEntidad compra : compraRepo.listarTodos()) {
-
             Long idJuego = compra.getIdJuego();
-
             ranking.put(idJuego,
                     ranking.getOrDefault(idJuego, VALOR_POR_DEFECTO) + 1);
         }
@@ -186,11 +178,10 @@ public class ProgramaControlador implements IProgramaControlador {
 
         Map<Long, List<ResenaEntidad>> agrupadas = new HashMap<>();
 
-        for (ResenaEntidad resenia : resenaRepo.listarTodos()) {
+        for (ResenaEntidad resena : resenaRepo.listarTodos()) {
 
-            agrupadas
-                    .computeIfAbsent(resenia.getIdJuego(), ignored -> new ArrayList<>())
-                    .add(resenia);
+            agrupadas.computeIfAbsent(resena.getIdJuego(), ignored -> new ArrayList<>())
+                    .add(resena);
         }
 
         Map<Long, Double> ranking = new HashMap<>();
@@ -209,7 +200,6 @@ public class ProgramaControlador implements IProgramaControlador {
     }
 
     private List<JuegosPopularesDto> juegosMasJugados(Integer limite) throws ValidationException {
-
         Map<Long, Double> ranking = new HashMap<>();
 
         for (BibliotecaEntidad biblioteca : bibliotecaRepo.listarTodos()) {
@@ -240,9 +230,7 @@ public class ProgramaControlador implements IProgramaControlador {
         int posicion = POSICION_INICIAL;
 
         for (Map.Entry<Long, Double> entry : listaOrdenada) {
-
             JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(entry.getKey(), errores);
-
             JuegosPopularesDto dto = new JuegosPopularesDto(
                     posicion,
                     JuegoEntidadADtoMapper.juegoEntidadADto(juegoEntidad),

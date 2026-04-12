@@ -10,9 +10,6 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.properties.HorizontalAlignment;
-import com.itextpdf.layout.properties.TextAlignment;
 import org.davidparada.modelo.dto.FacturaDto;
 
 import java.io.File;
@@ -57,7 +54,6 @@ public class PdfServicio {
 
             document.add(imgBorder);
             document.add(new Paragraph(""));
-
 
 
             // Cerrar
