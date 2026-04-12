@@ -40,7 +40,6 @@ class CompraControladorTest {
     private CompraRepoMemoria compraRepoMemoria;
     private BibliotecaRepoMemoria bibliotecaRepoMemoria;
     private BibliotecaControlador bibliotecaControlador;
-    private JuegoControlador juegoControlador;
     private ObtenerEntidadesOptional obtenerEntidades;
     private IGestorTransacciones gestorTransacciones;
 
@@ -122,7 +121,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.get().getIdJuego(),
@@ -152,7 +151,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.get().getIdJuego(),
@@ -188,7 +187,7 @@ class CompraControladorTest {
         var juego = crearJuego();
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -210,7 +209,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -223,7 +222,7 @@ class CompraControladorTest {
     void realizarCompra_usuarioNoExiste() {
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.realizarCompra(
                         1L,
                         1L,
@@ -255,7 +254,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -336,7 +335,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.realizarCompra(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
@@ -376,7 +375,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.procesarPago(
                         compra.get().getIdCompra(),
                         MetodoPagoEnum.PAYPAL
@@ -400,7 +399,7 @@ class CompraControladorTest {
     void procesarPagoCompraNoExiste() {
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.procesarPago(
                         999L,
                         MetodoPagoEnum.PAYPAL
@@ -502,7 +501,7 @@ class CompraControladorTest {
         );
 
         assertThrows(
-                ClassCastException.class,
+                ValidationException.class,
                 () -> compraControlador.consultarCompra(
                         compra.getIdCompra(),
                         usuario2.getIdUsuario()

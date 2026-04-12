@@ -16,6 +16,7 @@ import org.davidparada.modelo.formulario.CompraForm;
 import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.modelo.formulario.validacion.CompraFormValidador;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
+import org.davidparada.modelo.formulario.validacion.UsuarioFormValidador;
 import org.davidparada.modelo.mapper.CompraEntidadADtoMapper;
 import org.davidparada.modelo.mapper.JuegoEntidadADtoMapper;
 import org.davidparada.modelo.mapper.UsuarioEntidadADtoMapper;
@@ -27,6 +28,7 @@ import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +73,6 @@ public class CompraControlador implements ICompraControlador {
     @Override
     public CompraDto realizarCompra(Long idUsuario, Long idJuego, MetodoPagoEnum metodoPago) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("idUsuario", TipoErrorEnum.OBLIGATORIO));
         }
@@ -84,10 +85,8 @@ public class CompraControlador implements ICompraControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            UsuarioEntidad usuario;
-            JuegoEntidad juego;
-            usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-            juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(idUsuario, errores);
+            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
             // Compruebo Estado del juego
             if (juego.getEstado() == EstadoJuegoEnum.NO_DISPONIBLE) {
@@ -108,7 +107,6 @@ public class CompraControlador implements ICompraControlador {
             if (juego.getDescuento() < DESCUENTO_MIN || juego.getDescuento() > DESCUENTO_MAX) {
                 errores.add(new ErrorModel("descuento", TipoErrorEnum.RANGO_INVALIDO));
             }
-
             comprobarListaErrores(errores);
 
             // Comprueba si ya está en biblioteca
@@ -133,7 +131,6 @@ public class CompraControlador implements ICompraControlador {
             if (compraActiva) {
                 errores.add(new ErrorModel("juego", TipoErrorEnum.DUPLICADO));
             }
-
             comprobarListaErrores(errores);
 
             CompraForm nuevaCompra = new CompraForm(
@@ -145,7 +142,6 @@ public class CompraControlador implements ICompraControlador {
                     juego.getDescuento(),
                     EstadoCompraEnum.PENDIENTE
             );
-
             CompraFormValidador.validarCompra(nuevaCompra);
 
             CompraEntidad compra = compraRepo.crear(nuevaCompra);
@@ -162,6 +158,7 @@ public class CompraControlador implements ICompraControlador {
             errores.add(new ErrorModel("id", TipoErrorEnum.NO_ENCONTRADO));
         }
         comprobarListaErrores(errores);
+
         // Compruebo que exista el juego y esté apto para comprar.
         return gestorTransacciones.inTransaction(() -> {
 
@@ -196,13 +193,11 @@ public class CompraControlador implements ICompraControlador {
             }
 
             return CompraEntidadADtoMapper.compraEntidadADto(compra, usuario, juego);
-
         });
     }
 
     private void salir(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
         CompraForm nuevaCompra = new CompraForm(
                 compraEntidad.getIdUsuario(),
@@ -219,11 +214,9 @@ public class CompraControlador implements ICompraControlador {
 
     private void pagoConCarteraSteam(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
         UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(compraEntidad.getIdUsuario(), errores);
         JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(), errores);
-        comprobarListaErrores(errores);
 
         if (usuarioEntidad.getSaldo() < precioFinal(juegoEntidad.getPrecioBase(),
                 juegoEntidad.getDescuento())) {
@@ -236,9 +229,10 @@ public class CompraControlador implements ICompraControlador {
 
         // Modificamos saldo de Usuario
         Double precioJuego = precioFinal(compraEntidad.getPrecioBase(), juegoEntidad.getDescuento());
+        UsuarioForm usuarioActualizado = null;
         if (compraEntidad.getMetodoPago() == MetodoPagoEnum.CARTERA_STEAM) {
             Double nuevoSaldo = usuarioEntidad.getSaldo() - precioJuego;
-            usuarioRepo.actualizar(usuarioEntidad.getIdUsuario(), new UsuarioForm(
+            usuarioActualizado = new UsuarioForm(
                     usuarioEntidad.getNombreUsuario(),
                     usuarioEntidad.getEmail(),
                     usuarioEntidad.getPassword(),
@@ -248,18 +242,17 @@ public class CompraControlador implements ICompraControlador {
                     usuarioEntidad.getFechaRegistro(),
                     usuarioEntidad.getAvatar(),
                     nuevoSaldo,
-                    usuarioEntidad.getEstadoCuenta()));
+                    usuarioEntidad.getEstadoCuenta());
         }
-        comprobarListaErrores(errores);
+        UsuarioFormValidador.validarUsuario(usuarioActualizado);
+        usuarioRepo.actualizar(compraEntidad.getIdUsuario(), usuarioActualizado);
 
         completarCompra(compraEntidad);
     }
 
     private void pagoConTransferencia(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
-        comprobarListaErrores(errores);
 
         completarCompra(compraEntidad);
     }
@@ -267,16 +260,13 @@ public class CompraControlador implements ICompraControlador {
 
     private void pagoConPaypal(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
-        comprobarListaErrores(errores);
 
         completarCompra(compraEntidad);
     }
 
     private void pagoConTarjeta(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
 
         completarCompra(compraEntidad);
@@ -286,22 +276,18 @@ public class CompraControlador implements ICompraControlador {
     @Override
     public List<CompraDto> listarCompras(Long idUsuario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idUsuario == null) {
             errores.add(new ErrorModel("idUsuario", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-
             UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(idUsuario, errores);
-
             List<CompraEntidad> comprasEntidad = compraRepo.buscarPorUsuario(idUsuario);
 
             return comprasEntidad.stream()
                     .map(c -> {
                         JuegoEntidad juego = juegoRepo.buscarPorId(c.getIdJuego()).orElseThrow();
-
                         return new CompraDto(
                                 c.getIdCompra(),
                                 c.getIdUsuario(),
@@ -323,7 +309,6 @@ public class CompraControlador implements ICompraControlador {
     @Override
     public CompraDto consultarCompra(Long idCompra, Long idUsuario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idCompra == null) {
             errores.add(new ErrorModel("idCompra", TipoErrorEnum.OBLIGATORIO));
         }
@@ -340,7 +325,6 @@ public class CompraControlador implements ICompraControlador {
             if (!compra.getIdUsuario().equals(idUsuario)) {
                 errores.add(new ErrorModel("usuario", TipoErrorEnum.NO_PERMITIDO));
             }
-
             comprobarListaErrores(errores);
 
             return CompraEntidadADtoMapper.compraEntidadADto(compra, usuario, juego);
@@ -351,7 +335,6 @@ public class CompraControlador implements ICompraControlador {
     @Override
     public DetallesCompraDto detallesDeUnaCompra(Long idCompra, Long idUsuario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idCompra == null) {
             errores.add(new ErrorModel("idCompra", TipoErrorEnum.OBLIGATORIO));
         }
@@ -381,7 +364,6 @@ public class CompraControlador implements ICompraControlador {
     }
 
     // Solicitar reembolso
-
     /**
      * El reembolso, se realiza siempre a cartera, no se devuelve el dinero
      * por política de la empresa.
@@ -393,7 +375,6 @@ public class CompraControlador implements ICompraControlador {
     @Override
     public CompraDto solicitarReembolso(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idCompra == null) {
             errores.add(new ErrorModel("idCompra", TipoErrorEnum.OBLIGATORIO));
         }
@@ -421,7 +402,6 @@ public class CompraControlador implements ICompraControlador {
             // Busco usuario y juego asociado a la compra
             UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(compraEntidad.getIdUsuario(), errores);
             JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(), errores);
-            comprobarListaErrores(errores);
 
             // Devolver dinero a cartera
             Double precioJuego = precioFinal(compraEntidad.getPrecioBase(), compraEntidad.getDescuento());
@@ -461,11 +441,11 @@ public class CompraControlador implements ICompraControlador {
     @Override
     public FacturaDto generarFactura(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
-
         if (idCompra == null) {
             errores.add(new ErrorModel("idCompra", TipoErrorEnum.OBLIGATORIO));
         }
         comprobarListaErrores(errores);
+
         return gestorTransacciones.inTransaction(() -> {
             CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
             UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(compraEntidad.getIdUsuario(), errores);
@@ -482,18 +462,6 @@ public class CompraControlador implements ICompraControlador {
                     compraEntidad.getMetodoPago());
         });
     }
-
-//    public String generarFacturaPDF(Long idCompra) throws ValidationException {
-//
-//        // 1. Generar datos de factura
-//        FacturaDto factura = generarFactura(idCompra);
-//
-//        // 2. Generar PDF
-//        PdfServicio pdfService = new PdfServicio();
-//        String ruta = pdfService.generarFacturaPDF(factura);
-//
-//        return ruta;
-//    }
 
     private void completarCompra(CompraEntidad compraEntidad) throws ValidationException {
         CompraForm nuevaCompra = new CompraForm(
@@ -525,8 +493,20 @@ public class CompraControlador implements ICompraControlador {
 
     private String generarNumeroFactura(Long idCompra) {
         int anio = Instant.now()
-                .atZone(java.time.ZoneId.systemDefault())
+                .atZone(ZoneId.systemDefault())
                 .getYear();
         return anio + "-" + String.format("%06d", idCompra);
     }
+
+//    public String generarFacturaPDF(Long idCompra) throws ValidationException {
+//
+//        // 1. Generar datos de factura
+//        FacturaDto factura = generarFactura(idCompra);
+//
+//        // 2. Generar PDF
+//        PdfServicio pdfService = new PdfServicio();
+//        String ruta = pdfService.generarFacturaPDF(factura);
+//
+//        return ruta;
+//    }
 }
