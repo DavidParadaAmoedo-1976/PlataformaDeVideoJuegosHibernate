@@ -364,6 +364,7 @@ public class CompraControlador implements ICompraControlador {
     }
 
     // Solicitar reembolso
+
     /**
      * El reembolso, se realiza siempre a cartera, no se devuelve el dinero
      * por política de la empresa.

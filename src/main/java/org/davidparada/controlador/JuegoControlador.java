@@ -111,9 +111,9 @@ public class JuegoControlador implements IJuegoControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-                JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-                return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+            return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
         });
     }
 

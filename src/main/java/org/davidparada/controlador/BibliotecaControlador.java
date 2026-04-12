@@ -116,18 +116,18 @@ public class BibliotecaControlador implements IBibliotecaControlador {
             JuegoEntidad juego = obtenerEntidades.obtenerJuego(b.getIdJuego(), errores);
 
             bibliotecasDto.add(
-        new BibliotecaDto(
-                b.getIdBiblioteca(),
-                b.getIdUsuario(),
-                UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario),
-                b.getIdJuego(),
-                JuegoEntidadADtoMapper.juegoEntidadADto(juego),
-                b.getFechaAdquisicion(),
-                b.getHorasDeJuego(),
-                b.getUltimaFechaDeJuego(),
-                b.isEstadoInstalacion()
-        ));
-            }
+                    new BibliotecaDto(
+                            b.getIdBiblioteca(),
+                            b.getIdUsuario(),
+                            UsuarioEntidadADtoMapper.usuarioEntidadADto(usuario),
+                            b.getIdJuego(),
+                            JuegoEntidadADtoMapper.juegoEntidadADto(juego),
+                            b.getFechaAdquisicion(),
+                            b.getHorasDeJuego(),
+                            b.getUltimaFechaDeJuego(),
+                            b.isEstadoInstalacion()
+                    ));
+        }
         return bibliotecasDto;
     }
 

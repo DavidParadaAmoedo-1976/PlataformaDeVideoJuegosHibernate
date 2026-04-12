@@ -155,11 +155,11 @@ public class ProgramaControlador implements IProgramaControlador {
         Objects.requireNonNull(criterio);
 
         return gestorTransacciones.inTransaction(() -> {
-                return switch (criterio) {
-                    case MAS_VENDIDOS -> juegosMasVendidos(limite);
-                    case MEJOR_VALORADOS -> juegosMejorValorados(limite);
-                    case MAS_JUGADOS -> juegosMasJugados(limite);
-                };
+            return switch (criterio) {
+                case MAS_VENDIDOS -> juegosMasVendidos(limite);
+                case MEJOR_VALORADOS -> juegosMejorValorados(limite);
+                case MAS_JUGADOS -> juegosMasJugados(limite);
+            };
         });
     }
 
