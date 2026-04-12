@@ -2,14 +2,22 @@ package org.davidparada.servicio;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.geom.Line;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.element.Image;
-import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.properties.HorizontalAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
+import com.itextpdf.layout.properties.VerticalAlignment;
 import org.davidparada.modelo.dto.FacturaDto;
 
 import java.io.File;
@@ -45,15 +53,63 @@ public class PdfServicio {
                     .atZone(ZoneId.systemDefault())
                     .format(formatter);
 
+
+            // Cabecera
+
+            document.add(new Paragraph().add(new Text("FACTURA").setBold())
+                    .setFontSize(18)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(5));
+
+
+            // Bloque inicio
+
+            float[] columnas = {1,1};
+            Table tablaInicio = new Table(UnitValue.createPercentArray(columnas));
+            tablaInicio.useAllAvailableWidth();
+            tablaInicio.setBorder(Border.NO_BORDER);
+
             // Logo
 
-            Image imgBorder = new Image(imageData);
-            imgBorder.scaleToFit(50, 50);
+            Image imagenLogo = new Image(imageData);
+            imagenLogo.scaleToFit(80, 80);
             DeviceRgb borderColor = new DeviceRgb(85, 150, 240);
-            imgBorder.setBorder(new SolidBorder(borderColor, 2));
+            imagenLogo.setBorder(new SolidBorder(borderColor, 2));
 
-            document.add(imgBorder);
-            document.add(new Paragraph(""));
+            Cell logoCelda = new Cell()
+                    .add(imagenLogo)
+                    .setBorder(Border.NO_BORDER)
+                    .setPadding(50)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE);
+
+            tablaInicio.addCell(logoCelda);
+
+            // Datos de Factura
+
+            Cell datosFactura = new Cell()
+                    .add(new Paragraph(new Text("Nº Factura").setTextAlignment(TextAlignment.CENTER)))
+                    .add(new Paragraph(factura.numeroFactura()).setTextAlignment(TextAlignment.CENTER))
+                    .add(new Paragraph(new Text("Fecha de emision").setTextAlignment(TextAlignment.CENTER)))
+                    .add(new Paragraph(fecha).setTextAlignment(TextAlignment.CENTER))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setBorder(Border.NO_BORDER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE);
+            tablaInicio.addCell(datosFactura);
+
+
+            document.add(tablaInicio);
+
+            // Separador
+
+            SolidLine separador = new SolidLine(2);
+            separador.setColor(ColorConstants.DARK_GRAY);
+
+            LineSeparator linea = new LineSeparator(separador);
+            linea.setWidth(UnitValue.createPercentValue(100));
+            linea.setMarginTop(5);
+            linea.setMarginBottom(5);
+
+            document.add(linea);
 
 
             // Cerrar
