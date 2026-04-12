@@ -144,7 +144,7 @@ class ResenaControladorTest {
         );
 
         assertThrows(
-                RuntimeException.class,
+                ValidationException.class,
                 () -> controlador.escribirResena(
                         usuario.getIdUsuario(),
                         juego.getIdJuego(),
