@@ -109,33 +109,62 @@ public class PdfServicio {
             tablaDatos.setBorder(Border.NO_BORDER);
 
             // Cabeceras
-            Cell cabecera1 = new Cell().add(new Paragraph("FACTURAR A").setBold().setTextAlignment(TextAlignment.CENTER)
-                    .setFontSize(12)
-                    .setBorder(Border.NO_BORDER));
-            Cell cabecera2 = new Cell().add(new Paragraph("DETALLES").setBold().setTextAlignment(TextAlignment.CENTER)
-                    .setFontSize(12)
-                    .setBorder(Border.NO_BORDER));
-            Cell cabecera3 = new Cell().add(new Paragraph("PAGO").setBold().setTextAlignment(TextAlignment.CENTER)
-                    .setFontSize(12)
-                    .setBorder(Border.NO_BORDER));
+            Cell cabecera1 = new Cell()
+                    .add(new Paragraph("FACTURAR A")
+                            .setBold()
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setFontSize(12))
+                            .setBorderTop(Border.NO_BORDER)
+                            .setBorderLeft(Border.NO_BORDER)
+                            .setBorderRight(Border.NO_BORDER);
+            Cell cabecera2 = new Cell()
+                    .add(new Paragraph("DETALLES")
+                            .setBold()
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setFontSize(12))
+                            .setBorderTop(Border.NO_BORDER)
+                            .setBorderLeft(Border.NO_BORDER)
+                            .setBorderRight(Border.NO_BORDER);
+            Cell cabecera3 = new Cell()
+                    .add(new Paragraph("PAGO")
+                            .setBold()
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setFontSize(12))
+                            .setBorderTop(Border.NO_BORDER)
+                            .setBorderLeft(Border.NO_BORDER)
+                            .setBorderRight(Border.NO_BORDER);
 
             tablaDatos.addCell(cabecera1);
             tablaDatos.addCell(cabecera2);
             tablaDatos.addCell(cabecera3);
 
             // Datos cliente
-            tablaDatos.addCell(new Paragraph("FACTURAR A").setBold()).setTextAlignment(TextAlignment.CENTER)
-                    .setFontSize(12)
-                    .setBorder(Border.NO_BORDER));
-            tablaDatos.addCell(new Paragraph("").setTextAlignment(TextAlignment.CENTER).setFontSize(10)
-                    .setFontSize(12)
-                    .setBorder(Border.NO_BORDER));
-            tablaDatos.addCell(new Paragraph(factura.metodoPago().toString()).setTextAlignment(TextAlignment.CENTER)
-                    .setFontSize(10)
-                    .setBorder(Border.NO_BORDER));
+            tablaDatos.addCell(new Cell()
+                    .add(new Paragraph(factura.nombreReal())
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setFontSize(10))
+                            .setBorder(Border.NO_BORDER));
+            tablaDatos.addCell(new Cell()
+                    .add(new Paragraph("")
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setFontSize(10))
+                            .setBorder(Border.NO_BORDER));
+            tablaDatos.addCell(new Cell()
+                    .add(new Paragraph(factura.metodoPago().toString())
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setFontSize(10))
+                            .setBorder(Border.NO_BORDER));
 
 
             document.add(tablaDatos);
+
+            // Separador
+            LineSeparator linea2 = new LineSeparator(separador);
+            linea2.setWidth(UnitValue.createPercentValue(100));
+            linea2.setMarginTop(70);
+            linea2.setMarginBottom(15);
+
+            document.add(linea2);
 
             // Cerrar
             document.close();
