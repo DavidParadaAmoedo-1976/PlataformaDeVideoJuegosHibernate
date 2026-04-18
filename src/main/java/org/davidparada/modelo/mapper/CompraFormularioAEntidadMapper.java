@@ -23,7 +23,7 @@ public class CompraFormularioAEntidadMapper {
                 Instant.now(),
                 formulario.getMetodoPago(),
                 formulario.getPrecioBase(),
-                DESCUENTO_POR_DEFECTO,
+                formulario.getDescuento(),
                 EstadoCompraEnum.PENDIENTE
         );
     }

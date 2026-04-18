@@ -107,6 +107,7 @@ public class CompraControlador implements ICompraControlador {
             if (juego.getDescuento() < DESCUENTO_MIN || juego.getDescuento() > DESCUENTO_MAX) {
                 errores.add(new ErrorModel("descuento", TipoErrorEnum.RANGO_INVALIDO));
             }
+
             comprobarListaErrores(errores);
 
             // Comprueba si ya está en biblioteca
@@ -244,7 +245,7 @@ public class CompraControlador implements ICompraControlador {
                     nuevoSaldo,
                     usuarioEntidad.getEstadoCuenta());
         }
-        UsuarioFormValidador.validarUsuario(usuarioActualizado);
+//        UsuarioFormValidador.validarUsuario(usuarioActualizado);
         usuarioRepo.actualizar(compraEntidad.getIdUsuario(), usuarioActualizado);
 
         completarCompra(compraEntidad);

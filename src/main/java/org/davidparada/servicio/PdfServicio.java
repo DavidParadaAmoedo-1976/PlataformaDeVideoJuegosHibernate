@@ -204,12 +204,12 @@ public class PdfServicio {
                             .setFontSize(10))
                     .setBorder(Border.NO_BORDER));
             tablaJuego.addCell(new Cell()
-                    .add(new Paragraph(factura.descuento().toString())
+                    .add(new Paragraph(factura.descuento().toString() + " %")
                             .setTextAlignment(TextAlignment.CENTER)
                             .setFontSize(10))
                     .setBorder(Border.NO_BORDER));
             tablaJuego.addCell(new Cell()
-                    .add(new Paragraph(factura.importe().toString())
+                    .add(new Paragraph(factura.importe().toString() + " €")
                             .setTextAlignment(TextAlignment.CENTER)
                             .setFontSize(10))
                     .setBorder(Border.NO_BORDER));
