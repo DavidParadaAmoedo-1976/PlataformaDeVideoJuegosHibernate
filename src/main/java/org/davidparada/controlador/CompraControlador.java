@@ -16,7 +16,6 @@ import org.davidparada.modelo.formulario.CompraForm;
 import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.modelo.formulario.validacion.CompraFormValidador;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
-import org.davidparada.modelo.formulario.validacion.UsuarioFormValidador;
 import org.davidparada.modelo.mapper.CompraEntidadADtoMapper;
 import org.davidparada.modelo.mapper.JuegoEntidadADtoMapper;
 import org.davidparada.modelo.mapper.UsuarioEntidadADtoMapper;
@@ -457,6 +456,7 @@ public class CompraControlador implements ICompraControlador {
                     usuarioEntidad.getEmail(),
                     compraEntidad.getFechaCompra(),
                     precioFinal(compraEntidad.getPrecioBase(), compraEntidad.getDescuento()),
+                    compraEntidad.getPrecioBase(),
                     compraEntidad.getDescuento(),
                     compraEntidad.getMetodoPago());
         });

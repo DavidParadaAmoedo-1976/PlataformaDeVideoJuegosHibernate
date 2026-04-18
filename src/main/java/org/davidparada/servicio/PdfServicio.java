@@ -22,7 +22,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class PdfServicio {
-
+    private final Double IVA = 0.21;
     public String generarFacturaPDF(FacturaDto factura) {
 
         // Ruta de las facturas
@@ -58,8 +58,8 @@ public class PdfServicio {
                     .setMarginBottom(5));
 
 
-    // Bloque inicio
-            float[] columnasInicio = {1,1};
+            // Bloque inicio
+            float[] columnasInicio = {1, 1};
             Table tablaInicio = new Table(UnitValue.createPercentArray(columnasInicio));
             tablaInicio.useAllAvailableWidth();
             tablaInicio.setBorder(Border.NO_BORDER);
@@ -67,8 +67,8 @@ public class PdfServicio {
             // Logo
             Image imagenLogo = new Image(imageData);
             imagenLogo.scaleToFit(100, 100);
-            DeviceRgb borderColor = new DeviceRgb(85, 150, 240);
-            imagenLogo.setBorder(new SolidBorder(borderColor, 2));
+            DeviceRgb colorBorde = new DeviceRgb(85, 150, 240);
+            imagenLogo.setBorder(new SolidBorder(colorBorde, 2));
 
             Cell logoCelda = new Cell()
                     .add(imagenLogo)
@@ -102,8 +102,8 @@ public class PdfServicio {
 
             document.add(linea);
 
-    // Bloque datos cliente
-            float[] columnasDatos = {1,1,1};
+            // Bloque datos cliente
+            float[] columnasDatos = {1, 1, 1};
             Table tablaDatos = new Table(UnitValue.createPercentArray(columnasDatos));
             tablaDatos.useAllAvailableWidth();
             tablaDatos.setBorder(Border.NO_BORDER);
@@ -114,25 +114,25 @@ public class PdfServicio {
                             .setBold()
                             .setTextAlignment(TextAlignment.CENTER)
                             .setFontSize(12))
-                            .setBorderTop(Border.NO_BORDER)
-                            .setBorderLeft(Border.NO_BORDER)
-                            .setBorderRight(Border.NO_BORDER);
+                    .setBorderTop(Border.NO_BORDER)
+                    .setBorderLeft(Border.NO_BORDER)
+                    .setBorderRight(Border.NO_BORDER);
             Cell cabecera2 = new Cell()
                     .add(new Paragraph("DETALLES")
                             .setBold()
                             .setTextAlignment(TextAlignment.CENTER)
                             .setFontSize(12))
-                            .setBorderTop(Border.NO_BORDER)
-                            .setBorderLeft(Border.NO_BORDER)
-                            .setBorderRight(Border.NO_BORDER);
+                    .setBorderTop(Border.NO_BORDER)
+                    .setBorderLeft(Border.NO_BORDER)
+                    .setBorderRight(Border.NO_BORDER);
             Cell cabecera3 = new Cell()
                     .add(new Paragraph("PAGO")
                             .setBold()
                             .setTextAlignment(TextAlignment.CENTER)
                             .setFontSize(12))
-                            .setBorderTop(Border.NO_BORDER)
-                            .setBorderLeft(Border.NO_BORDER)
-                            .setBorderRight(Border.NO_BORDER);
+                    .setBorderTop(Border.NO_BORDER)
+                    .setBorderLeft(Border.NO_BORDER)
+                    .setBorderRight(Border.NO_BORDER);
 
             tablaDatos.addCell(cabecera1);
             tablaDatos.addCell(cabecera2);
@@ -143,22 +143,22 @@ public class PdfServicio {
                     .add(new Paragraph(factura.nombreReal())
                             .setTextAlignment(TextAlignment.CENTER)
                             .setFontSize(10))
-                            .setBorder(Border.NO_BORDER));
+                    .setBorder(Border.NO_BORDER));
             tablaDatos.addCell(new Cell()
                     .add(new Paragraph("")
                             .setTextAlignment(TextAlignment.CENTER)
                             .setFontSize(10))
-                            .setBorder(Border.NO_BORDER));
+                    .setBorder(Border.NO_BORDER));
             tablaDatos.addCell(new Cell()
                     .add(new Paragraph(factura.metodoPago().toString())
                             .setTextAlignment(TextAlignment.CENTER)
                             .setFontSize(10))
-                            .setBorder(Border.NO_BORDER));
+                    .setBorder(Border.NO_BORDER));
 
 
             document.add(tablaDatos);
 
-        // Separador
+            // Separador
             LineSeparator linea2 = new LineSeparator(separador);
             linea2.setWidth(UnitValue.createPercentValue(100));
             linea2.setMarginTop(70);
@@ -166,56 +166,170 @@ public class PdfServicio {
 
             document.add(linea2);
 
-    // Bloque de datos juego
-            float[] columnasJuego = {2,1,1};
+            // Bloque de datos juego
+            float[] columnasJuego = {2, 1, 1, 1};
             Table tablaJuego = new Table(UnitValue.createPercentArray(columnasJuego));
             tablaJuego.useAllAvailableWidth();
             tablaJuego.setBorder(Border.NO_BORDER);
 
 
             // Cabeceras
+            DeviceRgb colorRelleno = new DeviceRgb(135, 200, 240);
             Cell cabecera11 = new Cell()
                     .add(new Paragraph("TITULO")
                             .setBold()
                             .setTextAlignment(TextAlignment.CENTER)
-                            .setBackgroundColor(borderColor)
+                            .setBackgroundColor(colorRelleno)
                             .setFontSize(12));
             Cell cabecera12 = new Cell()
-                    .add(new Paragraph("DESCUENTO")
-                            .setBold()
-                            .setTextAlignment(TextAlignment.CENTER)
-                            .setBackgroundColor(borderColor)
-                            .setFontSize(12));
-            Cell cabecera13 = new Cell()
                     .add(new Paragraph("PRECIO")
                             .setBold()
                             .setTextAlignment(TextAlignment.CENTER)
-                            .setBackgroundColor(borderColor)
+                            .setBackgroundColor(colorRelleno)
+                            .setFontSize(12));
+            Cell cabecera13 = new Cell()
+                    .add(new Paragraph("DESCUENTO")
+                            .setBold()
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setBackgroundColor(colorRelleno)
+                            .setFontSize(12));
+            Cell cabecera14 = new Cell()
+                    .add(new Paragraph("IMPORTE")
+                            .setBold()
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setBackgroundColor(colorRelleno)
                             .setFontSize(12));
 
             tablaJuego.addCell(cabecera11);
             tablaJuego.addCell(cabecera12);
             tablaJuego.addCell(cabecera13);
+            tablaJuego.addCell(cabecera14);
 
             // Datos juego
+            DeviceRgb colorFactura1 = new DeviceRgb(220, 220, 220);
+            DeviceRgb colorFactura2 = new DeviceRgb(240, 240, 240);
+
             tablaJuego.addCell(new Cell()
                     .add(new Paragraph(factura.tituloJuego())
-                            .setTextAlignment(TextAlignment.CENTER)
+                            .setTextAlignment(TextAlignment.LEFT)
                             .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
+                    .setBorder(Border.NO_BORDER));
+            tablaJuego.addCell(new Cell()
+                    .add(new Paragraph(factura.precioBase().toString() + " €")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
                     .setBorder(Border.NO_BORDER));
             tablaJuego.addCell(new Cell()
                     .add(new Paragraph(factura.descuento().toString() + " %")
-                            .setTextAlignment(TextAlignment.CENTER)
+                            .setTextAlignment(TextAlignment.RIGHT)
                             .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
                     .setBorder(Border.NO_BORDER));
             tablaJuego.addCell(new Cell()
                     .add(new Paragraph(factura.importe().toString() + " €")
-                            .setTextAlignment(TextAlignment.CENTER)
+                            .setTextAlignment(TextAlignment.RIGHT)
                             .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
                     .setBorder(Border.NO_BORDER));
 
 
+            tablaJuego.addCell(new Cell()
+                    .add(new Paragraph("")
+                            .setTextAlignment(TextAlignment.LEFT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura2)
+                    .setBorder(Border.NO_BORDER));
+            tablaJuego.addCell(new Cell()
+                    .add(new Paragraph("")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura2)
+                    .setBorder(Border.NO_BORDER));
+            tablaJuego.addCell(new Cell()
+                    .add(new Paragraph("")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura2)
+                    .setBorder(Border.NO_BORDER));
+            tablaJuego.addCell(new Cell()
+                    .add(new Paragraph("")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura2)
+                    .setBorder(Border.NO_BORDER));
+
+            añadirCeldaVacia(tablaJuego, colorFactura2);
+            añadirCeldaVacia(tablaJuego, colorFactura2);
+            añadirCeldaVacia(tablaJuego, colorFactura2);
+            añadirCeldaVacia(tablaJuego, colorFactura2);
+
+            añadirCeldaVacia(tablaJuego, colorFactura1);
+            añadirCeldaVacia(tablaJuego, colorFactura1);
+            añadirCeldaVacia(tablaJuego, colorFactura1);
+            añadirCeldaVacia(tablaJuego, colorFactura1);
+
             document.add(tablaJuego);
+
+    // Desglose final
+
+            Double precioSinIva = factura.importe() - factura.importe() * IVA;
+            Double iva = factura.importe() * IVA;
+            DeviceRgb sinColor = new DeviceRgb(254, 254, 254);
+            float[] columnasDesglose = {2, 1, 1, 1};
+            Table tablaDesglose = new Table(UnitValue.createPercentArray(columnasDesglose));
+            tablaDesglose.useAllAvailableWidth();
+            tablaDesglose.setBorder(Border.NO_BORDER);
+
+            añadirCeldaVacia(tablaDesglose, sinColor);
+            añadirCeldaVacia(tablaDesglose, sinColor);
+            tablaDesglose.addCell(new Cell()
+                    .add(new Paragraph("Precio Base")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
+                    .setBorder(Border.NO_BORDER));
+            tablaDesglose.addCell(new Cell()
+                    .add(new Paragraph(precioSinIva + " €")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
+                    .setBorder(Border.NO_BORDER));
+
+            añadirCeldaVacia(tablaDesglose, sinColor);
+            añadirCeldaVacia(tablaDesglose, sinColor);
+            tablaDesglose.addCell(new Cell()
+                    .add(new Paragraph("IVA (21%)")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
+                    .setBorder(Border.NO_BORDER));
+            tablaDesglose.addCell(new Cell()
+                    .add(new Paragraph(iva + " €")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
+                    .setBorder(Border.NO_BORDER));
+
+            añadirCeldaVacia(tablaDesglose, sinColor);
+            añadirCeldaVacia(tablaDesglose, sinColor);
+            tablaDesglose.addCell(new Cell()
+                    .add(new Paragraph("TOTAL A PAGAR")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
+                    .setBorder(Border.NO_BORDER));
+            tablaDesglose.addCell(new Cell()
+                    .add(new Paragraph(factura.importe() + " €")
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setFontSize(10))
+                    .setBackgroundColor(colorFactura1)
+                    .setBorder(Border.NO_BORDER));
+
+            tablaDesglose.setMarginTop(20);
+            tablaDesglose.setMarginBottom(15);
+            document.add(tablaDesglose);
 
             // Cerrar
             document.close();
@@ -226,6 +340,14 @@ public class PdfServicio {
             e.printStackTrace();
         }
 
+
         return ruta;
+    }
+
+    private void añadirCeldaVacia(Table tabla, DeviceRgb color) {
+        tabla.addCell(new Cell()
+                .add(new Paragraph("\u00a0").setFontSize(10))
+                .setBackgroundColor(color)
+                .setBorder(Border.NO_BORDER));
     }
 }

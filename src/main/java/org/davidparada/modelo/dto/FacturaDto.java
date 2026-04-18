@@ -11,6 +11,7 @@ public record FacturaDto(String numeroFactura,
                          String email,
                          Instant fechaEmision,
                          Double importe,
+                         Double precioBase,
                          Integer descuento,
                          MetodoPagoEnum metodoPago) {
 }
