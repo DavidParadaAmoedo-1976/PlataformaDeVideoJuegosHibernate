@@ -77,10 +77,10 @@ public class MainCompra {
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "userCompra0",
-                    "compra0@email.com",
+                    "userCompra4",
+                    "compra4@email.com",
                     "1234Password",
-                    "Nombre Apellido",
+                    "Nombre Para Factura",
                     PaisEnum.ESPANA,
                     LocalDate.of(2000, 1, 1),
                     Instant.now(),

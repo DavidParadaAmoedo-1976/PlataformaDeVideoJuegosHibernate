@@ -48,7 +48,7 @@ public class CompraFormValidador {
 
         // Descuento
 
-        ValidacionesComunes.valorFueraDeRango("descuento", form.getPrecioBase(), DESCUENTO_MIN, DESCUENTO_MAX, errores);
+        ValidacionesComunes.valorFueraDeRango("descuento", form.getDescuento(), DESCUENTO_MIN, DESCUENTO_MAX, errores);
 
         // Estado
 

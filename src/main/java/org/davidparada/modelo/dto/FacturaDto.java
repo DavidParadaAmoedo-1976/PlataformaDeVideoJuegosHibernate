@@ -6,6 +6,7 @@ import java.time.Instant;
 
 public record FacturaDto(String numeroFactura,
                          Long idCompra,
+                         String tituloJuego,
                          String nombreReal,
                          String email,
                          Instant fechaEmision,

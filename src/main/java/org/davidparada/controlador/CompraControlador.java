@@ -446,11 +446,12 @@ public class CompraControlador implements ICompraControlador {
         return gestorTransacciones.inTransaction(() -> {
             CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
             UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(compraEntidad.getIdUsuario(), errores);
-            obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(), errores);
+            JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(), errores);
 
             String numeroFactura = generarNumeroFactura(idCompra);
             return new FacturaDto(numeroFactura,
                     idCompra,
+                    juegoEntidad.getTitulo(),
                     usuarioEntidad.getNombreReal(),
                     usuarioEntidad.getEmail(),
                     compraEntidad.getFechaCompra(),
