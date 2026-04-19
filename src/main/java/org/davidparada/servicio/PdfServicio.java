@@ -343,7 +343,7 @@ public class PdfServicio {
         return ruta;
     }
 
-    private void anadirCeldaVacia(Table tabla, DeviceRgb color) {
+    private static void anadirCeldaVacia(Table tabla, DeviceRgb color) {
         tabla.addCell(new Cell()
                 .add(new Paragraph("\u00a0").setFontSize(10))
                 .setBackgroundColor(color)
