@@ -4,6 +4,7 @@ import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.exceptions.PdfException;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -18,11 +19,13 @@ import com.itextpdf.layout.properties.VerticalAlignment;
 import org.davidparada.modelo.dto.FacturaDto;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class PdfServicio {
-    private final Double IVA = 0.21;
+    private static final Double IVA = 0.21;
     public String generarFacturaPDF(FacturaDto factura) {
 
         // Ruta de las facturas
@@ -30,7 +33,6 @@ public class PdfServicio {
 
         // Ruta de la imagen
         String rutaImagen = "src/main/resources/imagen/logo.png";
-
 
         try {
             // Crea directorio
@@ -40,7 +42,6 @@ public class PdfServicio {
             PdfWriter writer = new PdfWriter(ruta);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf, PageSize.A4);
-
 
             // CARGAR IMAGEN
             ImageData imageData = ImageDataFactory.create(rutaImagen);
@@ -56,7 +57,6 @@ public class PdfServicio {
                     .setFontSize(24)
                     .setTextAlignment(TextAlignment.CENTER)
                     .setMarginBottom(5));
-
 
             // Bloque inicio
             float[] columnasInicio = {1, 1};
@@ -155,7 +155,6 @@ public class PdfServicio {
                             .setFontSize(10))
                     .setBorder(Border.NO_BORDER));
 
-
             document.add(tablaDatos);
 
             // Separador
@@ -171,7 +170,6 @@ public class PdfServicio {
             Table tablaJuego = new Table(UnitValue.createPercentArray(columnasJuego));
             tablaJuego.useAllAvailableWidth();
             tablaJuego.setBorder(Border.NO_BORDER);
-
 
             // Cabeceras
             DeviceRgb colorRelleno = new DeviceRgb(135, 200, 240);
@@ -234,7 +232,6 @@ public class PdfServicio {
                     .setBackgroundColor(colorFactura1)
                     .setBorder(Border.NO_BORDER));
 
-
             tablaJuego.addCell(new Cell()
                     .add(new Paragraph("")
                             .setTextAlignment(TextAlignment.LEFT)
@@ -260,15 +257,15 @@ public class PdfServicio {
                     .setBackgroundColor(colorFactura2)
                     .setBorder(Border.NO_BORDER));
 
-            añadirCeldaVacia(tablaJuego, colorFactura2);
-            añadirCeldaVacia(tablaJuego, colorFactura2);
-            añadirCeldaVacia(tablaJuego, colorFactura2);
-            añadirCeldaVacia(tablaJuego, colorFactura2);
+            anadirCeldaVacia(tablaJuego, colorFactura2);
+            anadirCeldaVacia(tablaJuego, colorFactura2);
+            anadirCeldaVacia(tablaJuego, colorFactura2);
+            anadirCeldaVacia(tablaJuego, colorFactura2);
 
-            añadirCeldaVacia(tablaJuego, colorFactura1);
-            añadirCeldaVacia(tablaJuego, colorFactura1);
-            añadirCeldaVacia(tablaJuego, colorFactura1);
-            añadirCeldaVacia(tablaJuego, colorFactura1);
+            anadirCeldaVacia(tablaJuego, colorFactura1);
+            anadirCeldaVacia(tablaJuego, colorFactura1);
+            anadirCeldaVacia(tablaJuego, colorFactura1);
+            anadirCeldaVacia(tablaJuego, colorFactura1);
 
             document.add(tablaJuego);
 
@@ -282,8 +279,8 @@ public class PdfServicio {
             tablaDesglose.useAllAvailableWidth();
             tablaDesglose.setBorder(Border.NO_BORDER);
 
-            añadirCeldaVacia(tablaDesglose, sinColor);
-            añadirCeldaVacia(tablaDesglose, sinColor);
+            anadirCeldaVacia(tablaDesglose, sinColor);
+            anadirCeldaVacia(tablaDesglose, sinColor);
             tablaDesglose.addCell(new Cell()
                     .add(new Paragraph("Precio Base")
                             .setTextAlignment(TextAlignment.RIGHT)
@@ -297,8 +294,8 @@ public class PdfServicio {
                     .setBackgroundColor(colorFactura1)
                     .setBorder(Border.NO_BORDER));
 
-            añadirCeldaVacia(tablaDesglose, sinColor);
-            añadirCeldaVacia(tablaDesglose, sinColor);
+            anadirCeldaVacia(tablaDesglose, sinColor);
+            anadirCeldaVacia(tablaDesglose, sinColor);
             tablaDesglose.addCell(new Cell()
                     .add(new Paragraph("IVA (21%)")
                             .setTextAlignment(TextAlignment.RIGHT)
@@ -312,8 +309,8 @@ public class PdfServicio {
                     .setBackgroundColor(colorFactura1)
                     .setBorder(Border.NO_BORDER));
 
-            añadirCeldaVacia(tablaDesglose, sinColor);
-            añadirCeldaVacia(tablaDesglose, sinColor);
+            anadirCeldaVacia(tablaDesglose, sinColor);
+            anadirCeldaVacia(tablaDesglose, sinColor);
             tablaDesglose.addCell(new Cell()
                     .add(new Paragraph("TOTAL A PAGAR")
                             .setTextAlignment(TextAlignment.RIGHT)
@@ -336,15 +333,17 @@ public class PdfServicio {
 
             System.out.println("PDF generado correctamente");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
+            } catch (FileNotFoundException e) {
+                System.err.println("No se pudo crear el archivo PDF: " + e.getMessage());
+            } catch (IOException e) {
+                System.err.println("Error al leer recursos (imagen): " + e.getMessage());
+            } catch (PdfException e) {
+                System.err.println("Error generando el PDF: " + e.getMessage());
+            }
         return ruta;
     }
 
-    private void añadirCeldaVacia(Table tabla, DeviceRgb color) {
+    private void anadirCeldaVacia(Table tabla, DeviceRgb color) {
         tabla.addCell(new Cell()
                 .add(new Paragraph("\u00a0").setFontSize(10))
                 .setBackgroundColor(color)
