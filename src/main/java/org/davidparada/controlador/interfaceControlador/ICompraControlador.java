@@ -2,7 +2,6 @@ package org.davidparada.controlador.interfaceControlador;
 
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.CompraDto;
-import org.davidparada.modelo.dto.DetallesCompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.enums.MetodoPagoEnum;
 
@@ -61,7 +60,7 @@ public interface ICompraControlador {
      * @return Muestra un objeto DTO.
      * @throws ValidationException
      */
-    DetallesCompraDto detallesDeUnaCompra(Long idCompra, Long idUsuario) throws ValidationException;
+    CompraDto detallesDeUnaCompra(Long idCompra, Long idUsuario) throws ValidationException;
 
     /**
      * Reembolsa el dinero pagado por un juego. Siempre reembolsa a cartera.

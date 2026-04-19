@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter;
 
 public class PdfServicio {
     private static final Double IVA = 0.21;
-    public String generarFacturaPDF(FacturaDto factura) {
+    public static String generarFacturaPDF(FacturaDto factura) {
 
         // Ruta de las facturas
         String ruta = "facturas/factura_" + factura.numeroFactura() + "_TeisGame.pdf";

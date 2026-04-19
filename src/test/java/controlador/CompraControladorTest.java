@@ -5,7 +5,6 @@ import org.davidparada.controlador.CompraControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.CompraDto;
-import org.davidparada.modelo.dto.DetallesCompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.entidad.CompraEntidad;
 import org.davidparada.modelo.entidad.JuegoEntidad;
@@ -545,14 +544,13 @@ class CompraControladorTest {
                 )
         );
 
-        DetallesCompraDto detalles =
+        CompraDto detalles =
                 compraControlador.detallesDeUnaCompra(
                         compra.getIdCompra(),
                         usuario.getIdUsuario()
                 );
 
         assertNotNull(detalles);
-        assertNotNull(detalles.facturaDto());
     }
 
 // =========================

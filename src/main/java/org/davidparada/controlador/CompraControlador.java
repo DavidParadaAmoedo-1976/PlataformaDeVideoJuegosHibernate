@@ -4,9 +4,7 @@ import org.davidparada.controlador.interfaceControlador.ICompraControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.CompraDto;
-import org.davidparada.modelo.dto.DetallesCompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
-import org.davidparada.modelo.dto.JuegoDto;
 import org.davidparada.modelo.entidad.BibliotecaEntidad;
 import org.davidparada.modelo.entidad.CompraEntidad;
 import org.davidparada.modelo.entidad.JuegoEntidad;
@@ -23,6 +21,7 @@ import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
 import org.davidparada.repositorio.interfaceRepositorio.ICompraRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
+import org.davidparada.servicio.PdfServicio;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 
 import java.time.Duration;
@@ -57,7 +56,8 @@ public class CompraControlador implements ICompraControlador {
                              IJuegoRepo juegoRepo,
                              IBibliotecaRepo bibliotecaRepo,
                              BibliotecaControlador bibliotecaControlador,
-                             ObtenerEntidadesOptional obtenerEntidades, IGestorTransacciones gestorTransacciones) {
+                             ObtenerEntidadesOptional obtenerEntidades,
+                             IGestorTransacciones gestorTransacciones) {
 
         this.compraRepo = compraRepo;
         this.usuarioRepo = usuarioRepo;
@@ -244,7 +244,7 @@ public class CompraControlador implements ICompraControlador {
                     nuevoSaldo,
                     usuarioEntidad.getEstadoCuenta());
         }
-//        UsuarioFormValidador.validarUsuario(usuarioActualizado);
+
         usuarioRepo.actualizar(compraEntidad.getIdUsuario(), usuarioActualizado);
 
         completarCompra(compraEntidad);
@@ -333,7 +333,7 @@ public class CompraControlador implements ICompraControlador {
 
     // Consultar detalles de una compra
     @Override
-    public DetallesCompraDto detallesDeUnaCompra(Long idCompra, Long idUsuario) throws ValidationException {
+    public CompraDto detallesDeUnaCompra(Long idCompra, Long idUsuario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
         if (idCompra == null) {
             errores.add(new ErrorModel("idCompra", TipoErrorEnum.OBLIGATORIO));
@@ -350,16 +350,11 @@ public class CompraControlador implements ICompraControlador {
             CompraEntidad compraEntidad = obtenerEntidades.obtenerCompraUsuario(idCompra, idUsuario, errores);
             // Busco el juego asociado a esa compra
             JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(), errores);
-            CompraDto compraDto = CompraEntidadADtoMapper.compraEntidadADto(
+            return CompraEntidadADtoMapper.compraEntidadADto(
                     compraEntidad,
                     usuarioEntidad,
                     juegoEntidad
             );
-            JuegoDto juegoDto = JuegoEntidadADtoMapper.juegoEntidadADto(juegoEntidad);
-
-            FacturaDto facturaDto = generarFactura(idCompra);
-
-            return new DetallesCompraDto(compraDto, juegoDto, facturaDto);
         });
     }
 
@@ -445,11 +440,16 @@ public class CompraControlador implements ICompraControlador {
 
         return gestorTransacciones.inTransaction(() -> {
             CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
+            if (!compraEntidad.getEstadoCompra().equals(EstadoCompraEnum.COMPLETADA)){
+                errores.add(new ErrorModel("estadoCompra", TipoErrorEnum.ESTADO_INCORRECTO));
+            }
+            comprobarListaErrores(errores);
+
             UsuarioEntidad usuarioEntidad = obtenerEntidades.obtenerUsuario(compraEntidad.getIdUsuario(), errores);
             JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(), errores);
 
             String numeroFactura = generarNumeroFactura(idCompra);
-            return new FacturaDto(numeroFactura,
+            FacturaDto factura =  new FacturaDto(numeroFactura,
                     idCompra,
                     juegoEntidad.getTitulo(),
                     usuarioEntidad.getNombreReal(),
@@ -459,6 +459,9 @@ public class CompraControlador implements ICompraControlador {
                     compraEntidad.getPrecioBase(),
                     compraEntidad.getDescuento(),
                     compraEntidad.getMetodoPago());
+
+            PdfServicio.generarFacturaPDF(factura);
+            return factura;
         });
     }
 
@@ -474,6 +477,7 @@ public class CompraControlador implements ICompraControlador {
         );
         compraRepo.actualizar(compraEntidad.getIdCompra(), nuevaCompra);
         bibliotecaControlador.anadirJuego(compraEntidad.getIdUsuario(), compraEntidad.getIdJuego());
+        generarFactura(compraEntidad.getIdCompra());
     }
 
     public boolean estadoJuegoValido(EstadoJuegoEnum estado) {
@@ -496,16 +500,4 @@ public class CompraControlador implements ICompraControlador {
                 .getYear();
         return anio + "-" + String.format("%06d", idCompra);
     }
-
-//    public String generarFacturaPDF(Long idCompra) throws ValidationException {
-//
-//        // 1. Generar datos de factura
-//        FacturaDto factura = generarFactura(idCompra);
-//
-//        // 2. Generar PDF
-//        PdfServicio pdfService = new PdfServicio();
-//        String ruta = pdfService.generarFacturaPDF(factura);
-//
-//        return ruta;
-//    }
 }

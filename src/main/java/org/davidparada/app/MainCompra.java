@@ -6,7 +6,6 @@ import org.davidparada.controlador.UsuarioControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.CompraDto;
-import org.davidparada.modelo.dto.DetallesCompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.dto.UsuarioDto;
 import org.davidparada.modelo.enums.EstadoCuentaEnum;
@@ -159,7 +158,7 @@ public class MainCompra {
             // =========================
             System.out.println("\n📦 Detalles compra:");
 
-            DetallesCompraDto detalles =
+            CompraDto detalles =
                     compraControlador.detallesDeUnaCompra(idCompra, idUsuario);
 
             System.out.println(detalles);
