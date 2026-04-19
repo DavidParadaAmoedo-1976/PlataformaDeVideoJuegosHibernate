@@ -17,6 +17,7 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.davidparada.modelo.dto.FacturaDto;
+import org.davidparada.modelo.enums.EstadoCompraEnum;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -327,6 +328,17 @@ public class PdfServicio {
             tablaDesglose.setMarginTop(20);
             tablaDesglose.setMarginBottom(15);
             document.add(tablaDesglose);
+
+
+    // Estado compra
+            String mensaje = factura.estadoCompra().equals(EstadoCompraEnum.COMPLETADA) ? "PAGADA" : "REEMBOLSADA";
+            document.add(new Paragraph().add(new Text(mensaje)
+                    .setBold())
+                    .setFontSize(30)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontColor(ColorConstants.RED)
+                    .setMarginTop(175));
+
 
             // Cerrar
             document.close();

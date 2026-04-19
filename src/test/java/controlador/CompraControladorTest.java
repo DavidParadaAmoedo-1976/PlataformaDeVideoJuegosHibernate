@@ -1,5 +1,6 @@
 package controlador;
 
+import com.itextpdf.commons.utils.JsonUtil;
 import org.davidparada.controlador.BibliotecaControlador;
 import org.davidparada.controlador.CompraControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
@@ -27,6 +28,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -97,6 +99,7 @@ class CompraControladorTest {
         assertNotNull(dto);
         assertEquals(usuario.getIdUsuario(), dto.idUsuario());
     }
+
 
     @Test
     void realizarCompra_DescuentoNegativo_LanzaValidationException() throws Exception {
@@ -637,10 +640,12 @@ class CompraControladorTest {
                         MetodoPagoEnum.PAYPAL,
                         50.0,
                         0,
-                        EstadoCompraEnum.COMPLETADA
+                        EstadoCompraEnum.PENDIENTE
                 )
         );
-
+        compraControlador.procesarPago(compra.getIdCompra(), MetodoPagoEnum.TARJETA);
+//        Optional<CompraEntidad> compraActualizada  = compraRepoMemoria. buscarPorId(compra.getIdCompra());
+//        System.out.println("************************" + compraActualizada.get().getEstadoCompra());
         FacturaDto factura =
                 compraControlador.generarFactura(compra.getIdCompra());
 

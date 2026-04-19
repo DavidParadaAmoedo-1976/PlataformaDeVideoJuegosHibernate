@@ -425,6 +425,9 @@ public class CompraControlador implements ICompraControlador {
             // Quitar juego de la biblioteca
             bibliotecaControlador.eliminarJuego(compraEntidad.getIdUsuario(), compraEntidad.getIdJuego());
 
+            // Modificar Factura
+            generarFactura(idCompra);
+
             return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad, usuarioEntidad, juegoEntidad);
         });
     }
@@ -440,7 +443,7 @@ public class CompraControlador implements ICompraControlador {
 
         return gestorTransacciones.inTransaction(() -> {
             CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
-            if (!compraEntidad.getEstadoCompra().equals(EstadoCompraEnum.COMPLETADA)){
+            if (!compraEntidad.getEstadoCompra().equals(EstadoCompraEnum.COMPLETADA) && !compraEntidad.getEstadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)){
                 errores.add(new ErrorModel("estadoCompra", TipoErrorEnum.ESTADO_INCORRECTO));
             }
             comprobarListaErrores(errores);
@@ -458,7 +461,8 @@ public class CompraControlador implements ICompraControlador {
                     precioFinal(compraEntidad.getPrecioBase(), compraEntidad.getDescuento()),
                     compraEntidad.getPrecioBase(),
                     compraEntidad.getDescuento(),
-                    compraEntidad.getMetodoPago());
+                    compraEntidad.getMetodoPago(),
+                    compraEntidad.getEstadoCompra());
 
             PdfServicio.generarFacturaPDF(factura);
             return factura;

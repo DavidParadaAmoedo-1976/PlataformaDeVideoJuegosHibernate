@@ -1,5 +1,6 @@
 package org.davidparada.modelo.dto;
 
+import org.davidparada.modelo.enums.EstadoCompraEnum;
 import org.davidparada.modelo.enums.MetodoPagoEnum;
 
 import java.time.Instant;
@@ -13,5 +14,6 @@ public record FacturaDto(String numeroFactura,
                          Double importe,
                          Double precioBase,
                          Integer descuento,
-                         MetodoPagoEnum metodoPago) {
+                         MetodoPagoEnum metodoPago,
+                         EstadoCompraEnum estadoCompra) {
 }
