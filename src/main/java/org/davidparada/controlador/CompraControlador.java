@@ -1,5 +1,6 @@
 package org.davidparada.controlador;
 
+import org.davidparada.controlador.interfaceControlador.IBibliotecaControlador;
 import org.davidparada.controlador.interfaceControlador.ICompraControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
@@ -47,7 +48,7 @@ public class CompraControlador implements ICompraControlador {
     private final IUsuarioRepo usuarioRepo;
     private final IJuegoRepo juegoRepo;
     private final IBibliotecaRepo bibliotecaRepo;
-    private final BibliotecaControlador bibliotecaControlador;
+    private final IBibliotecaControlador bibliotecaControlador;
     private final ObtenerEntidadesOptional obtenerEntidades;
     private final IGestorTransacciones gestorTransacciones;
 
@@ -55,7 +56,7 @@ public class CompraControlador implements ICompraControlador {
                              IUsuarioRepo usuarioRepo,
                              IJuegoRepo juegoRepo,
                              IBibliotecaRepo bibliotecaRepo,
-                             BibliotecaControlador bibliotecaControlador,
+                             IBibliotecaControlador bibliotecaControlador,
                              ObtenerEntidadesOptional obtenerEntidades,
                              IGestorTransacciones gestorTransacciones) {
 
@@ -443,7 +444,7 @@ public class CompraControlador implements ICompraControlador {
 
         return gestorTransacciones.inTransaction(() -> {
             CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
-            if (!compraEntidad.getEstadoCompra().equals(EstadoCompraEnum.COMPLETADA) && !compraEntidad.getEstadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)){
+            if (!compraEntidad.getEstadoCompra().equals(EstadoCompraEnum.COMPLETADA) && !compraEntidad.getEstadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)) {
                 errores.add(new ErrorModel("estadoCompra", TipoErrorEnum.ESTADO_INCORRECTO));
             }
             comprobarListaErrores(errores);
@@ -452,7 +453,7 @@ public class CompraControlador implements ICompraControlador {
             JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(), errores);
 
             String numeroFactura = generarNumeroFactura(idCompra);
-            FacturaDto factura =  new FacturaDto(numeroFactura,
+            FacturaDto factura = new FacturaDto(numeroFactura,
                     idCompra,
                     juegoEntidad.getTitulo(),
                     usuarioEntidad.getNombreReal(),

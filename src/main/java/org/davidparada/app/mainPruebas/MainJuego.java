@@ -1,4 +1,4 @@
-package org.davidparada.app;
+package org.davidparada.app.mainPruebas;
 
 import org.davidparada.controlador.JuegoControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;

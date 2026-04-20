@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 
 public class PdfServicio {
     private static final Double IVA = 0.21;
+
     public static String generarFacturaPDF(FacturaDto factura) {
 
         // Ruta de las facturas
@@ -270,7 +271,7 @@ public class PdfServicio {
 
             document.add(tablaJuego);
 
-    // Desglose final
+            // Desglose final
 
             Double precioSinIva = factura.importe() - factura.importe() * IVA;
             Double iva = factura.importe() * IVA;
@@ -330,10 +331,10 @@ public class PdfServicio {
             document.add(tablaDesglose);
 
 
-    // Estado compra
+            // Estado compra
             String mensaje = factura.estadoCompra().equals(EstadoCompraEnum.COMPLETADA) ? "PAGADA" : "REEMBOLSADA";
             document.add(new Paragraph().add(new Text(mensaje)
-                    .setBold())
+                            .setBold())
                     .setFontSize(30)
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFontColor(ColorConstants.RED)
@@ -345,13 +346,13 @@ public class PdfServicio {
 
             System.out.println("PDF generado correctamente");
 
-            } catch (FileNotFoundException e) {
-                System.err.println("No se pudo crear el archivo PDF: " + e.getMessage());
-            } catch (IOException e) {
-                System.err.println("Error al leer recursos (imagen): " + e.getMessage());
-            } catch (PdfException e) {
-                System.err.println("Error generando el PDF: " + e.getMessage());
-            }
+        } catch (FileNotFoundException e) {
+            System.err.println("No se pudo crear el archivo PDF: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error al leer recursos (imagen): " + e.getMessage());
+        } catch (PdfException e) {
+            System.err.println("Error generando el PDF: " + e.getMessage());
+        }
         return ruta;
     }
 

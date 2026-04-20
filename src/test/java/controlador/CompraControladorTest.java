@@ -1,6 +1,5 @@
 package controlador;
 
-import com.itextpdf.commons.utils.JsonUtil;
 import org.davidparada.controlador.BibliotecaControlador;
 import org.davidparada.controlador.CompraControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
@@ -28,7 +27,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
