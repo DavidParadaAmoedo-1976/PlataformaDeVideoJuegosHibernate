@@ -376,7 +376,7 @@ public class CompraControlador implements ICompraControlador {
         }
         comprobarListaErrores(errores);
 
-        return gestorTransacciones.inTransaction(() -> {
+        CompraDto compraDto =  gestorTransacciones.inTransaction(() -> {
             CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
             if (compraEntidad.getEstadoCompra() != EstadoCompraEnum.COMPLETADA) {
                 errores.add(new ErrorModel("estado", TipoErrorEnum.NO_PERMITIDO));
@@ -434,6 +434,8 @@ public class CompraControlador implements ICompraControlador {
 
             return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad, usuarioEntidad, juegoEntidad);
         });
+        generarFactura(compraDto.idCompra());
+        return compraDto;
     }
 
     // Generar factura
