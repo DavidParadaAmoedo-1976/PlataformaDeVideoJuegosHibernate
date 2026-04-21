@@ -64,7 +64,7 @@ public class DatosPrueba {
                         UsuarioDto usuario = usuarioCtrl.registrarUsuario(new UsuarioForm(
                                 "usuario" + i,
                                 "usuario" + i + "@mail.com",
-                                "1234Password" + i,
+                                "1234Password",
                                 "Nombre Real " + i,
                                 PaisEnum.ESPANA,
                                 LocalDate.of(random.nextInt(1990, 2000), 5, 10),

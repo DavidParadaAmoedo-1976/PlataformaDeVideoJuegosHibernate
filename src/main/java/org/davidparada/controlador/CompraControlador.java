@@ -161,7 +161,7 @@ public class CompraControlador implements ICompraControlador {
         comprobarListaErrores(errores);
 
         // Compruebo que exista el juego y esté apto para comprar.
-        return gestorTransacciones.inTransaction(() -> {
+        CompraDto compraDto =  gestorTransacciones.inTransaction(() -> {
 
             CompraEntidad compra = obtenerEntidades.obtenerCompra(idCompra, errores);
             if (compra.getEstadoCompra() == EstadoCompraEnum.COMPLETADA) {
@@ -192,9 +192,12 @@ public class CompraControlador implements ICompraControlador {
                     default -> throw new IllegalArgumentException("Método de pago no válido");
                 }
             }
-
             return CompraEntidadADtoMapper.compraEntidadADto(compra, usuario, juego);
         });
+
+        generarFactura(compraDto.idCompra());
+
+        return compraDto;
     }
 
     private void salir(Long idCompra) throws ValidationException {
@@ -362,7 +365,7 @@ public class CompraControlador implements ICompraControlador {
     // Solicitar reembolso
 
     /**
-     * El reembolso, se realiza siempre a cartera, no se devuelve el dinero
+     * El reembolso se realiza siempre a cartera, no se devuelve el dinero
      * por política de la empresa.
      */
     @Override
@@ -482,7 +485,6 @@ public class CompraControlador implements ICompraControlador {
         );
         compraRepo.actualizar(compraEntidad.getIdCompra(), nuevaCompra);
         bibliotecaControlador.anadirJuego(compraEntidad.getIdUsuario(), compraEntidad.getIdJuego());
-        generarFactura(compraEntidad.getIdCompra());
     }
 
     public boolean estadoJuegoValido(EstadoJuegoEnum estado) {
