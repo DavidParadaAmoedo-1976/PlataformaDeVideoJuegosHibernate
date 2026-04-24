@@ -74,14 +74,15 @@ public class JuegoFormValidador {
 
 
     private static void validarIdioma(List<String> idiomas, List<ErrorModel> errores) {
-        if (idiomas != null) {
-            if (idiomas.isEmpty()) {
-                errores.add(new ErrorModel("idiomas", TipoErrorEnum.RANGO_INVALIDO));
-            }
-            for (String idioma : idiomas) {
-                if (idioma.length() > LONGITUD_MAX_IDIOMA) {
-                    errores.add(new ErrorModel("idiomas", TipoErrorEnum.LONGITUD_EXCEDIDA));
-                }
+        if (idiomas == null) {
+            return;
+        }
+        if (idiomas.isEmpty()) {
+            errores.add(new ErrorModel("idiomas", TipoErrorEnum.RANGO_INVALIDO));
+        }
+        for (String idioma : idiomas) {
+            if (idioma.length() > LONGITUD_MAX_IDIOMA) {
+                errores.add(new ErrorModel("idiomas", TipoErrorEnum.LONGITUD_EXCEDIDA));
             }
         }
     }

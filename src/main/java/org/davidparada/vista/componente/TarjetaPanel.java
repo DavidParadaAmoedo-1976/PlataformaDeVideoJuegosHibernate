@@ -134,52 +134,52 @@
 //    }
 //
 //
-////    public void pintarTarjeta() {
-////        tituloLabel.setText(this.uiState.getTitulo());
-////        descripcionLabel.setText(this.uiState.getDescripcion());
-////        descuentoLabel.setText(this.uiState.getDescuentoTarjeta());
-////
-////        if (this.uiState.getEstado() == null || this.uiState.getEstado().isEmpty()) {
-////            estadoLabel.setVisible(false);
-////        } else {
-////            estadoLabel.setVisible(true);
-////            estadoLabel.setText(this.uiState.getEstado());
-////        }
-////
-////        if (this.descuentoLabel == null || descuentoLabel.getText().isEmpty()) {
-////            descuentoLabel.setVisible(true);
-////            precioLabel.setText(String.format("%.2f", this.uiState.getPrecio()));
-////
-////        } else {
-////            descuentoLabel.setVisible(true);
-////            precioLabel.setText(String.format("<html><strike>%.2f €</strike></html>",this.uiState.getPrecio() ));
-////
-////        }
-////
-////
-////        this.add(imagenLabel);
-////
-////        tituloPanel.add(tituloLabel);
-////        tituloPanel.add(estadoLabel);
-////        mainPanel.add(tituloPanel);
-////
-////        mainPanel.add(descripcionLabel);
-////
-////        botonesPanel.add(botonPricipal);
-////        botonesPanel.add(botonSecundario);
-////        botonesPanel.add(botonPeligro);
-////        mainPanel.add(botonesPanel);
-////        this.add(mainPanel);
-////
-////
-////        precioPanel.add(precioLabel);
-////        precioPanel.add(descuentoLabel);
-////        extrasPanel.add(precioPanel);
-////        extrasPanel.add(lenguajeLabel);
-////        this.add(extrasPanel);
-////
-////
-////    }
+/// /    public void pintarTarjeta() {
+/// /        tituloLabel.setText(this.uiState.getTitulo());
+/// /        descripcionLabel.setText(this.uiState.getDescripcion());
+/// /        descuentoLabel.setText(this.uiState.getDescuentoTarjeta());
+/// /
+/// /        if (this.uiState.getEstado() == null || this.uiState.getEstado().isEmpty()) {
+/// /            estadoLabel.setVisible(false);
+/// /        } else {
+/// /            estadoLabel.setVisible(true);
+/// /            estadoLabel.setText(this.uiState.getEstado());
+/// /        }
+/// /
+/// /        if (this.descuentoLabel == null || descuentoLabel.getText().isEmpty()) {
+/// /            descuentoLabel.setVisible(true);
+/// /            precioLabel.setText(String.format("%.2f", this.uiState.getPrecio()));
+/// /
+/// /        } else {
+/// /            descuentoLabel.setVisible(true);
+/// /            precioLabel.setText(String.format("<html><strike>%.2f €</strike></html>",this.uiState.getPrecio() ));
+/// /
+/// /        }
+/// /
+/// /
+/// /        this.add(imagenLabel);
+/// /
+/// /        tituloPanel.add(tituloLabel);
+/// /        tituloPanel.add(estadoLabel);
+/// /        mainPanel.add(tituloPanel);
+/// /
+/// /        mainPanel.add(descripcionLabel);
+/// /
+/// /        botonesPanel.add(botonPricipal);
+/// /        botonesPanel.add(botonSecundario);
+/// /        botonesPanel.add(botonPeligro);
+/// /        mainPanel.add(botonesPanel);
+/// /        this.add(mainPanel);
+/// /
+/// /
+/// /        precioPanel.add(precioLabel);
+/// /        precioPanel.add(descuentoLabel);
+/// /        extrasPanel.add(precioPanel);
+/// /        extrasPanel.add(lenguajeLabel);
+/// /        this.add(extrasPanel);
+/// /
+/// /
+/// /    }
 //public void pintarTarjeta() {
 //
 //    tituloLabel.setText(uiState.getTitulo());

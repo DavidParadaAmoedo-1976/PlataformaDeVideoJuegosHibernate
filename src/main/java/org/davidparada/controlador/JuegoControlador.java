@@ -19,6 +19,7 @@ import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
 
@@ -133,21 +134,22 @@ public class JuegoControlador implements IJuegoControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+            JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-            juegoRepo.actualizar(juego.getIdJuego(),
-                    new JuegoForm(juego.getTitulo(),
-                            juego.getDescripcion(),
-                            juego.getDesarrollador(),
-                            juego.getFechaLanzamiento(),
-                            juego.getPrecioBase(),
+            JuegoForm juegoActualizado =
+                    new JuegoForm(juegoEntidad.getTitulo(),
+                            juegoEntidad.getDescripcion(),
+                            juegoEntidad.getDesarrollador(),
+                            juegoEntidad.getFechaLanzamiento(),
+                            juegoEntidad.getPrecioBase(),
                             descuento,
-                            juego.getCategoria(),
-                            juego.getClasificacionPorEdad(),
-                            juego.getIdiomas(),
-                            juego.getEstado()
-                    ));
-            return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+                            juegoEntidad.getCategoria(),
+                            juegoEntidad.getClasificacionPorEdad(),
+                            juegoEntidad.getIdiomas(),
+                            juegoEntidad.getEstado()
+                    );
+            Optional<JuegoEntidad> juego = juegoRepo.actualizar(juegoEntidad.getIdJuego(), juegoActualizado);
+            return JuegoEntidadADtoMapper.juegoEntidadADto(juego.orElse(null));
         });
     }
 
@@ -164,22 +166,23 @@ public class JuegoControlador implements IJuegoControlador {
         comprobarListaErrores(errores);
 
         return gestorTransacciones.inTransaction(() -> {
-            JuegoEntidad juego = obtenerEntidades.obtenerJuego(idJuego, errores);
+            JuegoEntidad juegoEntidad = obtenerEntidades.obtenerJuego(idJuego, errores);
 
-            juegoRepo.actualizar(juego.getIdJuego(),
+            JuegoForm juegoActualizado =
                     new JuegoForm(
-                            juego.getTitulo(),
-                            juego.getDescripcion(),
-                            juego.getDesarrollador(),
-                            juego.getFechaLanzamiento(),
-                            juego.getPrecioBase(),
-                            juego.getDescuento(),
-                            juego.getCategoria(),
-                            juego.getClasificacionPorEdad(),
-                            juego.getIdiomas(),
+                            juegoEntidad.getTitulo(),
+                            juegoEntidad.getDescripcion(),
+                            juegoEntidad.getDesarrollador(),
+                            juegoEntidad.getFechaLanzamiento(),
+                            juegoEntidad.getPrecioBase(),
+                            juegoEntidad.getDescuento(),
+                            juegoEntidad.getCategoria(),
+                            juegoEntidad.getClasificacionPorEdad(),
+                            juegoEntidad.getIdiomas(),
                             nuevoEstado
-                    ));
-            return JuegoEntidadADtoMapper.juegoEntidadADto(juego);
+                    );
+            Optional<JuegoEntidad> juego = juegoRepo.actualizar(idJuego, juegoActualizado);
+            return JuegoEntidadADtoMapper.juegoEntidadADto(juego.orElse(null));
         });
     }
 
