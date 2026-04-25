@@ -16,8 +16,11 @@ public class JuegoEntidadADtoMapper {
         if (juego == null) {
             return null;
         }
+        List<String> idiomas = null;
+        if (juego.getIdiomas() != null) {
+            idiomas = new ArrayList<>(juego.getIdiomas());
+        }
 
-        List<String> idiomas = new ArrayList<>(juego.getIdiomas());
         return new JuegoDto(
                 juego.getIdJuego(),
                 juego.getTitulo(),

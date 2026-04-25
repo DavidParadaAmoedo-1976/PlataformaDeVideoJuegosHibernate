@@ -37,6 +37,25 @@ class JuegoControladorTest {
     }
 
     @Test
+    public void crearJuego_FormularioValido_IdiomasNulos_Permitido() throws ValidationException {
+        var form = new JuegoForm(
+                "Steam Workshop Creator",
+                "Descripción.",
+                "Valve",
+                LocalDate.now(),
+                0.0,
+                0,
+                "Herramientas",
+                ClasificacionJuegoEnum.PEGI_3,
+                null, // idiomas opcionales
+                EstadoJuegoEnum.DISPONIBLE);
+
+        var juego = juegoControlador.crearJuego(form);
+
+        assertNotNull(juego);
+    }
+
+    @Test
     void crearJuegoCorrectamente() throws ValidationException {
 
         JuegoForm form = new JuegoForm(

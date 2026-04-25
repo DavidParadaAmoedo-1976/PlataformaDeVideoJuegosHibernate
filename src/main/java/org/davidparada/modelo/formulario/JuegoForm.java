@@ -26,7 +26,8 @@ public class JuegoForm {
                      Integer descuento,
                      String categoria,
                      ClasificacionJuegoEnum clasificacionPorEdad,
-                     List<String> idiomas, EstadoJuegoEnum estado) {
+                     List<String> idiomas,
+                     EstadoJuegoEnum estado) {
 
         this.titulo = titulo;
         this.descripcion = descripcion;

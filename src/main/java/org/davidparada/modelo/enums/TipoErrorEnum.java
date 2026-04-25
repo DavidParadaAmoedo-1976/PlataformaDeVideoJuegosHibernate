@@ -15,7 +15,8 @@ public enum TipoErrorEnum {
     SALDO_INSUFICIENTE("Saldo insuficiente"),
     NO_COINCIDE("No coincide"),
     NO_DISPONIBLE("No disponible"),
-    OTRO("Otro");
+    OTRO("Otro"),
+    LISTA_VACIA("Lista vacia");
 
     private final String descripcion;
 

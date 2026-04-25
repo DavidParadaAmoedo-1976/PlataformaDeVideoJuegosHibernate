@@ -70,6 +70,9 @@ public class UsuarioFormValidador {
 
         // Pais
         ValidacionesComunes.obligatorio("pais", form.getPais(), errores);
+        if (!errores.isEmpty()) {
+            throw new ValidationException(errores);
+        }
         validarPaisEnLista(form.getPais().descripcion(), errores);
 
         // FechaNacimiento
@@ -88,12 +91,19 @@ public class UsuarioFormValidador {
     }
 
     private static void validarPaisEnLista(String pais, List<ErrorModel> errores) {
-        if (pais == null) {
+        if (pais == null || pais.isBlank()) {
             errores.add(new ErrorModel("pais", TipoErrorEnum.OBLIGATORIO));
+            return;
         }
-        try {
-        PaisEnum.valueOf(pais.toUpperCase());
-        } catch (IllegalArgumentException e) {
+        boolean encontrado = false;
+        for (PaisEnum p : PaisEnum.values()) {
+            if (p.descripcion().equalsIgnoreCase(pais)) {
+                encontrado = true;
+                break;
+            }
+        }
+
+        if (!encontrado) {
             errores.add(new ErrorModel("pais", TipoErrorEnum.NO_PERMITIDO));
         }
     }

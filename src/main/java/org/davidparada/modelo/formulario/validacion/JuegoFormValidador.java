@@ -78,7 +78,8 @@ public class JuegoFormValidador {
             return;
         }
         if (idiomas.isEmpty()) {
-            errores.add(new ErrorModel("idiomas", TipoErrorEnum.RANGO_INVALIDO));
+            errores.add(new ErrorModel("idiomas", TipoErrorEnum.LISTA_VACIA));
+            return;
         }
         for (String idioma : idiomas) {
             if (idioma.length() > LONGITUD_MAX_IDIOMA) {
