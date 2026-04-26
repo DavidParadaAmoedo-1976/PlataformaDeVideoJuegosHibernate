@@ -6,12 +6,14 @@ import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.CompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
+import org.davidparada.modelo.dto.JuegoDto;
 import org.davidparada.modelo.entidad.BibliotecaEntidad;
 import org.davidparada.modelo.entidad.CompraEntidad;
 import org.davidparada.modelo.entidad.JuegoEntidad;
 import org.davidparada.modelo.entidad.UsuarioEntidad;
 import org.davidparada.modelo.enums.*;
 import org.davidparada.modelo.formulario.CompraForm;
+import org.davidparada.modelo.formulario.JuegoForm;
 import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.modelo.formulario.validacion.CompraFormValidador;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
@@ -30,7 +32,10 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.davidparada.controlador.JuegoControlador.DESCUENTO_MAXIMO;
+import static org.davidparada.controlador.JuegoControlador.DESCUENTO_MINIMO;
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
 
 public class CompraControlador implements ICompraControlador {
@@ -150,6 +155,40 @@ public class CompraControlador implements ICompraControlador {
             return CompraEntidadADtoMapper.compraEntidadADto(compra, usuario, juego);
         });
     }
+
+//    @Override
+//    public CompraDto aplicarDescuento(Long idCompra, Integer descuento) throws ValidationException {
+//        List<ErrorModel> errores = new ArrayList<>();
+//        if (idCompra == null)
+//            errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
+//        comprobarListaErrores(errores);
+//
+//        if (descuento == null) {
+//            errores.add(new ErrorModel("descuento", TipoErrorEnum.OBLIGATORIO));
+//        } else if (descuento < DESCUENTO_MINIMO || descuento > DESCUENTO_MAXIMO) {
+//            errores.add(new ErrorModel("descuento", TipoErrorEnum.RANGO_INVALIDO));
+//        }
+//        comprobarListaErrores(errores);
+//
+//        return gestorTransacciones.inTransaction(() -> {
+//            CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
+//
+//            CompraForm compraActualizada = new CompraForm(
+//                    idCompra,
+//                    compraEntidad.getIdJuego(),
+//                    compraEntidad.getFechaCompra(),
+//                    compraEntidad.getMetodoPago(),
+//                    compraEntidad.getPrecioBase(),
+//                    descuento,
+//                    compraEntidad.getEstadoCompra()
+//            );
+//            Optional<CompraEntidad> compra = compraRepo.actualizar(idCompra, compraActualizada);
+//            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(compraEntidad.getIdUsuario(),errores);
+//            JuegoEntidad juego = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(),errores);
+//
+//            return CompraEntidadADtoMapper.compraEntidadADto(compra.orElse(null), usuario, juego);
+//        });
+//    }
 
     // Procesar pago
     @Override

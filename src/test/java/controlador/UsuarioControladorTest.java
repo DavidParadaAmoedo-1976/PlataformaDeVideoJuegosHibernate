@@ -280,6 +280,46 @@ class UsuarioControladorTest {
     }
 
     // ==========================
+    // PAIS
+    // ==========================
+
+//    @Test
+//    public void crearUsuarioDTO_FormularioInvalido_LanzaValidationException_PaisObligatorio() {
+//        var paisVacioForm = new UsuarioForm("usuario1",
+//                "usuario1@gmail.com",
+//                "12345678Aa@",
+//                "usuario1",
+//                "", // país obligatorio
+//                LocalDate.now().minusYears(10),
+//                Instant.now(),
+//                null,
+//                0.0,
+//                EstadoCuentaEnum.ACTIVA
+//        );
+//
+//        assertThrows(ValidationException.class,
+//                () -> usuarioControlador.registrarUsuario(paisVacioForm));
+//    }
+//
+//    @Test
+//    public void crearUsuarioDTO_FormularioInvalido_LanzaValidationException_PaisNoValido() {
+//        var paisInvalidoForm = new UsuarioForm("usuario1",
+//                "usuario1@gmail.com",
+//                "12345678Aa@",
+//                "usuario1",
+//                "Mordor", // país no válido en la lista predefinida
+//                LocalDate.now().minusYears(10),
+//                Instant.now(),
+//                null,
+//                0.0,
+//                EstadoCuentaEnum.ACTIVA
+//        );
+//
+//        assertThrows(ValidationException.class,
+//                () -> usuarioControlador.registrarUsuario(paisInvalidoForm));
+//    }
+
+    // ==========================
     // SALDO
     // ==========================
 

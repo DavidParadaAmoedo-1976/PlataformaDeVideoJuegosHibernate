@@ -3,6 +3,7 @@ package org.davidparada.controlador.interfaceControlador;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.CompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
+import org.davidparada.modelo.dto.JuegoDto;
 import org.davidparada.modelo.enums.MetodoPagoEnum;
 
 import java.util.List;
@@ -24,6 +25,8 @@ public interface ICompraControlador {
             Long idJuego,
             MetodoPagoEnum metodoPago
     ) throws ValidationException;
+
+//    CompraDto aplicarDescuento(Long idJuego, Integer descuento) throws ValidationException;
 
     /**
      * Realiza el pago de la compra recibida con el metodo de pago indicado.

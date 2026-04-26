@@ -90,10 +90,9 @@ public class UsuarioFormValidador {
         }
     }
 
-    private static void validarPaisEnLista(String pais, List<ErrorModel> errores) {
-        if (pais == null || pais.isBlank()) {
+    private static void validarPaisEnLista(String pais, List<ErrorModel> errores) throws ValidationException {
+        if (pais.isBlank()) {
             errores.add(new ErrorModel("pais", TipoErrorEnum.OBLIGATORIO));
-            return;
         }
         boolean encontrado = false;
         for (PaisEnum p : PaisEnum.values()) {
@@ -102,10 +101,10 @@ public class UsuarioFormValidador {
                 break;
             }
         }
-
         if (!encontrado) {
             errores.add(new ErrorModel("pais", TipoErrorEnum.NO_PERMITIDO));
         }
+
     }
 
     private static void validarNombreUsuario(String nombre, List<ErrorModel> errores) {

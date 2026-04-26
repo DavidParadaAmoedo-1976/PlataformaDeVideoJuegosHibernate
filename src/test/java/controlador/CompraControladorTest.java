@@ -651,6 +651,10 @@ class CompraControladorTest {
         assertEquals(compra.getIdCompra(), factura.idCompra());
     }
 
+
+
+
+
 // =========================
 // HELPERS
 // =========================

@@ -39,7 +39,13 @@ public class BibliotecaFormValidador {
         // Ultima fecha de juego
 
         // Estado de instalación
+
+        if (!errores.isEmpty()) {
+            throw new ValidationException(errores);
+        }
     }
+
+
 
     private static void validarUnSoloDecimal(String campo, Double valor, List<ErrorModel> errores) {
         if (valor == null) {
