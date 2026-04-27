@@ -47,7 +47,7 @@ public class CompraRepoMemoria implements ICompraRepo {
         comprasEntidad.remove(compraEntidad);
         comprasEntidad.add(nuevaCompra);
 
-        return Optional.of(nuevaCompra);
+        return buscarPorId(idEntidad);
     }
 
     @Override

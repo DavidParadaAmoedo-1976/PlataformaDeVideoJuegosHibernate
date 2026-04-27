@@ -651,9 +651,27 @@ class CompraControladorTest {
         assertEquals(compra.getIdCompra(), factura.idCompra());
     }
 
+// =========================
+// TESTS CLASE
+// =========================
+
+    @Test
+    public void rocesarPago_CompraYaCompletada_LanzaValidationException() throws ValidationException {
+        UsuarioEntidad usuario = crearUsuario();
+        JuegoEntidad juego = crearJuego();
+        var compra = compraControlador.realizarCompra(
+                usuario.getIdUsuario(),
+                juego.getIdJuego(),
+                MetodoPagoEnum.PAYPAL
+                );
 
 
+        compraControlador.procesarPago(compra.idCompra(), compra.metodoPago()); // primera vez: PENDIENTE → COMPLETADA
 
+        // Segunda vez no debe ser posible, ya no está en PENDIENTE
+        assertThrows(ValidationException.class,
+                () -> compraControlador.procesarPago(compra.idCompra(), compra.metodoPago()));
+    }
 
 // =========================
 // HELPERS
