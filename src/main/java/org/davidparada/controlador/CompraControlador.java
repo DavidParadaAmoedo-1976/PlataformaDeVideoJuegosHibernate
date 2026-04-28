@@ -234,7 +234,7 @@ public class CompraControlador implements ICompraControlador {
             return CompraEntidadADtoMapper.compraEntidadADto(compra, usuario, juego);
         });
 
-        generarFactura(compraDto.idCompra());
+//        generarFactura(compraDto.idCompra());
 
         return compraDto;
     }

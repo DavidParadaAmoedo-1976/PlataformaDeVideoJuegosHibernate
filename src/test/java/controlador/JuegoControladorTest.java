@@ -596,25 +596,6 @@ class JuegoControladorTest {
                 () -> juegoControlador.crearJuego(form));
     }
 
-    @Test
-    void crearJuego_fallaSiIdiomasVacio() {
-
-        JuegoForm form = new JuegoForm(
-                "Juego Test",
-                "Descripcion valida",
-                "Dev Studio",
-                LocalDate.of(2020, 1, 1),
-                50.0,
-                0,
-                "Accion",
-                ClasificacionJuegoEnum.PEGI_18,
-                new ArrayList<>(List.of()),
-                EstadoJuegoEnum.DISPONIBLE
-        );
-
-        assertThrows(ValidationException.class,
-                () -> juegoControlador.crearJuego(form));
-    }
 
 
 // ===============================
