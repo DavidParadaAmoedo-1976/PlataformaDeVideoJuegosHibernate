@@ -285,8 +285,7 @@ class CompraControladorTest {
         );
 
         compraControlador.procesarPago(
-                compra.getIdCompra(),
-                MetodoPagoEnum.TARJETA
+                compra.getIdCompra()
         );
 
         var actualizada = compraRepoMemoria.buscarPorId(compra.getIdCompra()).get();
@@ -376,8 +375,7 @@ class CompraControladorTest {
         assertThrows(
                 ValidationException.class,
                 () -> compraControlador.procesarPago(
-                        compra.get().getIdCompra(),
-                        MetodoPagoEnum.PAYPAL
+                        compra.get().getIdCompra()
                 )
         );
     }
@@ -388,8 +386,7 @@ class CompraControladorTest {
         assertThrows(
                 ValidationException.class,
                 () -> compraControlador.procesarPago(
-                        null,
-                        MetodoPagoEnum.PAYPAL
+                        null
                 )
         );
     }
@@ -400,8 +397,7 @@ class CompraControladorTest {
         assertThrows(
                 ValidationException.class,
                 () -> compraControlador.procesarPago(
-                        999L,
-                        MetodoPagoEnum.PAYPAL
+                        999L
                 )
         );
     }
@@ -577,8 +573,7 @@ class CompraControladorTest {
         );
 
         compraControlador.procesarPago(
-                compra.getIdCompra(),
-                MetodoPagoEnum.PAYPAL
+                compra.getIdCompra()
         );
 
         compraControlador.solicitarReembolso(compra.getIdCompra());
@@ -608,8 +603,7 @@ class CompraControladorTest {
         );
 
         compraControlador.procesarPago(
-                compra.getIdCompra(),
-                MetodoPagoEnum.PAYPAL
+                compra.getIdCompra()
         );
 
         compraControlador.solicitarReembolso(compra.getIdCompra());
@@ -641,7 +635,9 @@ class CompraControladorTest {
                         EstadoCompraEnum.PENDIENTE
                 )
         );
-        compraControlador.procesarPago(compra.getIdCompra(), MetodoPagoEnum.TARJETA);
+        compraControlador.procesarPago(
+                compra.getIdCompra()
+        );
 //        Optional<CompraEntidad> compraActualizada  = compraRepoMemoria. buscarPorId(compra.getIdCompra());
 //        System.out.println("************************" + compraActualizada.get().getEstadoCompra());
         FacturaDto factura =
@@ -666,11 +662,12 @@ class CompraControladorTest {
                 );
 
 
-        compraControlador.procesarPago(compra.idCompra(), compra.metodoPago()); // primera vez: PENDIENTE → COMPLETADA
+        compraControlador.procesarPago(compra.idCompra()); // primera vez: PENDIENTE → COMPLETADA
 
         // Segunda vez no debe ser posible, ya no está en PENDIENTE
         assertThrows(ValidationException.class,
-                () -> compraControlador.procesarPago(compra.idCompra(), compra.metodoPago()));
+                () -> compraControlador.procesarPago(compra.idCompra()
+                ));
     }
 
 // =========================

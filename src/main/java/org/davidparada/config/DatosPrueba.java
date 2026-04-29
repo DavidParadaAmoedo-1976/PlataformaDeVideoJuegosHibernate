@@ -123,7 +123,7 @@ public class DatosPrueba {
 
                 for (int i = 1; i <= 10; i++) {
                     if (i % 2 == 0) {
-                        compraCtrl.procesarPago((long) i, MetodoPagoEnum.TARJETA);
+                        compraCtrl.procesarPago((long) i);
                         System.out.println("✅ Compra PAGADA.");
                     } else {
                         System.out.println("⏳ Compra pendiente de pago.");

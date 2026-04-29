@@ -121,8 +121,7 @@ public class MainCompra {
             System.out.println("\n💳 Procesar pago:");
 
             CompraDto compraPagada = compraControlador.procesarPago(
-                    idCompra,
-                    MetodoPagoEnum.CARTERA_STEAM
+                    idCompra
             );
 
             System.out.println(compraPagada);

@@ -156,43 +156,9 @@ public class CompraControlador implements ICompraControlador {
         });
     }
 
-//    @Override
-//    public CompraDto aplicarDescuento(Long idCompra, Integer descuento) throws ValidationException {
-//        List<ErrorModel> errores = new ArrayList<>();
-//        if (idCompra == null)
-//            errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
-//        comprobarListaErrores(errores);
-//
-//        if (descuento == null) {
-//            errores.add(new ErrorModel("descuento", TipoErrorEnum.OBLIGATORIO));
-//        } else if (descuento < DESCUENTO_MINIMO || descuento > DESCUENTO_MAXIMO) {
-//            errores.add(new ErrorModel("descuento", TipoErrorEnum.RANGO_INVALIDO));
-//        }
-//        comprobarListaErrores(errores);
-//
-//        return gestorTransacciones.inTransaction(() -> {
-//            CompraEntidad compraEntidad = obtenerEntidades.obtenerCompra(idCompra, errores);
-//
-//            CompraForm compraActualizada = new CompraForm(
-//                    idCompra,
-//                    compraEntidad.getIdJuego(),
-//                    compraEntidad.getFechaCompra(),
-//                    compraEntidad.getMetodoPago(),
-//                    compraEntidad.getPrecioBase(),
-//                    descuento,
-//                    compraEntidad.getEstadoCompra()
-//            );
-//            Optional<CompraEntidad> compra = compraRepo.actualizar(idCompra, compraActualizada);
-//            UsuarioEntidad usuario = obtenerEntidades.obtenerUsuario(compraEntidad.getIdUsuario(),errores);
-//            JuegoEntidad juego = obtenerEntidades.obtenerJuego(compraEntidad.getIdJuego(),errores);
-//
-//            return CompraEntidadADtoMapper.compraEntidadADto(compra.orElse(null), usuario, juego);
-//        });
-//    }
-
     // Procesar pago
     @Override
-    public CompraDto procesarPago(Long idCompra, MetodoPagoEnum metodoPago) throws ValidationException {
+    public CompraDto procesarPago(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
         if (idCompra == null) {
             errores.add(new ErrorModel("id", TipoErrorEnum.NO_ENCONTRADO));
@@ -221,8 +187,9 @@ public class CompraControlador implements ICompraControlador {
             comprobarListaErrores(errores);
 
             // método de pago
-            if (metodoPago != null) {
-                switch (metodoPago) {
+
+            if (compra.getMetodoPago() != null) {
+                switch (compra.getMetodoPago()) {
                     case TARJETA -> pagoConTarjeta(idCompra);
                     case PAYPAL -> pagoConPaypal(idCompra);
                     case TRANSFERENCIA -> pagoConTransferencia(idCompra);
@@ -468,8 +435,8 @@ public class CompraControlador implements ICompraControlador {
             // Quitar juego de la biblioteca
             bibliotecaControlador.eliminarJuego(compraEntidad.getIdUsuario(), compraEntidad.getIdJuego());
 
-            // Modificar Factura
-            generarFactura(idCompra);
+//            // Modificar Factura
+//            generarFactura(idCompra);
 
             return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad, usuarioEntidad, juegoEntidad);
         });

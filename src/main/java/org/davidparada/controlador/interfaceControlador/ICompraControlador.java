@@ -32,10 +32,9 @@ public interface ICompraControlador {
      * Realiza el pago de la compra recibida con el metodo de pago indicado.
      *
      * @param idCompra
-     * @param metodoPago
      * @throws ValidationException
      */
-    CompraDto procesarPago(Long idCompra, MetodoPagoEnum metodoPago) throws ValidationException;
+    CompraDto procesarPago(Long idCompra) throws ValidationException;
 
     /**
      * Muestra todas las compras de un usuario recibido.
