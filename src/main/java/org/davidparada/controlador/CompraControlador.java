@@ -430,7 +430,7 @@ public class CompraControlador implements ICompraControlador {
                     compraEntidad.getDescuento(),
                     EstadoCompraEnum.REEMBOLSADA
             );
-            compraRepo.actualizar(idCompra, nuevaCompra);
+            Optional<CompraEntidad> compraActualizada = compraRepo.actualizar(idCompra, nuevaCompra);
 
             // Quitar juego de la biblioteca
             bibliotecaControlador.eliminarJuego(compraEntidad.getIdUsuario(), compraEntidad.getIdJuego());
@@ -438,9 +438,9 @@ public class CompraControlador implements ICompraControlador {
 //            // Modificar Factura
 //            generarFactura(idCompra);
 
-            return CompraEntidadADtoMapper.compraEntidadADto(compraEntidad, usuarioEntidad, juegoEntidad);
+            return CompraEntidadADtoMapper.compraEntidadADto(compraActualizada.get(), usuarioEntidad, juegoEntidad);
         });
-        generarFactura(compraDto.idCompra());
+//        generarFactura(compraDto.idCompra());
         return compraDto;
     }
 
