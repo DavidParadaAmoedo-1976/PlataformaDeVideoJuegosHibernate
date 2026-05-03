@@ -12,15 +12,16 @@ public class UI {
         VentanaPrincipal ventana = new VentanaPrincipal();
         Navegador nav = new Navegador(ventana);
 
+        PanelDetalleJuego panelDetalle = new PanelDetalleJuego(nav);
+
+        PanelCatalogo catalogo = new PanelCatalogo(ctx.juegos(), nav, panelDetalle);
+
         PanelMenu panelMenu = new PanelMenu(nav);
 
         PanelInicio panelInicio = new PanelInicio(nav, panelMenu);
 
         PanelLogin panelLogin =
                 new PanelLogin(nav, panelMenu, ctx.usuario());
-
-        PanelCatalogo catalogo =
-                new PanelCatalogo(ctx.juegos());
 
         PanelRegistro registro =
                 new PanelRegistro(nav, ctx.usuario());
@@ -30,6 +31,7 @@ public class UI {
         ventana.agregarPanel("menu", panelMenu);
         ventana.agregarPanel("catalogo", catalogo);
         ventana.agregarPanel("registro", registro);
+        ventana.agregarPanel("detalleJuego", panelDetalle);
 
         ventana.mostrar("inicio");
         ventana.setVisible(true);
