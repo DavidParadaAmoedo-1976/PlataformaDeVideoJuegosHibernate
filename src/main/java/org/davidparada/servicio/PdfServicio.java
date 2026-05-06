@@ -18,12 +18,20 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.enums.EstadoCompraEnum;
+import org.davidparada.modelo.formulario.validacion.ErrorModel;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class PdfServicio {
     private static final Double IVA = 0.21;
@@ -31,14 +39,14 @@ public class PdfServicio {
     public static String generarFacturaPDF(FacturaDto factura) {
 
         // Ruta de las facturas
-        String ruta = "facturas/factura_" + factura.numeroFactura() + "_TeisGame.pdf";
+        String ruta = "documentacion/facturas/" + factura.numeroFactura() + "_TeisGame.pdf";
 
         // Ruta de la imagen
         String rutaImagen = "src/main/resources/imagen/logo.png";
 
         try {
             // Crea directorio
-            new File("facturas").mkdirs();
+            new File("documentacion/facturas").mkdirs();
 
             // CREAR PDF
             PdfWriter writer = new PdfWriter(ruta);
@@ -361,5 +369,30 @@ public class PdfServicio {
                 .add(new Paragraph("\u00a0").setFontSize(10))
                 .setBackgroundColor(color)
                 .setBorder(Border.NO_BORDER));
+    }
+
+
+    public static void moverFacturaReembolsada(FacturaDto factura) {
+        List<ErrorModel> errores = new ArrayList<>();
+        Path origen = Paths.get("documentacion/facturas", factura.numeroFactura() + "_TeisGame.pdf");
+        Path destino = Paths.get("documentacion/facturasReembolsadas", factura.numeroFactura() + "Reembolsada_TeisGame.pdf");
+
+        try {
+            if (!Files.exists(origen)) {
+                System.err.println("El archivo de origen no existe: " + origen.toAbsolutePath());
+                return;
+            }
+            Path directorioDestino = destino.getParent();
+            if (directorioDestino != null && Files.notExists(directorioDestino)) {
+                Files.createDirectories(directorioDestino);
+            }
+
+            Files.move(origen, destino, StandardCopyOption.REPLACE_EXISTING);
+
+            System.out.println("Archivo movido correctamente a: " + destino.getFileName());
+
+        } catch (IOException e) {
+            System.err.println("Error de E/S al mover el archivo: " + e.getMessage());
+        }
     }
 }

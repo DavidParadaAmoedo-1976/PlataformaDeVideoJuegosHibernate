@@ -476,6 +476,10 @@ public class CompraControlador implements ICompraControlador {
                     compraEntidad.getMetodoPago(),
                     compraEntidad.getEstadoCompra());
 
+            if(factura.estadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)) {
+                PdfServicio.moverFacturaReembolsada(factura);
+                return factura;
+            }
             PdfServicio.generarFacturaPDF(factura);
             return factura;
         });
@@ -513,6 +517,19 @@ public class CompraControlador implements ICompraControlador {
         int anio = Instant.now()
                 .atZone(ZoneId.systemDefault())
                 .getYear();
+//        int mes = Instant.now()
+//                .atZone(ZoneId.systemDefault())
+//                .getMonthValue();
+//        int dia = Instant.now()
+//                .atZone(ZoneId.systemDefault())
+//                .getDayOfMonth();
+//        int hora = Instant.now()
+//                .atZone(ZoneId.systemDefault())
+//                .getHour();
+//        int minuto = Instant.now()
+//                .atZone(ZoneId.systemDefault())
+//                .getMinute();
+
         return anio + "-" + String.format("%06d", idCompra);
     }
 }

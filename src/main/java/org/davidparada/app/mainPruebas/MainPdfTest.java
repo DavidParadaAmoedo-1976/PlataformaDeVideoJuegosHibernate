@@ -3,6 +3,7 @@ package org.davidparada.app.mainPruebas;
 import org.davidparada.controlador.BibliotecaControlador;
 import org.davidparada.controlador.CompraControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
+import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.repositorio.implementacionHibernate.BibliotecaRepoHibernate;
 import org.davidparada.repositorio.implementacionHibernate.CompraRepoHibernate;
@@ -47,7 +48,7 @@ public class MainPdfTest {
         PdfServicio pdfService = new PdfServicio();
 
         try {
-            Long idCompra = 5L; // 👈 CAMBIA ESTE ID (compra existente en BD)
+            Long idCompra = 3L; // 👈 CAMBIA ESTE ID (compra existente en BD)
 
             // =========================
             // 🧾 FACTURA
@@ -56,17 +57,20 @@ public class MainPdfTest {
 
             System.out.println("Factura: " + factura);
 
-            // =========================
-            // 📄 PDF
-            // =========================
-            new java.io.File("facturas").mkdirs();
-
-            String ruta = pdfService.generarFacturaPDF(factura);
-
-            System.out.println("PDF generado en: " + ruta);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+//            // =========================
+//            // 📄 PDF
+//            // =========================
+//            new java.io.File("facturas").mkdirs();
+//
+//            String ruta = pdfService.generarFacturaPDF(factura);
+//
+//            System.out.println("PDF generado en: " + ruta);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+    } catch (ValidationException e) {
+            throw new RuntimeException(e);
         }
     }
 }

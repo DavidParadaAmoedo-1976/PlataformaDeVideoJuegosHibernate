@@ -38,15 +38,17 @@ public class GestorTransaccionesHibernate implements IGestorTransacciones, ISess
                 throw e;
             }
 
-        } catch (ValidationException ve) {
-            throw ve;
-        } catch (Exception e) {
-            try {
-                return (T) Optional.empty();
-            } catch (ClassCastException ex) {
-                return null;
-            }
-        } finally {
+        }
+//        catch (ValidationException ve) {
+//            throw ve;
+//        } catch (Exception e) {
+//            try {
+//                return (T) Optional.empty();
+//            } catch (ClassCastException ex) {
+//                return null;
+//            }
+//        }
+        finally {
             session = null;
         }
     }

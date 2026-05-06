@@ -76,8 +76,8 @@ public class MainCompra {
             // 👤 1. CREAR USUARIO
             // =========================
             UsuarioForm usuario = new UsuarioForm(
-                    "userCompra8",
-                    "compra8@email.com",
+                    "userCompra2",
+                    "compra2@email.com",
                     "1234Password",
                     "Nombre Para Factura",
                     PaisEnum.ESPANA,
@@ -112,7 +112,6 @@ public class MainCompra {
             System.out.println(compra);
 
             pausa();
-
             Long idCompra = compra.idCompra();
 
             // =========================
