@@ -44,10 +44,10 @@ build/
 # Excluir archivos de configuración de IntelliJ
 .idea/
 
-# Excluir la carpeta de pruebas principales
-src/main/java/org/davidparada/app.mainPruebas/
+# Ignorar la carpeta de pruebas main (ruta corregida)
+src/main/java/org/davidparada/app/mainPruebas/
 
 # Excluir el contenido de la carpeta test
 src/test/java/controlador/
-src/test/java/davidparada/
+src/test/java/org/davidparada/
 src/test/java/repositorio/
