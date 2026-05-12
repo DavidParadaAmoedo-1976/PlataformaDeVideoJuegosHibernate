@@ -39,7 +39,12 @@ public class PdfServicio {
     public static String generarFacturaPDF(FacturaDto factura) {
 
         // Ruta de las facturas
-        String ruta = "documentacion/facturas/" + factura.numeroFactura() + "_TeisGame.pdf";
+        String ruta;
+        if(factura.estadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)) {
+            ruta = "documentacion/facturas/" + "R" + factura.numeroFactura() + "_TeisGame.pdf";
+        } else {
+            ruta = "documentacion/facturas/" + factura.numeroFactura() + "_TeisGame.pdf";
+        }
 
         // Ruta de la imagen
         String rutaImagen = "src/main/resources/imagen/logo.png";
@@ -374,8 +379,14 @@ public class PdfServicio {
 
     public static void moverFacturaReembolsada(FacturaDto factura) {
         List<ErrorModel> errores = new ArrayList<>();
+
+        // Crea directorio
+        new File("documentacion/facturasReembolsadas").mkdirs();
+
         Path origen = Paths.get("documentacion/facturas", factura.numeroFactura() + "_TeisGame.pdf");
         Path destino = Paths.get("documentacion/facturasReembolsadas", factura.numeroFactura() + "Reembolsada_TeisGame.pdf");
+
+        generarFacturaPDF(factura);
 
         try {
             if (!Files.exists(origen)) {

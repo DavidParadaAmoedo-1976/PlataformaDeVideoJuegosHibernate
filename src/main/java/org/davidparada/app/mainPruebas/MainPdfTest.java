@@ -48,7 +48,7 @@ public class MainPdfTest {
         PdfServicio pdfService = new PdfServicio();
 
         try {
-            Long idCompra = 3L; // 👈 CAMBIA ESTE ID (compra existente en BD)
+            Long idCompra = 11L; // 👈 CAMBIA ESTE ID (compra existente en BD)
 
             // =========================
             // 🧾 FACTURA

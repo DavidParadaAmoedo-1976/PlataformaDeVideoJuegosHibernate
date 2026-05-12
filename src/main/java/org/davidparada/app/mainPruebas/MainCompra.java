@@ -176,9 +176,6 @@ public class MainCompra {
             // Generar PDF
             PdfServicio pdfService = new PdfServicio();
 
-            // Crear carpeta si no existe
-            new java.io.File("facturas").mkdirs();
-
             String rutaPdf = pdfService.generarFacturaPDF(factura);
 
             System.out.println("📄 PDF generado en: " + rutaPdf);
