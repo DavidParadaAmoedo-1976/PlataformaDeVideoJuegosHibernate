@@ -37,3 +37,17 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Carpetas ignoradas ###
+/documentos/
+
+# Excluir archivos de configuración de IntelliJ
+.idea/
+
+# Excluir la carpeta de pruebas principales
+src/main/java/org/davidparada/app.mainPruebas/
+
+# Excluir el contenido de la carpeta test
+src/test/java/controlador/
+src/test/java/davidparada/
+src/test/java/repositorio/
