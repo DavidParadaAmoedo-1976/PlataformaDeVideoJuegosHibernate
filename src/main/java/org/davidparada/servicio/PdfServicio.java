@@ -41,7 +41,7 @@ public class PdfServicio {
         // Ruta de las facturas
         String ruta;
         if(factura.estadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)) {
-            ruta = "documentacion/facturas/" + "R" + factura.numeroFactura() + "_TeisGame.pdf";
+            ruta = "documentacion/facturas/" + "R-" + factura.numeroFactura() + "_TeisGame.pdf";
         } else {
             ruta = "documentacion/facturas/" + factura.numeroFactura() + "_TeisGame.pdf";
         }

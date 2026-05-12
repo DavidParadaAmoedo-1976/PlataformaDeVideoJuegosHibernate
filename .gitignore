@@ -39,7 +39,7 @@ build/
 .DS_Store
 
 ### Carpetas ignoradas ###
-/documentos/
+/documentacion/
 
 # Excluir archivos de configuración de IntelliJ
 .idea/
