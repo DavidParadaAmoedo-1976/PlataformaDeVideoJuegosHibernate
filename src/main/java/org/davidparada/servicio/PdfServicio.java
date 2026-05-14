@@ -43,7 +43,7 @@ public class PdfServicio {
         if(factura.estadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)) {
             ruta = "documentacion/facturas/" + "R-" + factura.numeroFactura() + "_TeisGame.pdf";
         } else {
-            ruta = "documentacion/facturas/" + factura.numeroFactura() + "_TeisGame.pdf";
+            ruta = "documentacion/facturas/" + "P-" + factura.numeroFactura() + "_TeisGame.pdf";
         }
 
         // Ruta de la imagen
@@ -384,7 +384,7 @@ public class PdfServicio {
         new File("documentacion/facturasReembolsadas").mkdirs();
 
         Path origen = Paths.get("documentacion/facturas", factura.numeroFactura() + "_TeisGame.pdf");
-        Path destino = Paths.get("documentacion/facturasReembolsadas", factura.numeroFactura() + "Reembolsada_TeisGame.pdf");
+        Path destino = Paths.get("documentacion/facturasReembolsadas", "P-" + factura.numeroFactura() + "TeisGame.pdf");
 
         generarFacturaPDF(factura);
 
