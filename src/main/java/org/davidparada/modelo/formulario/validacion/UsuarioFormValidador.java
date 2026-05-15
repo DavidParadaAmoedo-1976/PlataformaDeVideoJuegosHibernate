@@ -69,7 +69,7 @@ public class UsuarioFormValidador {
         ValidacionesComunes.longitudMaxima("nombreReal", form.getNombreReal(), LONGITUD_NOMBRE_REAL_MAXIMA, errores);
 
         // Pais
-        ValidacionesComunes.obligatorio("pais", form.getPais(), errores);
+        ValidacionesComunes.obligatorio("país", form.getPais(), errores);
         if (!errores.isEmpty()) {
             throw new ValidationException(errores);
         }
@@ -90,9 +90,9 @@ public class UsuarioFormValidador {
         }
     }
 
-    private static void validarPaisEnLista(String pais, List<ErrorModel> errores) throws ValidationException {
+    private static void validarPaisEnLista(String pais, List<ErrorModel> errores) {
         if (pais.isBlank()) {
-            errores.add(new ErrorModel("pais", TipoErrorEnum.OBLIGATORIO));
+            errores.add(new ErrorModel("país", TipoErrorEnum.OBLIGATORIO));
         }
         boolean encontrado = false;
         for (PaisEnum p : PaisEnum.values()) {
@@ -102,7 +102,7 @@ public class UsuarioFormValidador {
             }
         }
         if (!encontrado) {
-            errores.add(new ErrorModel("pais", TipoErrorEnum.NO_PERMITIDO));
+            errores.add(new ErrorModel("país", TipoErrorEnum.NO_PERMITIDO));
         }
 
     }

@@ -41,7 +41,7 @@ public class JuegoFormValidador {
         ValidacionesComunes.longitudMaxima("titulo", form.getTitulo(), LONGITUD_MAX_TITULO, errores);
 
         // Descripcion
-        ValidacionesComunes.longitudMaxima("descripcion", form.getDescripcion(), LONGITUD_MAX_DESCRIPCION, errores);
+        ValidacionesComunes.longitudMaxima("descripción", form.getDescripcion(), LONGITUD_MAX_DESCRIPCION, errores);
 
         // Desarrollador
         ValidacionesComunes.obligatorio("desarrollador", form.getDesarrollador(), errores);

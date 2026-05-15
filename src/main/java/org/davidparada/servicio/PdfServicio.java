@@ -16,8 +16,10 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
+import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.enums.EstadoCompraEnum;
+import org.davidparada.modelo.enums.TipoErrorEnum;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
 
 import java.io.File;
@@ -32,11 +34,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
 
 public class PdfServicio {
     private static final Double IVA = 0.21;
 
-    public static String generarFacturaPDF(FacturaDto factura) {
+    public static String generarFacturaPDF(FacturaDto factura) throws ValidationException {
+        List<ErrorModel> errores = new ArrayList<>();
 
         // Ruta de las facturas
         String ruta;
@@ -97,7 +101,7 @@ public class PdfServicio {
             Cell datosFactura = new Cell()
                     .add(new Paragraph(new Text("Nº Factura").setTextAlignment(TextAlignment.CENTER)).setBold())
                     .add(new Paragraph(factura.numeroFactura()).setTextAlignment(TextAlignment.CENTER))
-                    .add(new Paragraph(new Text("Fecha de emision").setTextAlignment(TextAlignment.CENTER)).setBold())
+                    .add(new Paragraph(new Text("Fecha de emisión").setTextAlignment(TextAlignment.CENTER)).setBold())
                     .add(new Paragraph(fecha).setTextAlignment(TextAlignment.CENTER))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setBorder(Border.NO_BORDER)
@@ -344,7 +348,7 @@ public class PdfServicio {
             document.add(tablaDesglose);
 
 
-            // Estado compra
+            // Estado de la compra
             String mensaje = factura.estadoCompra().equals(EstadoCompraEnum.COMPLETADA) ? "PAGADA" : "REEMBOLSADA";
             document.add(new Paragraph().add(new Text(mensaje)
                             .setBold())
@@ -360,12 +364,17 @@ public class PdfServicio {
             System.out.println("PDF generado correctamente");
 
         } catch (FileNotFoundException e) {
-            System.err.println("No se pudo crear el archivo PDF: " + e.getMessage());
+            // System.err.println("No se pudo crear el archivo PDF: " + e.getMessage());
+            errores.add (new ErrorModel("Archivos", TipoErrorEnum.ARCHIVO_NO_CREADO));
         } catch (IOException e) {
-            System.err.println("Error al leer recursos (imagen): " + e.getMessage());
+            // System.err.println("Error al leer recursos (imagen): " + e.getMessage());
+            errores.add(new ErrorModel("Leer recursos", TipoErrorEnum.NO_SE_PUEDE_LEER_ARCHIVO));
         } catch (PdfException e) {
-            System.err.println("Error generando el PDF: " + e.getMessage());
+            // System.err.println("Error generando el PDF: " + e.getMessage());
+            errores.add(new ErrorModel("PDF", TipoErrorEnum.NO_SE_PUEDE_CREAR_PDF));
         }
+
+        comprobarListaErrores(errores);
         return ruta;
     }
 
@@ -377,7 +386,7 @@ public class PdfServicio {
     }
 
 
-    public static void moverFacturaReembolsada(FacturaDto factura) {
+    public static String moverFacturaReembolsada(FacturaDto factura) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
 
         // Crea directorio
@@ -390,8 +399,9 @@ public class PdfServicio {
 
         try {
             if (!Files.exists(origen)) {
-                System.err.println("El archivo de origen no existe: " + origen.toAbsolutePath());
-                return;
+                // System.err.println("El archivo de origen no existe: " + origen.toAbsolutePath());
+                errores.add(new ErrorModel("Archivo", TipoErrorEnum.ARCHIVO_NO_ENCONTRADO));
+                return null;
             }
             Path directorioDestino = destino.getParent();
             if (directorioDestino != null && Files.notExists(directorioDestino)) {
@@ -403,7 +413,10 @@ public class PdfServicio {
             System.out.println("Archivo movido correctamente a: " + destino.getFileName());
 
         } catch (IOException e) {
-            System.err.println("Error de E/S al mover el archivo: " + e.getMessage());
+            // System.err.println("Error de E/S al mover el archivo: " + e.getMessage());
+            errores.add(new ErrorModel("Archivos", TipoErrorEnum.NO_SE_PUEDE_MOVER_ARCHIVO));
         }
+        comprobarListaErrores(errores);
+        return destino.toString();
     }
 }

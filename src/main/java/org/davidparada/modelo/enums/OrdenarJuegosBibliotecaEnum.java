@@ -2,10 +2,10 @@ package org.davidparada.modelo.enums;
 
 public enum OrdenarJuegosBibliotecaEnum {
 
-    ALFABETICO("Alfabetico"),
+    ALFABETICO("Alfabético"),
     TIEMPO_DE_JUEGO("Tiempo de Juego"),
-    ULTIMA_SESION("Ultima sesion"),
-    FECHA_DE_ADQUISICION("Fecha de Adquisicion"),
+    ULTIMA_SESION("Última sesión"),
+    FECHA_DE_ADQUISICION("Fecha de Adquisición"),
     ;
 
     private final String descripcion;

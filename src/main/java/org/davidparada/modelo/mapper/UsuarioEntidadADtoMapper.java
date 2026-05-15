@@ -18,7 +18,6 @@ public class UsuarioEntidadADtoMapper {
                 usuario.getIdUsuario(),
                 usuario.getNombreUsuario(),
                 usuario.getEmail(),
-//                usuario.getPassword(),
                 usuario.getNombreReal(),
                 usuario.getPais(),
                 usuario.getFechaNacimiento(),

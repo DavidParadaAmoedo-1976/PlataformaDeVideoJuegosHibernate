@@ -3,7 +3,6 @@ package org.davidparada.modelo.formulario.validacion;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.enums.TipoErrorEnum;
 import org.davidparada.modelo.formulario.BibliotecaForm;
-import org.davidparada.repositorio.interfaceRepositorio.IBibliotecaRepo;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.List;
 
 public class BibliotecaFormValidador {
     public static final int MAXIMO_DE_DECIMALES_UNO = 1;
-    private static IBibliotecaRepo bibliotecaRepo;
 
     private BibliotecaFormValidador() {
     }
@@ -34,7 +32,7 @@ public class BibliotecaFormValidador {
 
         // Tiempo de juego total
         ValidacionesComunes.valorNoNegativo("horasDeJuego", form.getHorasDeJuego(), errores);
-        validarUnSoloDecimal("horasDeJuego", form.getHorasDeJuego(), errores);
+        validarUnSoloDecimal(form.getHorasDeJuego(), errores);
 
         // Ultima fecha de juego
 
@@ -47,12 +45,12 @@ public class BibliotecaFormValidador {
 
 
 
-    private static void validarUnSoloDecimal(String campo, Double valor, List<ErrorModel> errores) {
+    private static void validarUnSoloDecimal(Double valor, List<ErrorModel> errores) {
         if (valor == null) {
             return;
         }
         if (BigDecimal.valueOf(valor).scale() > MAXIMO_DE_DECIMALES_UNO) {
-            errores.add(new ErrorModel(campo, TipoErrorEnum.FORMATO_INVALIDO));
+            errores.add(new ErrorModel("horasDeJuego", TipoErrorEnum.FORMATO_INVALIDO));
         }
     }
 }

@@ -6,14 +6,12 @@ import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.CompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
-import org.davidparada.modelo.dto.JuegoDto;
 import org.davidparada.modelo.entidad.BibliotecaEntidad;
 import org.davidparada.modelo.entidad.CompraEntidad;
 import org.davidparada.modelo.entidad.JuegoEntidad;
 import org.davidparada.modelo.entidad.UsuarioEntidad;
 import org.davidparada.modelo.enums.*;
 import org.davidparada.modelo.formulario.CompraForm;
-import org.davidparada.modelo.formulario.JuegoForm;
 import org.davidparada.modelo.formulario.UsuarioForm;
 import org.davidparada.modelo.formulario.validacion.CompraFormValidador;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;
@@ -34,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.davidparada.controlador.JuegoControlador.DESCUENTO_MAXIMO;
-import static org.davidparada.controlador.JuegoControlador.DESCUENTO_MINIMO;
 import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
 
 public class CompraControlador implements ICompraControlador {
@@ -435,18 +431,17 @@ public class CompraControlador implements ICompraControlador {
             // Quitar juego de la biblioteca
             bibliotecaControlador.eliminarJuego(compraEntidad.getIdUsuario(), compraEntidad.getIdJuego());
 
-//            // Modificar Factura
-//            generarFactura(idCompra);
+
 
             return CompraEntidadADtoMapper.compraEntidadADto(compraActualizada.get(), usuarioEntidad, juegoEntidad);
         });
-//        generarFactura(compraDto.idCompra());
+
         return compraDto;
     }
 
     // Generar factura
     @Override
-    public FacturaDto generarFactura(Long idCompra) throws ValidationException {
+    public String generarFactura(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
         if (idCompra == null) {
             errores.add(new ErrorModel("idCompra", TipoErrorEnum.OBLIGATORIO));
@@ -477,11 +472,10 @@ public class CompraControlador implements ICompraControlador {
                     compraEntidad.getEstadoCompra());
 
             if(factura.estadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)) {
-                PdfServicio.moverFacturaReembolsada(factura);
-                return factura;
+                return PdfServicio.moverFacturaReembolsada(factura);
+
             }
-            PdfServicio.generarFacturaPDF(factura);
-            return factura;
+            return PdfServicio.generarFacturaPDF(factura);
         });
     }
 
@@ -517,19 +511,6 @@ public class CompraControlador implements ICompraControlador {
         int anio = Instant.now()
                 .atZone(ZoneId.systemDefault())
                 .getYear();
-//        int mes = Instant.now()
-//                .atZone(ZoneId.systemDefault())
-//                .getMonthValue();
-//        int dia = Instant.now()
-//                .atZone(ZoneId.systemDefault())
-//                .getDayOfMonth();
-//        int hora = Instant.now()
-//                .atZone(ZoneId.systemDefault())
-//                .getHour();
-//        int minuto = Instant.now()
-//                .atZone(ZoneId.systemDefault())
-//                .getMinute();
-
         return anio + "-" + String.format("%06d", idCompra);
     }
 }

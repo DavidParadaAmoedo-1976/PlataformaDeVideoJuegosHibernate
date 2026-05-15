@@ -4,10 +4,10 @@ import java.time.Instant;
 
 public class ReporteVentasDto {
 
-    private Instant fechaInicio;
-    private Instant fechaFin;
-    private Integer totalVentas;
-    private Double ingresosTotales;
+    private final Instant fechaInicio;
+    private final Instant fechaFin;
+    private final Integer totalVentas;
+    private final Double ingresosTotales;
 
     public ReporteVentasDto(Instant fechaInicio,
                             Instant fechaFin,

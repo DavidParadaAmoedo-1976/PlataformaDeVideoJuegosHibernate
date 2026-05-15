@@ -2,9 +2,9 @@ package org.davidparada.modelo.dto;
 
 public class JuegosPopularesDto {
 
-    private Integer posicion;
-    private JuegoDto juego;
-    private Double metricaPrincipal;
+    private final Integer posicion;
+    private final JuegoDto juego;
+    private final Double metricaPrincipal;
 
     public JuegosPopularesDto(Integer posicion,
                               JuegoDto juego,

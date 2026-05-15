@@ -80,5 +80,5 @@ public interface ICompraControlador {
      * @return muestra un objeto DTO.
      * @throws ValidationException
      */
-    FacturaDto generarFactura(Long idCompra) throws ValidationException;
+    String generarFactura(Long idCompra) throws ValidationException;
 }

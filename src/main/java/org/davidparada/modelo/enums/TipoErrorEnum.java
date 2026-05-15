@@ -15,8 +15,13 @@ public enum TipoErrorEnum {
     SALDO_INSUFICIENTE("Saldo insuficiente"),
     NO_COINCIDE("No coincide"),
     NO_DISPONIBLE("No disponible"),
-    OTRO("Otro"),
-    LISTA_VACIA("Lista vacia");
+    LISTA_VACIA("Lista vacía"),
+    ARCHIVO_NO_ENCONTRADO("Archivo no encontrado"),
+    ARCHIVO_NO_CREADO("Archivo no creado"),
+    NO_SE_PUEDE_LEER_ARCHIVO("No se puede leer archivo"),
+    NO_SE_PUEDE_CREAR_PDF("No se puede crear PDF"),
+    NO_SE_PUEDE_MOVER_ARCHIVO("No se puede mover archivo"),
+    OTRO("Otro");
 
     private final String descripcion;
 

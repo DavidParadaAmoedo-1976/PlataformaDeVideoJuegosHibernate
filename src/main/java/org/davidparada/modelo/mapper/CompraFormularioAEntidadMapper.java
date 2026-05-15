@@ -8,9 +8,6 @@ import java.time.Instant;
 
 public class CompraFormularioAEntidadMapper {
 
-    public static final int DESCUENTO_POR_DEFECTO = 0;
-    public static final double REDONDEO = 100.0;
-
     private CompraFormularioAEntidadMapper() {
     }
 
@@ -33,8 +30,6 @@ public class CompraFormularioAEntidadMapper {
     }
 
     public static CompraEntidad actualizarCompraEntidad(Long idCompra, CompraForm formulario) {
-//
-//        double precioBase = redondear(formulario.getPrecioBase());
 
         return new CompraEntidad(
                 idCompra,
@@ -47,8 +42,4 @@ public class CompraFormularioAEntidadMapper {
                 formulario.getEstadoCompra()
         );
     }
-
-//    private static double redondear(double valor) {
-//        return Math.round(valor * REDONDEO) / REDONDEO;
-//    }
 }

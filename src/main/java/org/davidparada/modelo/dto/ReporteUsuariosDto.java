@@ -4,10 +4,10 @@ import java.time.Instant;
 
 public class ReporteUsuariosDto {
 
-    private Instant fechaInicio;
-    private Instant fechaFin;
-    private Integer nuevosUsuarios;
-    private Integer usuariosActivos;
+    private final Instant fechaInicio;
+    private final Instant fechaFin;
+    private final Integer nuevosUsuarios;
+    private final Integer usuariosActivos;
 
     public ReporteUsuariosDto(Instant fechaInicio,
                               Instant fechaFin,

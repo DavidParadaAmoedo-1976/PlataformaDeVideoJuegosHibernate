@@ -139,7 +139,7 @@ public class ProgramaControlador implements IProgramaControlador {
         });
     }
 
-    // Consultar juegos mas populares
+    // Consultar juegos más populares
 
     @Override
     public List<JuegosPopularesDto> consultarJuegosMasPopulares(CriterioPopularidadEnum criterio, Integer limite) throws ValidationException {
@@ -154,13 +154,13 @@ public class ProgramaControlador implements IProgramaControlador {
         comprobarListaErrores(errores);
         Objects.requireNonNull(criterio);
 
-        return gestorTransacciones.inTransaction(() -> {
-            return switch (criterio) {
+        return gestorTransacciones.inTransaction(() ->
+            switch (criterio) {
                 case MAS_VENDIDOS -> juegosMasVendidos(limite);
                 case MEJOR_VALORADOS -> juegosMejorValorados(limite);
                 case MAS_JUGADOS -> juegosMasJugados(limite);
-            };
-        });
+            }
+        );
     }
 
     private List<JuegosPopularesDto> juegosMasVendidos(Integer limite) throws ValidationException {

@@ -37,7 +37,7 @@ public class JuegoControlador implements IJuegoControlador {
         this.gestorTransacciones = gestorTransacciones;
     }
 
-    // Anadir Juego
+    // Añadir Juego
     @Override
     public JuegoDto crearJuego(JuegoForm formulario) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
@@ -92,7 +92,7 @@ public class JuegoControlador implements IJuegoControlador {
                     case ALFABETICO -> juegos.sort(Comparator.comparing(j -> j.getTitulo()));
                     case PRECIO -> juegos.sort(Comparator.comparing(j -> j.getPrecioBase()));
                     case FECHA -> juegos.sort(Comparator.comparing(j -> j.getFechaLanzamiento()));
-                    default -> throw new IllegalArgumentException("No se encontro el tipo de búsqueda");
+                    default -> throw new IllegalArgumentException("No se encontró el tipo de búsqueda");
                 }
             }
 
@@ -185,20 +185,4 @@ public class JuegoControlador implements IJuegoControlador {
             return JuegoEntidadADtoMapper.juegoEntidadADto(juego.orElse(null));
         });
     }
-
-    // Eliminar el juego
-
-    // Método no aparece en la gestion de juego.
-    // Se deja comentado por si hace falta en el futuro.
-//
-//    @Override
-//    public boolean eliminar(Long id) throws ValidationException {
-//        List<ErrorModel> errores = new ArrayList<>();
-//        if (id == null) {
-//            errores.add(new ErrorModel("id", TipoErrorEnum.OBLIGATORIO));
-//        }
-//        obtenerEntidades.obtenerJuego(id, errores);
-//
-//        return juegoRepo.eliminar(id);
-//    }
 }

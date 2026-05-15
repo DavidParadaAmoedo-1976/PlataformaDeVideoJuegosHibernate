@@ -2,7 +2,7 @@ package org.davidparada.modelo.enums;
 
 public enum OrdenarResenaEnum {
     RECIENTES("Recientes"),
-    HORAS_JUGADAS("Mas Horas Jugadas"),
+    HORAS_JUGADAS("Más Horas Jugadas"),
     ACTUALIZADAS("Actualizadas");
     private final String descripcion;
 
