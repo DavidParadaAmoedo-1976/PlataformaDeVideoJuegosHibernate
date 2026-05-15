@@ -384,7 +384,7 @@ public class PdfServicio {
         new File("documentacion/facturasReembolsadas").mkdirs();
 
         Path origen = Paths.get("documentacion/facturas", "P-" + factura.numeroFactura() + "_TeisGame.pdf");
-        Path destino = Paths.get("documentacion/facturasReembolsadas", "P-" + factura.numeroFactura() + "TeisGame.pdf");
+        Path destino = Paths.get("documentacion/facturasReembolsadas", "P-" + factura.numeroFactura() + "_TeisGame.pdf");
 
         generarFacturaPDF(factura);
 
