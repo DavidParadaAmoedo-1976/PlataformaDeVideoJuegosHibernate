@@ -4,6 +4,7 @@ import org.davidparada.controlador.interfaceControlador.IBibliotecaControlador;
 import org.davidparada.controlador.interfaceControlador.ICompraControlador;
 import org.davidparada.controlador.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
+import org.davidparada.modelo.dto.ArchivoInfoDto;
 import org.davidparada.modelo.dto.CompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.entidad.BibliotecaEntidad;
@@ -24,6 +25,7 @@ import org.davidparada.repositorio.interfaceRepositorio.IJuegoRepo;
 import org.davidparada.repositorio.interfaceRepositorio.IUsuarioRepo;
 import org.davidparada.servicio.PdfServicio;
 import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
+import org.davidparada.util.ArchivoUtils;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -441,7 +443,7 @@ public class CompraControlador implements ICompraControlador {
 
     // Generar factura
     @Override
-    public String generarFactura(Long idCompra) throws ValidationException {
+    public ArchivoInfoDto generarFactura(Long idCompra) throws ValidationException {
         List<ErrorModel> errores = new ArrayList<>();
         if (idCompra == null) {
             errores.add(new ErrorModel("idCompra", TipoErrorEnum.OBLIGATORIO));
@@ -471,11 +473,14 @@ public class CompraControlador implements ICompraControlador {
                     compraEntidad.getMetodoPago(),
                     compraEntidad.getEstadoCompra());
 
+            String idArchivo = "Factura" + idCompra;
             if(factura.estadoCompra().equals(EstadoCompraEnum.REEMBOLSADA)) {
-                return PdfServicio.moverFacturaReembolsada(factura);
+                String rutaArchivo = PdfServicio.moverFacturaReembolsada(factura);
+                return ArchivoUtils.crearArchivoInfo(idArchivo, TipoArchivoEnum.FACTURA_REEMBOLSADA, rutaArchivo);
 
             }
-            return PdfServicio.generarFacturaPDF(factura);
+            String rutaArchivo = PdfServicio.generarFacturaPDF(factura);
+            return ArchivoUtils.crearArchivoInfo(idArchivo, TipoArchivoEnum.FACTURA, rutaArchivo);
         });
     }
 

@@ -1,6 +1,7 @@
 package org.davidparada.controlador.interfaceControlador;
 
 import org.davidparada.excepcion.ValidationException;
+import org.davidparada.modelo.dto.ArchivoInfoDto;
 import org.davidparada.modelo.dto.CompraDto;
 import org.davidparada.modelo.dto.FacturaDto;
 import org.davidparada.modelo.dto.JuegoDto;
@@ -80,5 +81,5 @@ public interface ICompraControlador {
      * @return muestra un objeto DTO.
      * @throws ValidationException
      */
-    String generarFactura(Long idCompra) throws ValidationException;
+    ArchivoInfoDto generarFactura(Long idCompra) throws ValidationException;
 }
