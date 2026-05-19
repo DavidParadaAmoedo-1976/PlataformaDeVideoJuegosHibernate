@@ -1,4 +1,4 @@
-package org.davidparada.controlador.util;
+package org.davidparada.util;
 
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.formulario.validacion.ErrorModel;

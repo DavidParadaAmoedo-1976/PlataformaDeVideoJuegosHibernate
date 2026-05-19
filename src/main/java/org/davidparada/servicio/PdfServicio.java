@@ -34,7 +34,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
+import static org.davidparada.util.ComprobarErrores.comprobarListaErrores;
 
 public class PdfServicio {
     private static final Double IVA = 0.21;
@@ -290,8 +290,9 @@ public class PdfServicio {
 
             // Desglose final
 
-            Double precioSinIva = factura.importe() - factura.importe() * IVA;
-            Double iva = factura.importe() * IVA;
+            Double precioSinIva = Math.round(factura.importe() - factura.importe() * IVA) * 100.0 / 100.0;
+            Double iva = Math.round(factura.importe() * IVA) * 100.0 / 100.0;
+
             DeviceRgb sinColor = new DeviceRgb(254, 254, 254);
             float[] columnasDesglose = {2, 1, 1, 1};
             Table tablaDesglose = new Table(UnitValue.createPercentArray(columnasDesglose));

@@ -2,7 +2,7 @@ package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IBibliotecaControlador;
 import org.davidparada.controlador.interfaceControlador.ICompraControlador;
-import org.davidparada.controlador.util.ObtenerEntidadesOptional;
+import org.davidparada.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.ArchivoInfoDto;
 import org.davidparada.modelo.dto.CompraDto;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
+import static org.davidparada.util.ComprobarErrores.comprobarListaErrores;
 
 public class CompraControlador implements ICompraControlador {
 
@@ -508,7 +508,7 @@ public class CompraControlador implements ICompraControlador {
         if (descuento == CERO) {
             return precioBase;
         } else {
-            return precioBase * (UNO - descuento / POR_CIENTO_DOUBLE);
+            return Math.round(precioBase * (UNO - descuento / POR_CIENTO_DOUBLE)) * 100.00 / 100.00;
         }
     }
 

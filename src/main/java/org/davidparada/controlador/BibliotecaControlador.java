@@ -1,7 +1,7 @@
 package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IBibliotecaControlador;
-import org.davidparada.controlador.util.ObtenerEntidadesOptional;
+import org.davidparada.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.BibliotecaDto;
 import org.davidparada.modelo.dto.EstadisticasBibliotecaDto;
@@ -27,7 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
+import static org.davidparada.util.ComprobarErrores.comprobarListaErrores;
 
 public class BibliotecaControlador implements IBibliotecaControlador {
 

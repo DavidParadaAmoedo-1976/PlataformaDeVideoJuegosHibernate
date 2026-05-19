@@ -1,7 +1,7 @@
 package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IProgramaControlador;
-import org.davidparada.controlador.util.ObtenerEntidadesOptional;
+import org.davidparada.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.JuegosPopularesDto;
 import org.davidparada.modelo.dto.ReporteUsuariosDto;
@@ -20,7 +20,7 @@ import org.davidparada.transaciones.interfaceTransaciones.IGestorTransacciones;
 import java.time.Instant;
 import java.util.*;
 
-import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
+import static org.davidparada.util.ComprobarErrores.comprobarListaErrores;
 
 public class ProgramaControlador implements IProgramaControlador {
 

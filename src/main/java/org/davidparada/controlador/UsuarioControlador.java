@@ -1,7 +1,7 @@
 package org.davidparada.controlador;
 
 import org.davidparada.controlador.interfaceControlador.IUsuarioControlador;
-import org.davidparada.controlador.util.ObtenerEntidadesOptional;
+import org.davidparada.util.ObtenerEntidadesOptional;
 import org.davidparada.excepcion.ValidationException;
 import org.davidparada.modelo.dto.UsuarioDto;
 import org.davidparada.modelo.entidad.UsuarioEntidad;
@@ -18,7 +18,7 @@ import org.davidparada.util.EncriptarPassword;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.davidparada.controlador.util.ComprobarErrores.comprobarListaErrores;
+import static org.davidparada.util.ComprobarErrores.comprobarListaErrores;
 
 public class UsuarioControlador implements IUsuarioControlador {
 
