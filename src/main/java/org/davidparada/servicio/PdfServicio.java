@@ -355,7 +355,7 @@ public class PdfServicio {
                     .setFontSize(30)
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFontColor(ColorConstants.RED)
-                    .setMarginTop(175));
+                    .setMarginTop(160));
 
 
             // Cerrar
